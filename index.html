@@ -1,0 +1,136 @@
+---
+layout: default
+---
+{% include header.html %}
+<section class="container" id="base-section">
+	<div class="page-header">
+		<h4>
+			Audio Data
+			<small>
+				modify the data set you will be sorting.
+				preview how the data sounds and set playback options.
+			</small>
+		</h4>
+	</div>
+	<div class="row">
+		<div class="span4">
+			<div>
+				<strong>Volume:</strong>
+				<em id="volume-display" class="pull-right">&nbsp;</em>
+			</div>
+			<div id="volume-container"></div>
+			<div>
+				<strong>Tempo:</strong>
+				<em id="tempo-display" class="pull-right">&nbsp;</em>
+			</div>
+			<div id="tempo-container"></div>
+			<div>
+				<strong>Center Note:</strong>
+				<em id="center-note-display" class="pull-right">&nbsp;</em>
+			</div>
+			<div id="center-note-container"></div>
+			<div>
+				<strong>Data Size:</strong>
+				<em id="data-size-display" class="pull-right">&nbsp;</em>
+			</div>
+			<div id="data-size-container"></div>
+			<div>
+				<strong>Scale:</strong>
+				<em id="scale-display" class="pull-right">&nbsp;</em>
+			</div>
+			<select id="scale-select"></select>
+			<div>&nbsp;</div>
+		</div>
+		<div class="span8">
+			<div id="base-player" class="player-buttons">
+				<span data-action="stop" class="btn btn-mini btn-success">
+					<i class="icon-white icon-stop"></i>
+					Stop
+				</span>
+				<span data-action="play" class="btn btn-mini btn-success">
+					<i class="icon-white icon-step-forward"></i>
+					Play
+				</span>
+				<span data-action="reverse" class="btn btn-mini btn-success">
+					<i class="icon-white icon-step-backward"></i>
+					Reverse
+				</span>
+				<div class="mobile-break">&nbsp;</div>
+				<span data-action="loop" class="btn btn-mini active"><i class="icon-repeat"></i> Loop?</span>
+				<div class="mobile-break">&nbsp;</div>
+				<span id="base-position-count" class="position-count pull-right"></span>
+			</div>
+			<div id="base-chart"><svg id="base-svg"></svg></div>
+			<div class="position-container"></div>
+			<div id="base-buttons">
+				<span class="btn btn-mini btn-primary" data-action="sorted">Sorted</span>
+				<span class="btn btn-mini btn-primary" data-action="reverse">Reverse</span>
+				<span class="btn btn-mini btn-primary" data-action="randomUnique">Random (Unique)</span>
+				<span class="btn btn-mini btn-primary" data-action="randomDupes">Random (Dupes)</span>
+				<span class="btn btn-mini btn-primary" data-action="almostSorted">Almost Sorted</span>
+				<span class="btn btn-mini btn-primary" data-action="fewUnique">Few Unique</span>
+			</div>
+		</div>
+	</div>
+</section>
+<section class="container" id="sort-section">
+	<div class="page-header">
+		<h4>
+			Sorting
+			<small>
+				choose a sorting algorithm to visualize and
+				audibilize how the algorithm works.
+			</small>
+		</h4>
+	</div>
+	<div class="row">
+		<div class="span4">
+			<div id="sort-options-header">
+				<strong>Sort:</strong>
+				<div id="sort-modal-open" class="pull-right btn btn-info btn-mini pull-right">
+					<em id="sort-display">&nbsp;</em>
+					<i class="icon-white icon-info-sign"></i>
+				</div>
+				<div class="clearfix" style="height:1px;overflow:hidden;">&nbsp;</div>
+			</div>
+			<ul id="sort-options" class="nav nav-pills nav-stacked"></ul>
+			<div>
+				<!--
+				<div class="pull-left" style="line-height:30px">
+					<input type="checkbox" style="margin-bottom:10px;margin-right:10px" /> AutoPlay?
+				</div>
+				-->
+				<div id="add-algorithm-btn" class="pull-right btn btn-mini btn-primary">
+					Add Algorithm
+					<i class="icon-white icon-plus-sign"></i>
+				</div>
+			</div>
+		</div>
+		<div class="span8">
+			<div id="sort-player" class="player-buttons">
+				<span id="swap-position-count" class="swap-count pull-left"></span>
+				<div class="mobile-break">&nbsp;</div>
+				<span data-action="stop" class="btn btn-mini btn-success">
+					<i class="icon-white icon-stop"></i>
+					Stop
+				</span>
+				<span data-action="play" class="btn btn-mini btn-success">
+					<i class="icon-white icon-step-forward"></i>
+					Play
+				</span>
+				<span data-action="reverse" class="btn btn-mini btn-success">
+					<i class="icon-white icon-step-backward"></i>
+					Reverse
+				</span>
+				<div class="mobile-break">&nbsp;</div>
+				<span data-action="loop" class="btn btn-mini"><i class="icon-repeat"></i> Loop?</span>
+				<div class="mobile-break">&nbsp;</div>
+				<span id="sort-position-count" class="position-count pull-right"></span>
+			</div>
+			<div id="sort-chart"><svg id="sort-svg"></svg></div>
+			<div class="position-container"></div>
+		</div>
+	</div>
+</section>
+{% include modals.html %}
+{% include footer.html %}

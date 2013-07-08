@@ -1,0 +1,48 @@
+---
+layout: default
+---
+{% include header.html %}
+<section class="container">
+
+	<div class="hero-unit" style="margin-top:40px;text-align:center">
+		<h1>Audio Sort</h1>
+		<p>
+			This app was created as a way to "hear" what sorting algorithms sound like.
+		</p>
+		<p>
+			To accomplish this, it uses a long list of
+			<a href="https://github.com/skratchdot/audio-sort/README.md#Built-With">libraries</a>,
+			and some of the more recent browser features like
+			<a href="http://www.html5rocks.com/en/tutorials/workers/basics/">Web Workers</a>.
+		</p>
+		<p>
+			I plan on adding a few more features, and getting a longer list of default sorting
+			algoritms to choose from.  You can currently tweak the existing algorithms,
+			(or add your own) to hear what small changes sound like.
+		</p>
+		<p>
+			If you have feature requests (or find a bug), please
+			<a href="https://github.com/skratchdot/audio-sort/issues">log an issue at Github</a>.
+			You can also leave <a href="http://skratchdot.com/projects/audio-sort/">comments on the Project Page</a>
+		</p>
+		<p>
+			<a class="btn btn-primary btn-large" href="index.html">
+			Get Started
+			</a>
+		</p>
+	</div>
+
+	<div style="width: 250px; margin: 50px auto 0;">
+		<div class="addthis_toolbox addthis_default_style addthis_32x32_style">
+			<a class="addthis_button_preferred_1"></a>
+			<a class="addthis_button_preferred_2"></a>
+			<a class="addthis_button_preferred_3"></a>
+			<a class="addthis_button_preferred_4"></a>
+			<a class="addthis_button_compact"></a>
+			<a class="addthis_counter addthis_bubble_style"></a>
+		</div>
+	</div>
+
+</section>
+{% assign include_addthis = true %}
+{% include footer.html %}

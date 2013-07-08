@@ -1,0 +1,202 @@
+html, body {
+	height: 100%;
+	background-image: -ms-radial-gradient(center, circle farthest-corner, #ffffff 0%, #fbfefe 100%);
+	background-image: -moz-radial-gradient(center, circle farthest-corner, #ffffff 0%, #fbfefe 100%);
+	background-image: -o-radial-gradient(center, circle farthest-corner, #ffffff 0%, #fbfefe 100%);
+	background-image: -webkit-gradient(radial, center center, 0, center center, 497, color-stop(0, #ffffff), color-stop(1, #fbfefe));
+	background-image: -webkit-radial-gradient(center, circle farthest-corner, #ffffff 0%, #fbfefe 100%);
+	background-image: radial-gradient(circle farthest-corner at center, #ffffff 0%, #fbfefe 100%);
+}
+
+header, footer, svg, #sort-options {
+	background: url(../img/gradient_squares.png) repeat !important;
+}
+
+svg, #sort-options {
+	border: 1px solid #999;
+	border-radius: 5px;
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+	background: #fdfdfd;
+}
+
+:focus {
+	outline: 0 !important;
+}
+
+.page-header {
+	margin: 0 0 10px;
+	padding: 0;
+}
+#center-note-name-display {
+	padding-right: 5px;
+}
+
+#base-chart,
+#sort-chart {
+	height: 200px;
+	padding: 10px 0;
+}
+
+#base-chart svg,
+#sort-chart svg {
+	width: 100%;
+	height: 100%;
+}
+
+#base-chart svg rect,
+#sort-chart svg rect {
+	fill: steelblue;
+	stroke: white;
+}
+
+#sort-chart svg circle {
+	stroke: #333;
+}
+
+#sort-chart svg circle.compare {
+	fill: #FAA732;
+}
+
+#sort-chart svg circle.swap {
+	fill: #5BB75B;
+}
+
+#sort-chart svg circle.mark {
+	fill: #fefefe;
+}
+
+#sort-chart svg circle.markTwo {
+	fill: purple;
+}
+
+#base-chart svg rect.play,
+#sort-chart svg rect.play {
+	fill: #c80000;
+}
+
+#base-player,
+#base-buttons,
+#sort-player {
+	text-align: center;
+}
+
+#base-buttons .btn {
+	margin: 3px 0;
+}
+
+.position-container {
+	margin: 0 2%;
+}
+
+#scale-display {
+	margin-bottom: 3px;
+}
+
+#sort-options {
+	height: 200px;
+	overflow: auto;
+	margin: 0;
+}
+
+#sort-options-header {
+	margin-bottom: 10px;
+}
+
+.btn {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+#wrapper {
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	margin: 0 auto -45px;
+}
+
+#scale-select {
+	width: 100%;
+}
+
+header {
+	background: #e6e6e6;
+	border-bottom:1px solid #999;
+}
+
+header h1 a.home-link {
+	color: #333;
+}
+
+header h1 small a {
+	font-size: 20px;
+	color: #c80000;
+}
+
+header .breadcrumb {
+	background: transparent;
+	border-bottom:2px dotted #ccc;
+	border-radius:0px 0px 0px 0px;
+}
+
+#header-nav ul {
+	float:right;
+}
+
+.mobile-break {
+	display: none;
+	height: 3px;
+	overflow: hidden;
+}
+
+#footer-spacer, footer {
+	position:relative;
+	height: 45px;
+}
+
+footer {
+	bottom:0;
+	left:0;
+	background-color: #e6e6e6;
+}
+
+footer .footer-built-with {
+	margin: 10px;
+	float: left;
+}
+
+footer .footer-copy {
+	margin: 10px;
+	float: right;
+}
+
+footer .footer-copy img {
+	width: 16px;
+	height: 16px;
+}
+
+footer hr {
+	padding: 0;
+	margin: 0;
+	border-color: #999;
+	border-style: inset;
+}
+
+#sort-information, #sort-algorithm, #sort-links, #new-sort-algorithm {
+	min-height: 300px;
+	width: 100%;
+}
+
+#sort-algorithm div.js-editor, #new-sort-algorithm div.js-editor {
+	height: 300px;
+	width: 95%;
+}
+
+#add-algorithm-btn {
+	margin-top: 5px;
+}
