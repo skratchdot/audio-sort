@@ -30,6 +30,8 @@ This app is still being developed, and there's a long [TODO List](TODO.md).
 
 - [chosen](http://harvesthq.github.io/chosen/)
 
+- [JS Beautifier](http://jsbeautifier.org/)
+
 
 ## See Also / Credits
 
