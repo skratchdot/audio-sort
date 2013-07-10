@@ -265,14 +265,16 @@
 		var name = $('#new-sort-name').val(),
 			nameSafe = name.replace(/[^a-zA-Z]/gi, ''),
 			id = nameSafe + '_id_' + (new Date()).getTime();
-		global.sort[id] = new Fn(aceEditor.getValue());
-		global.sort[id].display = name;
-		global.sort[id].stable = true;
-		global.sort[id].best = '';
-		global.sort[id].average = '';
-		global.sort[id].worst = '';
-		global.sort[id].memory = '';
-		global.sort[id].method = '';
+		if ($.trim(name).length) {
+			global.sort[id] = new Fn(aceEditor.getValue());
+			global.sort[id].display = name;
+			global.sort[id].stable = true;
+			global.sort[id].best = '';
+			global.sort[id].average = '';
+			global.sort[id].worst = '';
+			global.sort[id].memory = '';
+			global.sort[id].method = '';
+		}
 		$('#add-algorithm-modal').modal('hide');
 		buildSortOptions('#sort-options');
 	};
