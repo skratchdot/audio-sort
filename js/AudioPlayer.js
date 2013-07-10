@@ -25,14 +25,6 @@
 		_init = function () {
 			options = options || {};
 
-			// we need 2 timbre objects: env & pluck
-			if (!options.hasOwnProperty('env') || !options.hasOwnProperty('pluck')) {
-				throw new Error('Invalid "env" or "pluck" passed to AudioPlayer.create(options)');
-			} else {
-				env = options.env;
-				pluck = options.pluck;
-			}
-
 			// setup some more variables
 			isLooping = options.isLooping || false;
 			isPlaying = options.isPlaying || false;
@@ -45,8 +37,19 @@
 			svg = d3.select('#' + $container.find('svg').attr('id'));
 			onPlayerButtonClickCallback = options.onPlayerButtonClickCallback || null;
 
-			// setup audio interval
+			// setup audio interval and envelopes
+			env = timbre('perc', { a: 50, r: 2500 });
+			pluck = timbre('PluckGen', {
+				env: env,
+				mul: AudioSort.getSelected('volume'),
+				poly: 10
+			}).on('ended', function () {
+				if (!isPlaying) {
+					this.pause();
+				}
+			});
 			interval = timbre('interval', { interval: AudioSort.getSelected('tempo') }, intervalCallback);
+
 			// listen for player button clicks
 			$container.find('.player-buttons').on('click', '.btn', onPlayerButtonClick);
 		};
@@ -261,6 +264,10 @@
 			interval.set({interval: tempo});
 		};
 
+		player.setVolume = function (volume) {
+			pluck.set({mul: volume});
+		};
+
 		player.play = function (reverse) {
 			interval.stop();
 			isPlaying = true;
@@ -272,6 +279,7 @@
 				intervalIndex = 0;
 			}
 			isReverse = reverse === true ? true : false;
+			pluck.play();
 			interval.start();
 		};
 

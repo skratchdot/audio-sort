@@ -504,14 +504,6 @@
 		_init = function () {
 			options = options || {};
 
-			// we need 2 timbre objects: env & pluck
-			if (!options.hasOwnProperty('env') || !options.hasOwnProperty('pluck')) {
-				throw new Error('Invalid "env" or "pluck" passed to AudioPlayer.create(options)');
-			} else {
-				env = options.env;
-				pluck = options.pluck;
-			}
-
 			// setup some more variables
 			isLooping = options.isLooping || false;
 			isPlaying = options.isPlaying || false;
@@ -524,8 +516,19 @@
 			svg = d3.select('#' + $container.find('svg').attr('id'));
 			onPlayerButtonClickCallback = options.onPlayerButtonClickCallback || null;
 
-			// setup audio interval
+			// setup audio interval and envelopes
+			env = timbre('perc', { a: 50, r: 2500 });
+			pluck = timbre('PluckGen', {
+				env: env,
+				mul: AudioSort.getSelected('volume'),
+				poly: 10
+			}).on('ended', function () {
+				if (!isPlaying) {
+					this.pause();
+				}
+			});
 			interval = timbre('interval', { interval: AudioSort.getSelected('tempo') }, intervalCallback);
+
 			// listen for player button clicks
 			$container.find('.player-buttons').on('click', '.btn', onPlayerButtonClick);
 		};
@@ -740,6 +743,10 @@
 			interval.set({interval: tempo});
 		};
 
+		player.setVolume = function (volume) {
+			pluck.set({mul: volume});
+		};
+
 		player.play = function (reverse) {
 			interval.stop();
 			isPlaying = true;
@@ -751,6 +758,7 @@
 				intervalIndex = 0;
 			}
 			isReverse = reverse === true ? true : false;
+			pluck.play();
 			interval.start();
 		};
 
@@ -790,7 +798,7 @@
 		return player;
 	};
 }(this));
-/*global $, timbre, sc, ace, AudioPlayer, Worker */
+/*global $, sc, ace, js_beautify, AudioPlayer, Worker */
 (function (global) {
 	'use strict';
 
@@ -857,7 +865,6 @@
 		onSortModalClick,
 		onAddAlgorithmModalClick,
 		populateSelect,
-		setupAudio,
 		setupPlayers,
 		updateDisplayCache;
 
@@ -944,7 +951,8 @@
 		onSlider('volume', '#volume-display', e, function (val) {
 			return val.toFixed(2);
 		});
-		pluck.set({mul: selected.volume});
+		players.base.setVolume(selected.volume);
+		players.sort.setVolume(selected.volume);
 	};
 
 	onSliderTempo = function (e) {
@@ -1002,12 +1010,31 @@
 		aceEditor = ace.edit(id);
 		aceEditor.setTheme('ace/theme/monokai');
 		aceEditor.getSession().setMode('ace/mode/javascript');
+		aceEditor.getSession().on('changeAnnotation', function () {
+			var i,
+				annotation,
+				annotationsOld = aceEditor.getSession().getAnnotations(),
+				annotationsNew = [],
+				changed = false;
+			for (i = 0; i < annotationsOld.length; i++) {
+				annotation = annotationsOld[i];
+				if (annotation.text === "'AS' is not defined.") {
+					changed = true;
+				} else {
+					annotationsNew.push(annotation);
+				}
+			}
+			if (changed) {
+				aceEditor.getSession().setAnnotations(annotationsNew);
+			}
+		});
 	};
 
 	onSortModalClick = function () {
 		var $modal = $('#sort-modal'),
 			selectedSort = global.sort[selected.sort],
-			fnArray;
+			fnArray,
+			fnText;
 		$modal.find('.sort-name').text(selectedSort.display);
 		$modal.find('.nav-tabs a:first').tab('show');
 		$modal.find('#sort-info-display').html(selectedSort.display || '&nbsp;');
@@ -1019,7 +1046,12 @@
 		$modal.find('#sort-info-method').html(selectedSort.method || '&nbsp;');
 		addAceEditor('#sort-algorithm');
 		fnArray = $.trim(selectedSort.toString()).split('\n');
-		aceEditor.setValue(fnArray.splice(1, fnArray.length - 2).join('\n'));
+		fnText = fnArray.splice(1, fnArray.length - 2).join('\n');
+		fnText = js_beautify(fnText, {
+			indent_size: 1,
+			indent_char: '\t'
+		});
+		aceEditor.setValue(fnText);
 		aceEditor.clearSelection();
 		$modal.modal();
 	};
@@ -1054,11 +1086,6 @@
 
 	getTempoString = function () {
 		return 'bpm' + (parseFloat(selected.tempo) || 120) + ' l16';
-	};
-
-	setupAudio = function () {
-		env = timbre('perc', { a: 50, r: 2500 });
-		pluck = timbre('PluckGen', { env: env, mul: selected.volume, poly: 10 }).play();
 	};
 
 	setupPlayers = function () {
@@ -1199,7 +1226,6 @@
 		// build our sort options
 		buildSortOptions('#sort-options');
 		// setup audio and audio players
-		setupAudio();
 		setupPlayers();
 		// setup base data
 		baseData = global.fn.datagen.randomUnique(selected.dataSize);

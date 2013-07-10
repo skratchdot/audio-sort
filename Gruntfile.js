@@ -57,7 +57,8 @@ module.exports = function(grunt) {
 					'js/_lib/chosen.jquery.js',
 					'js/_lib/subcollider.js',
 					'js/_lib/timbre.js',
-					'js/_lib/d3.v3.js'
+					'js/_lib/d3.v3.js',
+					'js/_lib/js_beautify.js'
 				],
 				dest: 'dist/libs.js'
 			},
