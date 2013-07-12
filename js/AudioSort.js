@@ -37,7 +37,6 @@
 		displayCache = {},
 		baseData = [],
 		maxData = [],
-		autoPlayOnSortEnabled = false,
 		// Web Workers
 		worker = null,
 		workerKey,
@@ -377,7 +376,7 @@
 		if (event.data.key === workerKey) {
 			players.sort.setData(event.data.frames || []);
 			players.sort.goToFirst();
-			if (isSortPlaying || autoPlayOnSortEnabled) {
+			if (isSortPlaying) {
 				clickPlayButton();
 			} 
 		}
@@ -457,9 +456,6 @@
 		$('#base-buttons').on('click', '.btn', onAudioDataButton);
 		$('#sort-options').on('click', 'li', onSortOptionSelected);
 		$('#sort-options [data-sort=' + selected.sort + ']').click();
-		// after we have artificially clicked the default sort, we can
-		// set the autoPlayOnSortEnabled flag so that future click trigger the play button
-		autoPlayOnSortEnabled = true;
 		// update slider selction text
 		updateDisplayCache('#volume-display', selected.volume);
 		updateDisplayCache('#tempo-display', selected.tempo);
