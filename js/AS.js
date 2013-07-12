@@ -158,7 +158,7 @@
 			return [];
 		}
 	};
-	
+
 	AS.length = function () {
 		return _array.length;
 	};
