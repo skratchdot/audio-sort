@@ -24,7 +24,5 @@
 
 - Add "share settings" button which would populate the url based on your current settings
 
-- Clean up the "AS" api. It was rushed. The idea of markers needs to be more generalized.
-
 - Fix the play intervalCallback() function. Shouldn't be looping so much in there. The
   program was running faster before I re-factored a bunch of stuff and added this stupid loop.

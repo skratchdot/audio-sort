@@ -138,7 +138,6 @@
 					AS.swap(i + 1, i);
 					swapped = true;
 				}
-				AS.next();
 			}
 			endIndex--;
 		} while(swapped);
@@ -170,9 +169,7 @@
 				if (secondValue > firstValue) {
 					AS.swap(j, j + 1);
 				}
-				AS.next();
 			}
-			AS.next();
 		}
 	};
 
@@ -187,16 +184,18 @@
 (function (global) {
 	'use strict';
 
+	// a slightly modified version of:
+	// https://raw.github.com/nzakas/computer-science-in-javascript/master/algorithms/sorting/quicksort/quicksort.js
 	global.sort.quick = function () {
 		var partition, quickSort;
 
-		// a slightly modified version of:
-		// https://raw.github.com/nzakas/computer-science-in-javascript/master/algorithms/sorting/quicksort/quicksort.js
 		partition = function (left, right) {
 			var pivotIndex = Math.floor((right + left) / 2),
 				pivotValue = AS.get(pivotIndex),
 				i = left,
 				j = right;
+
+			AS.highlight(i, j, pivotIndex);
 
 			// while the two indices don't match
 			while (i <= j) {
@@ -205,8 +204,6 @@
 				while (AS.get(i) < pivotValue) {
 					AS.play(i, j);
 					AS.mark(i, j);
-					AS.markTwo(pivotIndex);
-					AS.next();
 					i++;
 				}
 
@@ -214,8 +211,6 @@
 				while (AS.get(j) > pivotValue) {
 					AS.play(i, j);
 					AS.mark(i, j);
-					AS.markTwo(pivotIndex);
-					AS.next();
 					j--;
 				}
 
@@ -223,21 +218,19 @@
 				if (i <= j) {
 					AS.play(i, j);
 					AS.mark(i, j);
-					AS.markTwo(pivotIndex);
 					AS.swap(i, j);
-					AS.next();
 					// change indices to continue loop
 					i++;
 					j--;
 				}
 			}
 
+			AS.clearHighlight();
+
 			// this value is necessary for recursion
 			return i;
 		};
 
-		// a slightly modified version of:
-		// https://raw.github.com/nzakas/computer-science-in-javascript/master/algorithms/sorting/quicksort/quicksort.js
 		quickSort = function (left, right) {
 
 			var index, len = AS.length();
@@ -293,13 +286,11 @@
 				if (AS.lt(j, min)) {
 					min = j;
 				}
-				AS.next();
 			}
 			if (i !== min) {
 				AS.swap(i, min);
 			}
 		}
-		AS.next();
     };
 
 	global.sort.selection.display = 'Selection';
@@ -317,8 +308,15 @@
 		// internal arrays
 		_array = [],
 		_frames = [],
+		_token = '',
 		// state
-		needNext = true,
+		recent = {
+			play: [],
+			mark: [],
+			swap: [],
+			compare: [],
+			highlight: []
+		},
 		// counters
 		compareCount = 0,
 		swapCount = 0,
@@ -332,49 +330,68 @@
 	copyObject = function (obj) {
 		var isObject = (typeof obj === 'object'), result;
 		result = {
+			id: isObject ? obj.id : _token + '_' + obj,
 			value: isObject ? obj.value : obj,
 			play: isObject ? obj.play : false,
-			swap: isObject ? obj.swap : false,
-			compare: isObject ? obj.compare : false,
 			mark: isObject ? obj.mark : false,
-			markTwo: isObject ? obj.markTwo : false
+			swap: isObject ? obj.swap : false,
+			justSwapped: isObject ? obj.justSwapped : false,
+			compare: isObject ? obj.compare : false,
+			highlight: isObject ? obj.highlight : false
 		};
 		return result;
 	};
 	
-	frameCheck = function () {
-		if (needNext) {
+	frameCheck = function (type) {
+		if (_frames.length === 0 || (recent.hasOwnProperty(type) && recent[type].length)) {
 			addFrame();
 		}
-		needNext = false;
 	};
 
 	addFrame = function () {
-		var i, copy = [];
+		var i, copy = [], obj;
 		for (i = 0; i < _array.length; i++) {
-			copy.push(copyObject(_array[i]));
+			obj = copyObject(_array[i]);
+			// justSwapped
+			if (recent.swap.indexOf(obj.id) >= 0) {
+				obj.justSwapped = true;
+			}
+			// highlight
+			if (recent.highlight.indexOf(obj.id) >= 0) {
+				obj.highlight = true;
+			}
+			copy.push(obj);
 		}
 		_frames.push({
 			arr: copy,
 			compareCount: compareCount,
 			swapCount: swapCount
 		});
+		recent.play = [];
+		recent.mark = [];
+		recent.swap = [];
+		recent.compare = [];
 	};
 
 	compare = function (one, two) {
-		mark('compare', one);
-		mark('compare', two);
+		mark('compare', [one, two]);
 		compareCount++;
 		_frames[_frames.length - 1].compareCount = compareCount;
 	};
 
-	mark = function (type, index) {
-		var frameIndex, len;
-		frameCheck();
+	mark = function (type, indexes) {
+		var frameIndex, len, i, index;
+		frameCheck(type);
 		frameIndex = _frames.length - 1;
 		len = _frames[frameIndex].arr.length;
-		if (index >= 0 && index < len) {
-			_frames[frameIndex].arr[index][type] = true;
+		for (i = 0; i < indexes.length; i++) {
+			index = indexes[i];
+			if (index >= 0 && index < len) {
+				_frames[frameIndex].arr[index][type] = true;
+				if (recent.hasOwnProperty(type)) {
+					recent[type].push(_frames[frameIndex].arr[index].id);
+				}
+			}
 		}
 	};
 
@@ -382,15 +399,38 @@
 		return _frames;
 	};
 
-	AS.init = function (inputArray) {
+	AS.init = function (inputArray, token) {
 		var i;
 		_array = [];
 		_frames = [];
-		needNext = true;
+		_token = token;
 		compareCount = 0;
 		swapCount = 0;
 		for (i = 0; i < inputArray.length; i++) {
 			_array.push(copyObject(inputArray[i]));
+		}
+	};
+	
+	AS.end = function (token) {
+		var i, lastFrameArray;
+		if (_token === token) {
+			// handle empty frames
+			if (_frames.length === 0) {
+				addFrame();
+			}
+			// handle the case in which last frame doesn't match _array
+			lastFrameArray = _frames[_frames.length - 1].arr;
+			for (i = 0; i < _array.length; i++) {
+				if (_array[i].id !== lastFrameArray) {
+					addFrame();
+					return _frames;
+				}
+			}
+			// we didn't have to artificially add a new frame
+			return _frames;
+		} else {
+			// someone besides the worker was trying to call AS.end();
+			return [];
 		}
 	};
 	
@@ -431,24 +471,20 @@
 	};
 
 	AS.play = function () {
-		var i;
-		for (i = 0; i < arguments.length; i++) {
-			mark('play', arguments[i]);
-		}
+		mark('play', arguments);
 	};
 
 	AS.mark = function () {
-		var i;
-		for (i = 0; i < arguments.length; i++) {
-			mark('mark', arguments[i]);
-		}
+		mark('mark', arguments);
 	};
 
-	AS.markTwo = function () {
-		var i;
-		for (i = 0; i < arguments.length; i++) {
-			mark('markTwo', arguments[i]);
-		}
+	AS.clearHighlight = function () {
+		recent.highlight = [];
+	};
+
+	AS.highlight = function () {
+		AS.clearHighlight();
+		mark('highlight', arguments);
 	};
 	
 	AS.get = function (index) {
@@ -458,8 +494,7 @@
 	AS.swap = function (one, two) {
 		var tempOne, tempTwo;
 		// mark as swapped
-		mark('swap', one);
-		mark('swap', two);
+		mark('swap', [one, two]);
 		// perform swap
 		tempOne = _array[one];
 		tempTwo = _array[two];
@@ -467,12 +502,6 @@
 		_array[two] = tempOne;
 		swapCount++;
 		_frames[_frames.length - 1].swapCount = swapCount;
-		needNext = true;
-	};
-	
-	AS.next = function () {
-		addFrame();
-		needNext = false;
 	};
 
 	global.AS = AS;
@@ -603,7 +632,8 @@
 				rect.exit().remove();
 				
 				// draw our markers
-				drawMarkers(info, 1, 'markTwo');
+				drawMarkers(info, 1, 'highlight');
+				drawMarkers(info, 2, 'justSwapped');
 				drawMarkers(info, 3, 'swap');
 				drawMarkers(info, 4, 'compare');
 				drawMarkers(info, 5, 'mark');
@@ -842,6 +872,8 @@
 		worker = null,
 		workerKey,
 		workerUrl = 'dist/worker.min.js',
+		workerOnMessage,
+		workerOnError,
 		// Functions
 		addAceEditor,
 		onSaveAlgorithmEdit,
@@ -894,10 +926,11 @@
 			objectArray.push({
 				value: baseData[i],
 				play: i === playIndex,
-				swap: false,
-				compare: false,
 				mark: false,
-				markTwo: false
+				swap: false,
+				justSwapped: false,
+				compare: false,
+				highlight: false
 			});
 		}
 		return objectArray;
@@ -970,7 +1003,7 @@
 		onSlider('dataSize', '#data-size-display', e);
 		baseData = maxData.slice(0, selected.dataSize);
 		players.base.setData(getBaseDataAsFrames());
-		doSort(true, false);
+		doSort();
 	};
 
 	onScaleChange = function (e) {
@@ -986,7 +1019,7 @@
 			if (players.base.isPlaying()) {
 				players.base.play();
 			}
-			doSort(true, false);
+			doSort();
 		}
 	};
 
@@ -1000,7 +1033,7 @@
 		$item.addClass('active');
 		updateDisplayCache('#sort-display', $item.text());
 		selected.sort = $item.find('a').data('sort');
-		doSort(true, autoPlayOnSortEnabled);
+		doSort();
 	};
 	
 	addAceEditor = function (container) {
@@ -1065,14 +1098,16 @@
 		var name = $('#new-sort-name').val(),
 			nameSafe = name.replace(/[^a-zA-Z]/gi, ''),
 			id = nameSafe + '_id_' + (new Date()).getTime();
-		global.sort[id] = new Fn(aceEditor.getValue());
-		global.sort[id].display = name;
-		global.sort[id].stable = true;
-		global.sort[id].best = '';
-		global.sort[id].average = '';
-		global.sort[id].worst = '';
-		global.sort[id].memory = '';
-		global.sort[id].method = '';
+		if ($.trim(name).length) {
+			global.sort[id] = new Fn(aceEditor.getValue());
+			global.sort[id].display = name;
+			global.sort[id].stable = true;
+			global.sort[id].best = '';
+			global.sort[id].average = '';
+			global.sort[id].worst = '';
+			global.sort[id].memory = '';
+			global.sort[id].method = '';
+		}
 		$('#add-algorithm-modal').modal('hide');
 		buildSortOptions('#sort-options');
 	};
@@ -1167,28 +1202,34 @@
 		$(chosenSelector).width('100%');
 	};
 
-	doSort = function (moveToFront, startPlaying) {
+	workerOnMessage = function (event) {
+		var isSortPlaying = players.sort.isPlaying();
+		if (event.data.key === workerKey) {
+			players.sort.setData(event.data.frames || []);
+			players.sort.goToFirst();
+			if (isSortPlaying || autoPlayOnSortEnabled) {
+				clickPlayButton();
+			} 
+		}
+	};
+
+	workerOnError = function (event) {
+		console.log(event);
+	};
+
+	doSort = function () {
 		if (typeof Worker === 'undefined') {
 			return;
 		}
 		if (worker !== null) {
+			worker.removeEventListener('message', workerOnMessage, false);
+			worker.removeEventListener('error', workerOnError, false);
 			worker.terminate();
 		}
 		workerKey = (new Date()).getTime();
 		worker = new Worker(workerUrl);
-		worker.addEventListener('message', function (event) {
-			var isSortPlaying = players.sort.isPlaying();
-			if (event.data.key === workerKey) {
-				players.sort.setData(event.data.frames || []);
-
-				if (isSortPlaying || moveToFront) {
-					players.sort.goToFirst();
-				}
-				if (isSortPlaying || startPlaying) {
-					clickPlayButton();
-				} 
-			}
-		}, false);
+		worker.addEventListener('message', workerOnMessage, false);
+		worker.addEventListener('error', workerOnError, false);
 		worker.postMessage({
 			key : workerKey,
 			fn : global.sort[selected.sort].toString(),

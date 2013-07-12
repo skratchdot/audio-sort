@@ -5,8 +5,15 @@
 		// internal arrays
 		_array = [],
 		_frames = [],
+		_token = '',
 		// state
-		needNext = true,
+		recent = {
+			play: [],
+			mark: [],
+			swap: [],
+			compare: [],
+			highlight: []
+		},
 		// counters
 		compareCount = 0,
 		swapCount = 0,
@@ -20,49 +27,68 @@
 	copyObject = function (obj) {
 		var isObject = (typeof obj === 'object'), result;
 		result = {
+			id: isObject ? obj.id : _token + '_' + obj,
 			value: isObject ? obj.value : obj,
 			play: isObject ? obj.play : false,
-			swap: isObject ? obj.swap : false,
-			compare: isObject ? obj.compare : false,
 			mark: isObject ? obj.mark : false,
-			markTwo: isObject ? obj.markTwo : false
+			swap: isObject ? obj.swap : false,
+			justSwapped: isObject ? obj.justSwapped : false,
+			compare: isObject ? obj.compare : false,
+			highlight: isObject ? obj.highlight : false
 		};
 		return result;
 	};
 	
-	frameCheck = function () {
-		if (needNext) {
+	frameCheck = function (type) {
+		if (_frames.length === 0 || (recent.hasOwnProperty(type) && recent[type].length)) {
 			addFrame();
 		}
-		needNext = false;
 	};
 
 	addFrame = function () {
-		var i, copy = [];
+		var i, copy = [], obj;
 		for (i = 0; i < _array.length; i++) {
-			copy.push(copyObject(_array[i]));
+			obj = copyObject(_array[i]);
+			// justSwapped
+			if (recent.swap.indexOf(obj.id) >= 0) {
+				obj.justSwapped = true;
+			}
+			// highlight
+			if (recent.highlight.indexOf(obj.id) >= 0) {
+				obj.highlight = true;
+			}
+			copy.push(obj);
 		}
 		_frames.push({
 			arr: copy,
 			compareCount: compareCount,
 			swapCount: swapCount
 		});
+		recent.play = [];
+		recent.mark = [];
+		recent.swap = [];
+		recent.compare = [];
 	};
 
 	compare = function (one, two) {
-		mark('compare', one);
-		mark('compare', two);
+		mark('compare', [one, two]);
 		compareCount++;
 		_frames[_frames.length - 1].compareCount = compareCount;
 	};
 
-	mark = function (type, index) {
-		var frameIndex, len;
-		frameCheck();
+	mark = function (type, indexes) {
+		var frameIndex, len, i, index;
+		frameCheck(type);
 		frameIndex = _frames.length - 1;
 		len = _frames[frameIndex].arr.length;
-		if (index >= 0 && index < len) {
-			_frames[frameIndex].arr[index][type] = true;
+		for (i = 0; i < indexes.length; i++) {
+			index = indexes[i];
+			if (index >= 0 && index < len) {
+				_frames[frameIndex].arr[index][type] = true;
+				if (recent.hasOwnProperty(type)) {
+					recent[type].push(_frames[frameIndex].arr[index].id);
+				}
+			}
 		}
 	};
 
@@ -70,15 +96,38 @@
 		return _frames;
 	};
 
-	AS.init = function (inputArray) {
+	AS.init = function (inputArray, token) {
 		var i;
 		_array = [];
 		_frames = [];
-		needNext = true;
+		_token = token;
 		compareCount = 0;
 		swapCount = 0;
 		for (i = 0; i < inputArray.length; i++) {
 			_array.push(copyObject(inputArray[i]));
+		}
+	};
+	
+	AS.end = function (token) {
+		var i, lastFrameArray;
+		if (_token === token) {
+			// handle empty frames
+			if (_frames.length === 0) {
+				addFrame();
+			}
+			// handle the case in which last frame doesn't match _array
+			lastFrameArray = _frames[_frames.length - 1].arr;
+			for (i = 0; i < _array.length; i++) {
+				if (_array[i].id !== lastFrameArray) {
+					addFrame();
+					return _frames;
+				}
+			}
+			// we didn't have to artificially add a new frame
+			return _frames;
+		} else {
+			// someone besides the worker was trying to call AS.end();
+			return [];
 		}
 	};
 	
@@ -119,24 +168,20 @@
 	};
 
 	AS.play = function () {
-		var i;
-		for (i = 0; i < arguments.length; i++) {
-			mark('play', arguments[i]);
-		}
+		mark('play', arguments);
 	};
 
 	AS.mark = function () {
-		var i;
-		for (i = 0; i < arguments.length; i++) {
-			mark('mark', arguments[i]);
-		}
+		mark('mark', arguments);
 	};
 
-	AS.markTwo = function () {
-		var i;
-		for (i = 0; i < arguments.length; i++) {
-			mark('markTwo', arguments[i]);
-		}
+	AS.clearHighlight = function () {
+		recent.highlight = [];
+	};
+
+	AS.highlight = function () {
+		AS.clearHighlight();
+		mark('highlight', arguments);
 	};
 	
 	AS.get = function (index) {
@@ -146,8 +191,7 @@
 	AS.swap = function (one, two) {
 		var tempOne, tempTwo;
 		// mark as swapped
-		mark('swap', one);
-		mark('swap', two);
+		mark('swap', [one, two]);
 		// perform swap
 		tempOne = _array[one];
 		tempTwo = _array[two];
@@ -155,12 +199,6 @@
 		_array[two] = tempOne;
 		swapCount++;
 		_frames[_frames.length - 1].swapCount = swapCount;
-		needNext = true;
-	};
-	
-	AS.next = function () {
-		addFrame();
-		needNext = false;
 	};
 
 	global.AS = AS;

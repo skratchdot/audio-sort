@@ -1,16 +1,18 @@
 (function (global) {
 	'use strict';
 
+	// a slightly modified version of:
+	// https://raw.github.com/nzakas/computer-science-in-javascript/master/algorithms/sorting/quicksort/quicksort.js
 	global.sort.quick = function () {
 		var partition, quickSort;
 
-		// a slightly modified version of:
-		// https://raw.github.com/nzakas/computer-science-in-javascript/master/algorithms/sorting/quicksort/quicksort.js
 		partition = function (left, right) {
 			var pivotIndex = Math.floor((right + left) / 2),
 				pivotValue = AS.get(pivotIndex),
 				i = left,
 				j = right;
+
+			AS.highlight(i, j, pivotIndex);
 
 			// while the two indices don't match
 			while (i <= j) {
@@ -19,8 +21,6 @@
 				while (AS.get(i) < pivotValue) {
 					AS.play(i, j);
 					AS.mark(i, j);
-					AS.markTwo(pivotIndex);
-					AS.next();
 					i++;
 				}
 
@@ -28,8 +28,6 @@
 				while (AS.get(j) > pivotValue) {
 					AS.play(i, j);
 					AS.mark(i, j);
-					AS.markTwo(pivotIndex);
-					AS.next();
 					j--;
 				}
 
@@ -37,21 +35,19 @@
 				if (i <= j) {
 					AS.play(i, j);
 					AS.mark(i, j);
-					AS.markTwo(pivotIndex);
 					AS.swap(i, j);
-					AS.next();
 					// change indices to continue loop
 					i++;
 					j--;
 				}
 			}
 
+			AS.clearHighlight();
+
 			// this value is necessary for recursion
 			return i;
 		};
 
-		// a slightly modified version of:
-		// https://raw.github.com/nzakas/computer-science-in-javascript/master/algorithms/sorting/quicksort/quicksort.js
 		quickSort = function (left, right) {
 
 			var index, len = AS.length();

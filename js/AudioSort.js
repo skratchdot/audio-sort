@@ -42,6 +42,8 @@
 		worker = null,
 		workerKey,
 		workerUrl = 'dist/worker.min.js',
+		workerOnMessage,
+		workerOnError,
 		// Functions
 		addAceEditor,
 		onSaveAlgorithmEdit,
@@ -94,10 +96,11 @@
 			objectArray.push({
 				value: baseData[i],
 				play: i === playIndex,
-				swap: false,
-				compare: false,
 				mark: false,
-				markTwo: false
+				swap: false,
+				justSwapped: false,
+				compare: false,
+				highlight: false
 			});
 		}
 		return objectArray;
@@ -170,7 +173,7 @@
 		onSlider('dataSize', '#data-size-display', e);
 		baseData = maxData.slice(0, selected.dataSize);
 		players.base.setData(getBaseDataAsFrames());
-		doSort(true, false);
+		doSort();
 	};
 
 	onScaleChange = function (e) {
@@ -186,7 +189,7 @@
 			if (players.base.isPlaying()) {
 				players.base.play();
 			}
-			doSort(true, false);
+			doSort();
 		}
 	};
 
@@ -200,7 +203,7 @@
 		$item.addClass('active');
 		updateDisplayCache('#sort-display', $item.text());
 		selected.sort = $item.find('a').data('sort');
-		doSort(true, autoPlayOnSortEnabled);
+		doSort();
 	};
 	
 	addAceEditor = function (container) {
@@ -369,28 +372,34 @@
 		$(chosenSelector).width('100%');
 	};
 
-	doSort = function (moveToFront, startPlaying) {
+	workerOnMessage = function (event) {
+		var isSortPlaying = players.sort.isPlaying();
+		if (event.data.key === workerKey) {
+			players.sort.setData(event.data.frames || []);
+			players.sort.goToFirst();
+			if (isSortPlaying || autoPlayOnSortEnabled) {
+				clickPlayButton();
+			} 
+		}
+	};
+
+	workerOnError = function (event) {
+		console.log(event);
+	};
+
+	doSort = function () {
 		if (typeof Worker === 'undefined') {
 			return;
 		}
 		if (worker !== null) {
+			worker.removeEventListener('message', workerOnMessage, false);
+			worker.removeEventListener('error', workerOnError, false);
 			worker.terminate();
 		}
 		workerKey = (new Date()).getTime();
 		worker = new Worker(workerUrl);
-		worker.addEventListener('message', function (event) {
-			var isSortPlaying = players.sort.isPlaying();
-			if (event.data.key === workerKey) {
-				players.sort.setData(event.data.frames || []);
-
-				if (isSortPlaying || moveToFront) {
-					players.sort.goToFirst();
-				}
-				if (isSortPlaying || startPlaying) {
-					clickPlayButton();
-				} 
-			}
-		}, false);
+		worker.addEventListener('message', workerOnMessage, false);
+		worker.addEventListener('error', workerOnError, false);
 		worker.postMessage({
 			key : workerKey,
 			fn : global.sort[selected.sort].toString(),

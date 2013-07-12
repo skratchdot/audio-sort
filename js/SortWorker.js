@@ -16,6 +16,7 @@
 	global.onmessage = function (event) {
 		var Fn = Function,
 			obj = {},
+			token = (new Date()).getTime(),
 			fnArray,
 			frames;
 
@@ -30,13 +31,9 @@
 		obj.fn = new Fn(obj.fn);
 
 		// get result
-		AS.init(obj.arr);
+		AS.init(obj.arr, token);
 		obj.fn();
-		frames = AS.getFrames();
-		if (frames.length === 0) {
-			AS.next();
-			frames = AS.getFrames();
-		}
+		frames = AS.end(token);
 
 		// return result
 		global.postMessage({

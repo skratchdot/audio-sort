@@ -124,7 +124,8 @@
 				rect.exit().remove();
 				
 				// draw our markers
-				drawMarkers(info, 1, 'markTwo');
+				drawMarkers(info, 1, 'highlight');
+				drawMarkers(info, 2, 'justSwapped');
 				drawMarkers(info, 3, 'swap');
 				drawMarkers(info, 4, 'compare');
 				drawMarkers(info, 5, 'mark');

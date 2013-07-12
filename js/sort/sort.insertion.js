@@ -15,9 +15,7 @@
 				if (secondValue > firstValue) {
 					AS.swap(j, j + 1);
 				}
-				AS.next();
 			}
-			AS.next();
 		}
 	};
 

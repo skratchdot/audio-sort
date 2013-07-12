@@ -12,7 +12,6 @@
 					AS.swap(i + 1, i);
 					swapped = true;
 				}
-				AS.next();
 			}
 			endIndex--;
 		} while(swapped);

@@ -7930,19 +7930,23 @@ svg, #sort-options {
 	stroke: #333;
 }
 
+#sort-chart svg circle.mark {
+	fill: #fefefe;
+}
+
 #sort-chart svg circle.compare {
 	fill: #FAA732;
 }
 
 #sort-chart svg circle.swap {
+	fill: yellow;
+}
+
+#sort-chart svg circle.justSwapped {
 	fill: #5BB75B;
 }
 
-#sort-chart svg circle.mark {
-	fill: #fefefe;
-}
-
-#sort-chart svg circle.markTwo {
+#sort-chart svg circle.highlight {
 	fill: purple;
 }
 

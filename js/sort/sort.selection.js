@@ -14,13 +14,11 @@
 				if (AS.lt(j, min)) {
 					min = j;
 				}
-				AS.next();
 			}
 			if (i !== min) {
 				AS.swap(i, min);
 			}
 		}
-		AS.next();
     };
 
 	global.sort.selection.display = 'Selection';
