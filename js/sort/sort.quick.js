@@ -12,20 +12,23 @@
 				i = left,
 				j = right;
 
+			AS.clearHighlight();
+			AS.play(i, j);
+			AS.mark(i, j);
 			AS.highlight(i, j, pivotIndex);
 
 			// while the two indices don't match
 			while (i <= j) {
 
 				// if the item on the left is less than the pivot, continue right
-				while (AS.get(i) < pivotValue) {
+				while (AS.lt(AS.get(i), pivotValue)) {
 					AS.play(i, j);
 					AS.mark(i, j);
 					i++;
 				}
 
 				// if the item on the right is greater than the pivot, continue left
-				while (AS.get(j) > pivotValue) {
+				while (AS.gt(AS.get(j), pivotValue)) {
 					AS.play(i, j);
 					AS.mark(i, j);
 					j--;

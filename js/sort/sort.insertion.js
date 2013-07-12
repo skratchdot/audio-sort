@@ -11,8 +11,7 @@
 			for (j = i - 1; j > -1; j--) {
 				secondValue = AS.get(j);
 				AS.play(j);
-				AS.gt(j, i); // just marking as a compare
-				if (secondValue > firstValue) {
+				if (AS.gt(secondValue, firstValue)) {
 					AS.swap(j, j + 1);
 				}
 			}

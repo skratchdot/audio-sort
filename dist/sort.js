@@ -165,8 +165,7 @@
 			for (j = i - 1; j > -1; j--) {
 				secondValue = AS.get(j);
 				AS.play(j);
-				AS.gt(j, i); // just marking as a compare
-				if (secondValue > firstValue) {
+				if (AS.gt(secondValue, firstValue)) {
 					AS.swap(j, j + 1);
 				}
 			}
@@ -195,20 +194,23 @@
 				i = left,
 				j = right;
 
+			AS.clearHighlight();
+			AS.play(i, j);
+			AS.mark(i, j);
 			AS.highlight(i, j, pivotIndex);
 
 			// while the two indices don't match
 			while (i <= j) {
 
 				// if the item on the left is less than the pivot, continue right
-				while (AS.get(i) < pivotValue) {
+				while (AS.lt(AS.get(i), pivotValue)) {
 					AS.play(i, j);
 					AS.mark(i, j);
 					i++;
 				}
 
 				// if the item on the right is greater than the pivot, continue left
-				while (AS.get(j) > pivotValue) {
+				while (AS.gt(AS.get(j), pivotValue)) {
 					AS.play(i, j);
 					AS.mark(i, j);
 					j--;
@@ -325,12 +327,16 @@
 		compare,
 		copyObject,
 		frameCheck,
+		getIndexFromSortObject,
+		getSortObjects,
 		mark;
 
 	copyObject = function (obj) {
-		var isObject = (typeof obj === 'object'), result;
+		var isObject = (typeof obj === 'object'),
+			rand =  parseInt(Math.random() * 10000000, 10),
+			result;
 		result = {
-			id: isObject ? obj.id : _token + '_' + obj,
+			id: isObject ? obj.id : rand + '_' + obj,
 			value: isObject ? obj.value : obj,
 			play: isObject ? obj.play : false,
 			mark: isObject ? obj.mark : false,
@@ -373,19 +379,42 @@
 		recent.compare = [];
 	};
 
-	compare = function (one, two) {
-		mark('compare', [one, two]);
-		compareCount++;
-		_frames[_frames.length - 1].compareCount = compareCount;
+	getIndexFromSortObject = function (obj) {
+		var i;
+		for (i = 0; i < _array.length; i++) {
+			if (_array[i].id === obj.id) {
+				return i;
+			}
+		}
+		return -1;
 	};
 
-	mark = function (type, indexes) {
-		var frameIndex, len, i, index;
+	getSortObjects = function (inputArray) {
+		var i, current, ret = [];
+		for (i = 0; i < inputArray.length; i++) {
+			current = inputArray[i];
+			if (typeof current === 'number') {
+				current = AS.get(current);
+			}
+			ret.push(current);
+		}
+		return ret;
+	};
+
+	compare = function (one, two) {
+		var sortObjects = mark('compare', [one, two]);
+		compareCount++;
+		_frames[_frames.length - 1].compareCount = compareCount;
+		return sortObjects;
+	};
+
+	mark = function (type, inputArray) {
+		var frameIndex, len, i, index, sortObjects = getSortObjects(inputArray);
 		frameCheck(type);
 		frameIndex = _frames.length - 1;
 		len = _frames[frameIndex].arr.length;
-		for (i = 0; i < indexes.length; i++) {
-			index = indexes[i];
+		for (i = 0; i < sortObjects.length; i++) {
+			index = getIndexFromSortObject(sortObjects[i]);
 			if (index >= 0 && index < len) {
 				_frames[frameIndex].arr[index][type] = true;
 				if (recent.hasOwnProperty(type)) {
@@ -393,6 +422,7 @@
 				}
 			}
 		}
+		return sortObjects;
 	};
 
 	AS.getFrames = function () {
@@ -441,33 +471,33 @@
 	AS.size = AS.length;
 
 	AS.lt = function (one, two) {
-		compare(one, two);
-		return AS.get(one) < AS.get(two);
+		var sortObjects = compare(one, two);
+		return sortObjects[0].value < sortObjects[1].value;
 	};
 
 	AS.lte = function (one, two) {
-		compare(one, two);
-		return AS.get(one) <= AS.get(two);
+		var sortObjects = compare(one, two);
+		return sortObjects[0].value <= sortObjects[1].value;
 	};
 
 	AS.gt = function (one, two) {
-		compare(one, two);
-		return AS.get(one) > AS.get(two);
+		var sortObjects = compare(one, two);
+		return sortObjects[0].value > sortObjects[1].value;
 	};
 
 	AS.gte = function (one, two) {
-		compare(one, two);
-		return AS.get(one) >= AS.get(two);
+		var sortObjects = compare(one, two);
+		return sortObjects[0].value >= sortObjects[1].value;
 	};
 
 	AS.eq = function (one, two) {
-		compare(one, two);
-		return AS.get(one) === AS.get(two);
+		var sortObjects = compare(one, two);
+		return sortObjects[0].value === sortObjects[1].value;
 	};
 
 	AS.neq = function (one, two) {
-		compare(one, two);
-		return AS.get(one) !== AS.get(two);
+		var sortObjects = compare(one, two);
+		return sortObjects[0].value !== sortObjects[1].value;
 	};
 
 	AS.play = function () {
@@ -488,18 +518,20 @@
 	};
 	
 	AS.get = function (index) {
-		return _array[index].value;
+		return copyObject(_array[index]);
 	};
 
 	AS.swap = function (one, two) {
-		var tempOne, tempTwo;
+		var indexOne, indexTwo, tempOne, tempTwo, sortObjects;
 		// mark as swapped
-		mark('swap', [one, two]);
+		sortObjects = mark('swap', [one, two]);
+		indexOne = getIndexFromSortObject(sortObjects[0]);
+		indexTwo = getIndexFromSortObject(sortObjects[1]);
 		// perform swap
-		tempOne = _array[one];
-		tempTwo = _array[two];
-		_array[one] = tempTwo;
-		_array[two] = tempOne;
+		tempOne = _array[indexOne];
+		tempTwo = _array[indexTwo];
+		_array[indexOne] = tempTwo;
+		_array[indexTwo] = tempOne;
 		swapCount++;
 		_frames[_frames.length - 1].swapCount = swapCount;
 	};
