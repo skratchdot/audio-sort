@@ -562,7 +562,7 @@
 			// Functions
 			_init, drawMarkers, drawSvg, ensureIntervalIndex, intervalCallback,
 			getMidiNumber, getMidiNumberHelper, getPlayIndices,
-			getIndexAndValueFromMouse,
+			getIndexAndValueFromMouse, refreshSliderPosition,
 			// Event Listeners
 			onPlayerButtonClick,
 			onPlayerButtonClickCallback,
@@ -782,6 +782,12 @@
 			}
 		};
 
+		refreshSliderPosition = function () {
+			if ($slider.length) {
+				$slider.slider('setValue', intervalIndex);
+			}
+		};
+
 		ensureIntervalIndex = function () {
 			// ensure current index is safe
 			intervalIndex = Math.min(intervalIndex, data.length - 1);
@@ -820,9 +826,7 @@
 			var midi, info, i, currentItem;
 			if (isPlaying) {
 				ensureIntervalIndex();
-				if ($slider.length) {
-					$slider.slider('setValue', intervalIndex);
-				}
+				refreshSliderPosition();
 
 				// play if possible
 				if (data.length > 0) {
@@ -868,6 +872,10 @@
 				player.play();
 			} else if (action === 'reverse') {
 				player.play(true);
+			} else if (action === 'goToFirst') {
+				player.goToFirst();
+			} else if (action === 'goToLast') {
+				player.goToLast();
 			} else if (action === 'loop') {
 				isLooping = !$item.hasClass('active');
 				if (isLooping) {
@@ -876,6 +884,7 @@
 					$item.removeClass('active');
 				}
 			}
+			refreshSliderPosition();
 			if (typeof onPlayerButtonClickCallback === 'function') {
 				onPlayerButtonClickCallback({
 					item: $item,
@@ -915,10 +924,14 @@
 			isPlaying = true;
 			if (reverse === true) {
 				isReverse = true;
-				intervalIndex = data.length - 1;
+				if (intervalIndex <= 0) {
+					intervalIndex = data.length - 1;
+				}
 			} else {
 				isReverse = false;
-				intervalIndex = 0;
+				if (intervalIndex >= data.length - 1) {
+					intervalIndex = 0;
+				}
 			}
 			isReverse = reverse === true ? true : false;
 			pluck.play();
@@ -935,14 +948,12 @@
 		};
 
 		player.goToFirst = function () {
-			isReverse = false;
 			intervalIndex = 0;
 			ensureIntervalIndex();
 			drawSvg();
 		};
 
 		player.goToLast = function () {
-			isReverse = false;
 			intervalIndex = data.length - 1;
 			ensureIntervalIndex();
 			drawSvg();
