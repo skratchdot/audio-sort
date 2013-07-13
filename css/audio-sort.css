@@ -211,3 +211,7 @@ footer hr {
 #add-algorithm-btn {
 	margin-top: 5px;
 }
+
+.table thead th {
+	background: #d9edf7;
+}
