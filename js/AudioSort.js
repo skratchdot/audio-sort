@@ -37,6 +37,9 @@
 		displayCache = {},
 		baseData = [],
 		maxData = [],
+		// Prevent clicks from spawing too many web workers
+		clickTimer = null,
+		clickDelay = 250,
 		// Web Workers
 		worker = null,
 		workerKey,
@@ -184,10 +187,6 @@
 		if (global.fn.datagen.hasOwnProperty(action)) {
 			baseData = global.fn.datagen[action](selected.dataSize);
 			players.base.setData(getBaseDataAsFrames());
-			players.base.goToFirst();
-			if (players.base.isPlaying()) {
-				players.base.play();
-			}
 			doSort();
 		}
 	};
@@ -301,7 +300,10 @@
 			allowHover: true,
 			allowClick: true,
 			onClick: function (index, value) {
-				console.log(index, value);
+				baseData[index] = value;
+				players.base.setData(getBaseDataAsFrames());
+				clearTimeout(clickTimer);
+				clickTimer = setTimeout(doSort, clickDelay);
 			},
 			onPlayerButtonClickCallback: function (e) {
 				if (e.action !== 'loop') {
