@@ -12,6 +12,10 @@ header, footer, svg, #sort-options {
 	background: url(../img/gradient_squares.png) repeat !important;
 }
 
+#base-chart svg {
+	cursor: pointer;
+}
+
 svg, #sort-options {
 	border: 1px solid #999;
 	border-radius: 5px;

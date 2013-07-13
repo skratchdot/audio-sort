@@ -545,10 +545,16 @@
 	global.AudioPlayer.create = function (containerSelector, options) {
 		var player = {},
 			// State Variables
-			isLooping, isPlaying, isReverse,
+			isLooping, isPlaying, isReverse, isClicking = false,
 			intervalIndex, hasMarkers,
+			hoverIndex = -1,
+			hoverValue = -1,
+			clickIndex = -1,
+			clickValue = -1,
+			allowHover, allowClick,
+			onClick,
 			// Cached jQuery items
-			$container, $positionCount, $swapCount, $slider,
+			$container, $svg, $positionCount, $swapCount, $slider,
 			// Cached d3 items
 			svg,
 			// Data
@@ -556,6 +562,7 @@
 			// Functions
 			_init, drawMarkers, drawSvg, ensureIntervalIndex, intervalCallback,
 			getMidiNumber, getMidiNumberHelper, getPlayIndices,
+			getIndexAndValueFromMouse,
 			// Event Listeners
 			onPlayerButtonClick,
 			onPlayerButtonClickCallback,
@@ -570,11 +577,18 @@
 			isPlaying = options.isPlaying || false;
 			isReverse = options.isReverse || false;
 			hasMarkers = options.hasMarkers || false;
+			allowHover = options.allowHover || false;
+			allowClick = options.allowClick || false;
+			onClick = options.onClick;
+			if (typeof onClick !== 'function') {
+				onClick = $.noop;
+			}
 			intervalIndex = 0;
 			$container = $(containerSelector || null);
 			$positionCount = $container.find('.position-count');
 			$swapCount = $container.find('.swap-count');
-			svg = d3.select('#' + $container.find('svg').attr('id'));
+			$svg = $container.find('svg');
+			svg = d3.select('#' + $svg.attr('id'));
 			onPlayerButtonClickCallback = options.onPlayerButtonClickCallback || null;
 
 			// setup audio interval and envelopes
@@ -592,6 +606,93 @@
 
 			// listen for player button clicks
 			$container.find('.player-buttons').on('click', '.btn', onPlayerButtonClick);
+
+			// handle hovers
+			if (allowHover) {
+				$svg.on('mousemove', function (e) {
+					var result = getIndexAndValueFromMouse(e), $rect;
+					if (hoverIndex !== result.index) {
+						hoverIndex = result.index;
+						$rect = $svg.find('rect');
+						$rect.attr('opacity', 1);
+						$rect.eq(hoverIndex).attr('opacity', 0.5);						
+					}
+					hoverValue = result.value;
+					if (isClicking && (hoverIndex !== clickIndex || hoverValue !== clickValue)) {
+						clickIndex = hoverIndex;
+						clickValue = hoverValue;
+						onClick(clickIndex, clickValue);
+					}
+				});
+				$svg.on('mouseout', function () {
+					hoverIndex = -1;
+					$svg.find('rect').attr('opacity', 1);
+				});
+			}
+
+			// handle clicks
+			if (allowClick) {
+				$svg.on('mousedown', function (e) {
+					var result = getIndexAndValueFromMouse(e);
+					e.preventDefault();
+					isClicking = true;
+					clickIndex = result.index;
+					clickValue = result.value;
+					onClick(clickIndex, clickValue);
+				});
+				$svg.on('mouseup', function () {
+					isClicking = false;
+					clickIndex = -1;
+					clickValue = -1;
+				});
+			}
+		};
+
+		getIndexAndValueFromMouse = function (e) {
+			var index, value, $this = $(e.currentTarget),
+				$parent = $this.parent(), parentOffset,
+				relX, relY, w, h, n = 0, min = 0;
+
+			// set relative positions
+			parentOffset = $parent.offset();
+			relX = e.pageX - parentOffset.left;
+			relY = e.pageY - parentOffset.top;
+
+			// account for border/margin/padding
+			relX = relX - parseInt($parent.css('border-left-width'), 10);
+			relX = relX - parseInt($parent.css('margin-left'), 10);
+			relX = relX - parseInt($parent.css('padding-left'), 10);
+			relY = relY - parseInt($parent.css('border-top-width'), 10);
+			relY = relY - parseInt($parent.css('margin-top'), 10);
+			relY = relY - parseInt($parent.css('padding-top'), 10);
+
+			// store widths and heights
+			w = $this.parent().width();
+			h = $this.parent().height();
+
+			// get datasize
+			if (data.length > 0) {
+				n = data[intervalIndex].arr.length;
+				min = n - 1;
+			}
+
+			// set index/value
+			index = Math.floor((relX / w) * n);
+			value = Math.floor((relY / h) * n);
+
+			// account for div/0
+			index = isFinite(index) ? index : 0;
+			value = isFinite(value) ? value : 0;
+
+			// handle offset errors
+			index = Math.min(min, index);
+			value = Math.min(min, value);
+			value = min - value;
+
+			return {
+				index: index,
+				value: value
+			};
 		};
 
 		drawMarkers = function (info, level, property) {
@@ -1160,6 +1261,11 @@
 			pluck: pluck,
 			isLooping: true,
 			hasMarkers: false,
+			allowHover: true,
+			allowClick: true,
+			onClick: function (index, value) {
+				console.log(index, value);
+			},
 			onPlayerButtonClickCallback: function (e) {
 				if (e.action !== 'loop') {
 					players.sort.stop();

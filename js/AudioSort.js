@@ -298,6 +298,11 @@
 			pluck: pluck,
 			isLooping: true,
 			hasMarkers: false,
+			allowHover: true,
+			allowClick: true,
+			onClick: function (index, value) {
+				console.log(index, value);
+			},
 			onPlayerButtonClickCallback: function (e) {
 				if (e.action !== 'loop') {
 					players.sort.stop();
