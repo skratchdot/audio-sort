@@ -12,11 +12,19 @@
 			data = settings.data;
 			svg = settings.svg;
 			$svg = settings.$svg;
-			svg.attr('viewBox', '0 0 ' + data.length + ' ' + data[0].arr.length);
 			svg.attr('preserveAspectRatio', 'none');
+			svg.attr('viewBox', '0 0 ' + data.length + ' ' + data[0].arr.length);
 		};
 
-		flat.draw = function () {
+		flat.draw = function (index) {
+			var info;
+			$svg.empty();
+			
+			// draw it
+			if (data.length > 0) {
+				info = data[index];
+			}
+			return info;
 		};
 
 		_init(settings);

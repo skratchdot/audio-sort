@@ -67,6 +67,7 @@
 		onSliderVolume,
 		onSortOptionSelected,
 		onSortModalClick,
+		onSortVisualizationButton,
 		onAddAlgorithmModalClick,
 		playerButtonCallback,
 		populateSelect,
@@ -256,6 +257,12 @@
 		aceEditor.setValue(fnText);
 		aceEditor.clearSelection();
 		$modal.modal();
+	};
+
+	onSortVisualizationButton = function () {
+		var $this = $(this),
+			type = $this.data('visualization');
+		players.sort.setVisualization(type);
 	};
 
 	onSaveAlgorithmEdit = function () {
@@ -465,6 +472,7 @@
 		$('#save-algorithm-new').on('click', onSaveAlgorithmNew);
 		$('#base-buttons').on('click', '.btn', onAudioDataButton);
 		$('#sort-options').on('click', 'li', onSortOptionSelected);
+		$('.sort-visualization').on('click', onSortVisualizationButton);
 		$('#sort-options [data-sort=' + selected.sort + ']').click();
 		// update slider selction text
 		updateDisplayCache('#volume-display', selected.volume);

@@ -15,7 +15,7 @@
 			// Cached d3 items
 			svg,
 			// Data
-			data, interval, env, pluck, visualization,
+			data, interval, env, pluck, visualization, selectedVisualization = 'bar',
 			// Functions
 			_init, drawSvg, ensureIntervalIndex, intervalCallback,
 			getMidiNumber, getMidiNumberHelper, getPlayIndices,
@@ -261,14 +261,25 @@
 				max: data.length - 1,
 				step: 1
 			}, onSliderPositionChange);
-			visualization = global.visualization.bar({
-				data: data,
-				svg: svg,
-				$svg: $svg,
-				hasMarkers: hasMarkers,
-				onClick: onClick
-			});
-			drawSvg();
+			player.setVisualization(selectedVisualization, true);
+		};
+
+		player.setVisualization = function (visualizationName, forceInit) {
+			var shouldInit = false;
+			if (global.visualization.hasOwnProperty(visualizationName) && selectedVisualization !== visualizationName) {
+				selectedVisualization = visualizationName;
+				shouldInit = true;
+			}
+			if (shouldInit || forceInit) {
+				visualization = global.visualization[selectedVisualization]({
+					data: data,
+					svg: svg,
+					$svg: $svg,
+					hasMarkers: hasMarkers,
+					onClick: onClick
+				});
+				drawSvg();
+			}
 		};
 
 		player.setTempo = function (tempo) {

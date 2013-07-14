@@ -332,6 +332,7 @@
 			data = settings.data;
 			svg = settings.svg;
 			$svg = settings.$svg;
+			$svg.removeAttr('preserveAspectRatio');
 			$svg.removeAttr('viewBox');
 			hasMarkers = settings.hasMarkers;
 			onClick = settings.onClick;
@@ -520,11 +521,19 @@
 			data = settings.data;
 			svg = settings.svg;
 			$svg = settings.$svg;
-			svg.attr('viewBox', '0 0 ' + data.length + ' ' + data[0].arr.length);
 			svg.attr('preserveAspectRatio', 'none');
+			svg.attr('viewBox', '0 0 ' + data.length + ' ' + data[0].arr.length);
 		};
 
-		flat.draw = function () {
+		flat.draw = function (index) {
+			var info;
+			$svg.empty();
+			
+			// draw it
+			if (data.length > 0) {
+				info = data[index];
+			}
+			return info;
 		};
 
 		_init(settings);
@@ -784,7 +793,7 @@
 			// Cached d3 items
 			svg,
 			// Data
-			data, interval, env, pluck, visualization,
+			data, interval, env, pluck, visualization, selectedVisualization = 'bar',
 			// Functions
 			_init, drawSvg, ensureIntervalIndex, intervalCallback,
 			getMidiNumber, getMidiNumberHelper, getPlayIndices,
@@ -1030,14 +1039,25 @@
 				max: data.length - 1,
 				step: 1
 			}, onSliderPositionChange);
-			visualization = global.visualization.bar({
-				data: data,
-				svg: svg,
-				$svg: $svg,
-				hasMarkers: hasMarkers,
-				onClick: onClick
-			});
-			drawSvg();
+			player.setVisualization(selectedVisualization, true);
+		};
+
+		player.setVisualization = function (visualizationName, forceInit) {
+			var shouldInit = false;
+			if (global.visualization.hasOwnProperty(visualizationName) && selectedVisualization !== visualizationName) {
+				selectedVisualization = visualizationName;
+				shouldInit = true;
+			}
+			if (shouldInit || forceInit) {
+				visualization = global.visualization[selectedVisualization]({
+					data: data,
+					svg: svg,
+					$svg: $svg,
+					hasMarkers: hasMarkers,
+					onClick: onClick
+				});
+				drawSvg();
+			}
 		};
 
 		player.setTempo = function (tempo) {
@@ -1163,6 +1183,7 @@
 		onSliderVolume,
 		onSortOptionSelected,
 		onSortModalClick,
+		onSortVisualizationButton,
 		onAddAlgorithmModalClick,
 		playerButtonCallback,
 		populateSelect,
@@ -1352,6 +1373,12 @@
 		aceEditor.setValue(fnText);
 		aceEditor.clearSelection();
 		$modal.modal();
+	};
+
+	onSortVisualizationButton = function () {
+		var $this = $(this),
+			type = $this.data('visualization');
+		players.sort.setVisualization(type);
 	};
 
 	onSaveAlgorithmEdit = function () {
@@ -1561,6 +1588,7 @@
 		$('#save-algorithm-new').on('click', onSaveAlgorithmNew);
 		$('#base-buttons').on('click', '.btn', onAudioDataButton);
 		$('#sort-options').on('click', 'li', onSortOptionSelected);
+		$('.sort-visualization').on('click', onSortVisualizationButton);
 		$('#sort-options [data-sort=' + selected.sort + ']').click();
 		// update slider selction text
 		updateDisplayCache('#volume-display', selected.volume);
