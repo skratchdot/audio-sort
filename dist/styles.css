@@ -8082,6 +8082,11 @@ footer hr {
 	width: 100%;
 }
 
+#sort-information th {
+	text-align: right;
+	width: 100px;
+}
+
 #sort-algorithm div.js-editor, #new-sort-algorithm div.js-editor {
 	height: 300px;
 	width: 95%;
