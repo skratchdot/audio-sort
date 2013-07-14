@@ -68,6 +68,7 @@
 		onSortOptionSelected,
 		onSortModalClick,
 		onAddAlgorithmModalClick,
+		playerButtonCallback,
 		populateSelect,
 		setupPlayers,
 		updateDisplayCache;
@@ -291,6 +292,12 @@
 		return 'bpm' + (parseFloat(selected.tempo) || 120) + ' l16';
 	};
 
+	playerButtonCallback = function (player, action) {
+		if (action === 'play' || action === 'reverse') {
+			player.stop();
+		}
+	};
+
 	setupPlayers = function () {
 		players.base = AudioPlayer.create('#base-section', {
 			env: env,
@@ -306,9 +313,7 @@
 				clickTimer = setTimeout(doSort, clickDelay);
 			},
 			onPlayerButtonClickCallback: function (e) {
-				if (e.action !== 'loop') {
-					players.sort.stop();
-				}
+				playerButtonCallback(players.sort, e.action);
 			}
 		});
 		players.sort = AudioPlayer.create('#sort-section', {
@@ -317,9 +322,7 @@
 			isLooping: true,
 			hasMarkers: true,
 			onPlayerButtonClickCallback: function (e) {
-				if (e.action !== 'loop') {
-					players.base.stop();
-				}
+				playerButtonCallback(players.base, e.action);
 			}
 		});
 	};
