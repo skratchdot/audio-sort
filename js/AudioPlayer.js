@@ -89,7 +89,7 @@
 						visualization.onMouseDown(e);
 					}
 				});
-				$svg.on('mouseup', function (e) {
+				$('body').on('mouseup', function (e) {
 					if (visualization.onMouseUp) {
 						visualization.onMouseUp(e);
 					}
