@@ -305,6 +305,208 @@
 }(this));
 (function (global) {
 	'use strict';
+	global.viz = global.viz || {};
+}(this));
+/*global $ */
+(function (global) {
+	'use strict';
+
+	var hoverIndex = -1,
+		hoverValue = -1,
+		clickIndex = -1,
+		clickValue = -1,
+		isClicking = false;
+
+	global.viz.bar = function (settings) {
+		var bar = {},
+			// settings
+			data, $svg, svg,
+			hasMarkers,
+			onClick,
+			// function
+			_init,
+			drawMarkers,
+			getIndexAndValueFromMouse;
+
+		_init = function (settings) {
+			data = settings.data;
+			svg = settings.svg;
+			$svg = settings.$svg;
+			hasMarkers = settings.hasMarkers;
+			onClick = settings.onClick;
+		};
+
+		drawMarkers = function (info, level, property) {
+			var circle, len, radius, cy;
+			if (hasMarkers) {
+				// select some items
+				circle = svg.selectAll('circle.' + property).data(info.arr);
+				len = info.arr.length;
+	
+				// create
+				circle.enter().append('circle');
+				
+				// determine our radius and our y position
+				radius = 100 / (Math.max(len, 20) * 4);
+				cy = 100 - (level * 10) + '%';
+	
+				// update
+				circle
+					.attr('cy', cy)
+					.attr('cx', function (d, i) {
+						var width = (100 / (len * 2));
+						return (((i / len) * 100) + width) + '%';
+					})
+					.attr('r', function () {
+						return radius + '%';
+					})
+					.attr('class', property)
+					.attr('style', function (d) {
+						return d[property] ? '' : 'display:none';
+					});
+	
+				// exit
+				circle.exit().remove();
+			}
+		};
+	
+		getIndexAndValueFromMouse = function (e) {
+			var index, value, $this = $(e.currentTarget),
+				$parent = $this.parent(), parentOffset,
+				relX, relY, w, h, n = 0, min = 0;
+	
+			// set relative positions
+			parentOffset = $parent.offset();
+			relX = e.pageX - parentOffset.left;
+			relY = e.pageY - parentOffset.top;
+	
+			// account for border/margin/padding
+			relX = relX - parseInt($parent.css('border-left-width'), 10);
+			relX = relX - parseInt($parent.css('margin-left'), 10);
+			relX = relX - parseInt($parent.css('padding-left'), 10);
+			relY = relY - parseInt($parent.css('border-top-width'), 10);
+			relY = relY - parseInt($parent.css('margin-top'), 10);
+			relY = relY - parseInt($parent.css('padding-top'), 10);
+	
+			// store widths and heights
+			w = $this.parent().width();
+			h = $this.parent().height();
+	
+			// get datasize
+			if (data.length > 0) {
+				n = data[0].arr.length;
+				min = n - 1;
+			}
+	
+			// set index/value
+			index = Math.floor((relX / w) * n);
+			value = Math.floor((relY / h) * n);
+	
+			// account for div/0
+			index = isFinite(index) ? index : 0;
+			value = isFinite(value) ? value : 0;
+	
+			// handle offset errors
+			index = Math.min(min, index);
+			value = Math.min(min, value);
+			value = min - value;
+	
+			return {
+				index: index,
+				value: value
+			};
+		};
+		
+		bar.onMouseMove = function (e) {
+			var result = getIndexAndValueFromMouse(e), $rect;
+			if (hoverIndex !== result.index) {
+				hoverIndex = result.index;
+				$rect = $svg.find('rect');
+				$rect.attr('opacity', 1);
+				$rect.eq(hoverIndex).attr('opacity', 0.5);						
+			}
+			hoverValue = result.value;
+			if (isClicking && (hoverIndex !== clickIndex || hoverValue !== clickValue)) {
+				clickIndex = hoverIndex;
+				clickValue = hoverValue;
+				onClick(clickIndex, clickValue);
+			}
+		};
+
+		bar.onMouseOut = function () {
+			hoverIndex = -1;
+			$svg.find('rect').attr('opacity', 1);
+		};
+
+		bar.onMouseDown = function (e) {
+			var result = getIndexAndValueFromMouse(e);
+			e.preventDefault();
+			isClicking = true;
+			clickIndex = result.index;
+			clickValue = result.value;
+			onClick(clickIndex, clickValue);
+		};
+
+		bar.onMouseUp = function () {
+			isClicking = false;
+			clickIndex = -1;
+			clickValue = -1;
+		};
+
+		bar.draw = function (index) {
+			var info, rect, len;
+
+			// draw it
+			if (data.length > 0) {
+				info = data[index];
+
+				// select some items
+				rect = svg.selectAll('rect').data(info.arr);
+				len = info.arr.length;
+
+				// create
+				rect.enter().append('rect');
+
+				// update
+				rect
+					.attr('width', function () {
+						return (100 / len) + '%';
+					})
+					.attr('height', function (d) {
+						return ((100 / len) * (d.value + 1)) + '%';
+					})
+					.attr('x', function (d, i) {
+						return ((i / len) * 100) + '%';
+					})
+					.attr('y', function (d) {
+						return (100 - ((100 / len) * (d.value + 1))) + '%';
+					})
+					.attr('class', function (d) {
+						return d.play ? 'play' : '';
+					});
+
+				// exit
+				rect.exit().remove();
+
+				// draw our markers
+				drawMarkers(info, 1, 'highlight');
+				drawMarkers(info, 2, 'justSwapped');
+				drawMarkers(info, 3, 'swap');
+				drawMarkers(info, 4, 'compare');
+				drawMarkers(info, 5, 'mark');
+				//drawMarkers(info, 5, 'play');
+			}
+
+			return info;
+		};
+
+		_init(settings);
+		return bar;
+	};
+
+}(this));
+(function (global) {
+	'use strict';
 
 	var AS = {},
 		// internal arrays
@@ -545,24 +747,18 @@
 	global.AudioPlayer.create = function (containerSelector, options) {
 		var player = {},
 			// State Variables
-			isLooping, isPlaying, isReverse, isClicking = false,
-			intervalIndex, hasMarkers,
-			hoverIndex = -1,
-			hoverValue = -1,
-			clickIndex = -1,
-			clickValue = -1,
-			allowHover, allowClick,
-			onClick,
+			isLooping, isPlaying, isReverse,
+			intervalIndex, hasMarkers, allowHover, allowClick, onClick,
 			// Cached jQuery items
 			$container, $svg, $positionCount, $swapCount, $slider,
 			// Cached d3 items
 			svg,
 			// Data
-			data, interval, env, pluck,
+			data, interval, env, pluck, visualization,
 			// Functions
-			_init, drawMarkers, drawSvg, ensureIntervalIndex, intervalCallback,
+			_init, drawSvg, ensureIntervalIndex, intervalCallback,
 			getMidiNumber, getMidiNumberHelper, getPlayIndices,
-			getIndexAndValueFromMouse, refreshSliderPosition,
+			refreshSliderPosition,
 			// Event Listeners
 			onPlayerButtonClick,
 			onPlayerButtonClickCallback,
@@ -610,168 +806,43 @@
 			// handle hovers
 			if (allowHover) {
 				$svg.on('mousemove', function (e) {
-					var result = getIndexAndValueFromMouse(e), $rect;
-					if (hoverIndex !== result.index) {
-						hoverIndex = result.index;
-						$rect = $svg.find('rect');
-						$rect.attr('opacity', 1);
-						$rect.eq(hoverIndex).attr('opacity', 0.5);						
-					}
-					hoverValue = result.value;
-					if (isClicking && (hoverIndex !== clickIndex || hoverValue !== clickValue)) {
-						clickIndex = hoverIndex;
-						clickValue = hoverValue;
-						onClick(clickIndex, clickValue);
+					if (visualization.onMouseMove) {
+						visualization.onMouseMove(e);
 					}
 				});
-				$svg.on('mouseout', function () {
-					hoverIndex = -1;
-					$svg.find('rect').attr('opacity', 1);
+				$svg.on('mouseout', function (e) {
+					if (visualization.onMouseOut) {
+						visualization.onMouseOut(e);
+					}
 				});
 			}
 
 			// handle clicks
 			if (allowClick) {
 				$svg.on('mousedown', function (e) {
-					var result = getIndexAndValueFromMouse(e);
-					e.preventDefault();
-					isClicking = true;
-					clickIndex = result.index;
-					clickValue = result.value;
-					onClick(clickIndex, clickValue);
+					if (visualization.onMouseDown) {
+						visualization.onMouseDown(e);
+					}
 				});
-				$svg.on('mouseup', function () {
-					isClicking = false;
-					clickIndex = -1;
-					clickValue = -1;
+				$svg.on('mouseup', function (e) {
+					if (visualization.onMouseUp) {
+						visualization.onMouseUp(e);
+					}
 				});
 			}
-		};
 
-		getIndexAndValueFromMouse = function (e) {
-			var index, value, $this = $(e.currentTarget),
-				$parent = $this.parent(), parentOffset,
-				relX, relY, w, h, n = 0, min = 0;
-
-			// set relative positions
-			parentOffset = $parent.offset();
-			relX = e.pageX - parentOffset.left;
-			relY = e.pageY - parentOffset.top;
-
-			// account for border/margin/padding
-			relX = relX - parseInt($parent.css('border-left-width'), 10);
-			relX = relX - parseInt($parent.css('margin-left'), 10);
-			relX = relX - parseInt($parent.css('padding-left'), 10);
-			relY = relY - parseInt($parent.css('border-top-width'), 10);
-			relY = relY - parseInt($parent.css('margin-top'), 10);
-			relY = relY - parseInt($parent.css('padding-top'), 10);
-
-			// store widths and heights
-			w = $this.parent().width();
-			h = $this.parent().height();
-
-			// get datasize
-			if (data.length > 0) {
-				n = data[intervalIndex].arr.length;
-				min = n - 1;
-			}
-
-			// set index/value
-			index = Math.floor((relX / w) * n);
-			value = Math.floor((relY / h) * n);
-
-			// account for div/0
-			index = isFinite(index) ? index : 0;
-			value = isFinite(value) ? value : 0;
-
-			// handle offset errors
-			index = Math.min(min, index);
-			value = Math.min(min, value);
-			value = min - value;
-
-			return {
-				index: index,
-				value: value
-			};
-		};
-
-		drawMarkers = function (info, level, property) {
-			var circle, len, radius, cy;
-			if (hasMarkers) {
-				// select some items
-				circle = svg.selectAll('circle.' + property).data(info.arr);
-				len = info.arr.length;
-
-				// create
-				circle.enter().append('circle');
-				
-				// determine our radius and our y position
-				radius = 100 / (Math.max(len, 20) * 4);
-				cy = 100 - (level * 10) + '%';
-
-				// update
-				circle
-					.attr('cy', cy)
-					.attr('cx', function (d, i) {
-						var width = (100 / (len * 2));
-						return (((i / len) * 100) + width) + '%';
-					})
-					.attr('r', function () {
-						return radius + '%';
-					})
-					.attr('class', property)
-					.attr('style', function (d) {
-						return d[property] ? '' : 'display:none';
-					});
-
-				// exit
-				circle.exit().remove();
-			}
 		};
 
 		drawSvg = function () {
-			var info, rect, len;
+			var info;
+
+			// make sure we have a valid index
 			ensureIntervalIndex();
-			// draw it
-			if (data.length > 0) {
-				info = data[intervalIndex];
 
-				// select some items
-				rect = svg.selectAll('rect').data(info.arr);
-				len = info.arr.length;
+			// draw our visualization
+			info = visualization.draw(intervalIndex);
 
-				// create
-				rect.enter().append('rect');
-
-				// update
-				rect
-					.attr('width', function () {
-						return (100 / len) + '%';
-					})
-					.attr('height', function (d) {
-						return ((100 / len) * (d.value + 1)) + '%';
-					})
-					.attr('x', function (d, i) {
-						return ((i / len) * 100) + '%';
-					})
-					.attr('y', function (d) {
-						return (100 - ((100 / len) * (d.value + 1))) + '%';
-					})
-					.attr('class', function (d) {
-						return d.play ? 'play' : '';
-					});
-
-				// exit
-				rect.exit().remove();
-				
-				// draw our markers
-				drawMarkers(info, 1, 'highlight');
-				drawMarkers(info, 2, 'justSwapped');
-				drawMarkers(info, 3, 'swap');
-				drawMarkers(info, 4, 'compare');
-				drawMarkers(info, 5, 'mark');
-				//drawMarkers(info, 5, 'play');
-
+			if (info) {
 				// position count
 				$positionCount.text(parseInt(intervalIndex + 1, 10) + ' / ' + data.length);
 
@@ -908,6 +979,13 @@
 				max: data.length - 1,
 				step: 1
 			}, onSliderPositionChange);
+			visualization = global.viz.bar({
+				data: data,
+				svg: svg,
+				$svg: $svg,
+				hasMarkers: hasMarkers,
+				onClick: onClick
+			});
 			drawSvg();
 		};
 
@@ -955,13 +1033,6 @@
 
 		player.goToLast = function () {
 			intervalIndex = data.length - 1;
-			ensureIntervalIndex();
-			drawSvg();
-		};
-
-		player.goToIndex = function (index) {
-			isReverse = false;
-			intervalIndex = index;
 			ensureIntervalIndex();
 			drawSvg();
 		};

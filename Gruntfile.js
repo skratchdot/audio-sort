@@ -16,7 +16,7 @@ module.exports = function(grunt) {
 				src: 'Gruntfile.js'
 			},
 			lib: {
-				src: ['js/*.js', 'js/fn/*.js', 'js/sort/*.js']
+				src: ['js/*.js', 'js/fn/*.js', 'js/sort/*.js', 'js/visualizations/*.js']
 			},
 			test: {
 				src: ['test/**/*.js']
@@ -66,6 +66,7 @@ module.exports = function(grunt) {
 				src: [
 					'js/fn/*.js',
 					'js/sort/*.js',
+					'js/visualizations/*.js',
 					'js/AS.js',
 					'js/AudioPlayer.js',
 					'js/AudioSort.js'
