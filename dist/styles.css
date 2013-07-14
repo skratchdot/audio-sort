@@ -8095,6 +8095,10 @@ footer hr {
 	background: #d9edf7;
 }
 
+.max-divider {
+	border-top: 1px solid #333;
+}
+
 @media (max-width: 979px) {
 }
 

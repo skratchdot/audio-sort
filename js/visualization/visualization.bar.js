@@ -23,6 +23,7 @@
 			data = settings.data;
 			svg = settings.svg;
 			$svg = settings.$svg;
+			$svg.removeAttr('viewBox');
 			hasMarkers = settings.hasMarkers;
 			onClick = settings.onClick;
 		};

@@ -332,6 +332,7 @@
 			data = settings.data;
 			svg = settings.svg;
 			$svg = settings.$svg;
+			$svg.removeAttr('viewBox');
 			hasMarkers = settings.hasMarkers;
 			onClick = settings.onClick;
 		};
@@ -504,6 +505,32 @@
 		return bar;
 	};
 
+}(this));
+(function (global) {
+	'use strict';
+	
+	global.visualization.flat = function (settings) {
+		var flat = {},
+			// settings
+			data, $svg, svg,
+			// functions
+			_init;
+		
+		_init = function (settings) {
+			data = settings.data;
+			svg = settings.svg;
+			$svg = settings.$svg;
+			svg.attr('viewBox', '0 0 ' + data.length + ' ' + data[0].arr.length);
+			svg.attr('preserveAspectRatio', 'none');
+		};
+
+		flat.draw = function () {
+		};
+
+		_init(settings);
+		return flat;
+	};
+	
 }(this));
 (function (global) {
 	'use strict';
@@ -750,7 +777,10 @@
 			isLooping, isPlaying, isReverse,
 			intervalIndex, hasMarkers, allowHover, allowClick, onClick,
 			// Cached jQuery items
-			$container, $svg, $positionCount, $swapCount, $slider,
+			$container, $svg, $slider,
+			$compareCurrent, $compareMax,
+			$swapCurrent, $swapMax,
+			$positionCurrent, $positionMax,
 			// Cached d3 items
 			svg,
 			// Data
@@ -781,8 +811,12 @@
 			}
 			intervalIndex = 0;
 			$container = $(containerSelector || null);
-			$positionCount = $container.find('.position-count');
-			$swapCount = $container.find('.swap-count');
+			$compareCurrent = $container.find('.compare-current');
+			$compareMax = $container.find('.compare-max');
+			$swapCurrent = $container.find('.swap-current');
+			$swapMax = $container.find('.swap-max');
+			$positionCurrent = $container.find('.position-current');
+			$positionMax = $container.find('.position-max');
 			$svg = $container.find('svg');
 			svg = d3.select('#' + $svg.attr('id'));
 			onPlayerButtonClickCallback = options.onPlayerButtonClickCallback || null;
@@ -834,7 +868,7 @@
 		};
 
 		drawSvg = function () {
-			var info;
+			var info, len = data.length, last = len - 1;
 
 			// make sure we have a valid index
 			ensureIntervalIndex();
@@ -843,12 +877,29 @@
 			info = visualization.draw(intervalIndex);
 
 			if (info) {
-				// position count
-				$positionCount.text(parseInt(intervalIndex + 1, 10) + ' / ' + data.length);
-
-				// swap count
-				if ($swapCount.length) {
-					$swapCount.text('c:' + info.compareCount + ' / s:' + info.swapCount);
+				// compare: current
+				if ($compareCurrent.length) {
+					$compareCurrent.text(info.compareCount);
+				}
+				// compare: max
+				if ($compareMax.length) {
+					$compareMax.text(last > 0 ? data[last].compareCount : 0);
+				}
+				// swap: current
+				if ($swapCurrent.length) {
+					$swapCurrent.text(info.swapCount);
+				}
+				// swap: max
+				if ($swapMax.length) {
+					$swapMax.text(last > 0 ? data[last].swapCount : 0);
+				}
+				// position: current
+				if ($positionCurrent.length) {
+					$positionCurrent.text(intervalIndex + 1);
+				}
+				// position: max
+				if ($positionMax.length) {
+					$positionMax.text(len);
 				}
 			}
 		};
@@ -1359,7 +1410,7 @@
 		players.sort = AudioPlayer.create('#sort-section', {
 			env: env,
 			pluck: pluck,
-			isLooping: false,
+			isLooping: true,
 			hasMarkers: true,
 			onPlayerButtonClickCallback: function (e) {
 				if (e.action !== 'loop') {

@@ -219,3 +219,7 @@ footer hr {
 .table thead th {
 	background: #d9edf7;
 }
+
+.max-divider {
+	border-top: 1px solid #333;
+}
