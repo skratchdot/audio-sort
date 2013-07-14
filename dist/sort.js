@@ -305,7 +305,7 @@
 }(this));
 (function (global) {
 	'use strict';
-	global.viz = global.viz || {};
+	global.visualization = global.visualization || {};
 }(this));
 /*global $ */
 (function (global) {
@@ -317,7 +317,7 @@
 		clickValue = -1,
 		isClicking = false;
 
-	global.viz.bar = function (settings) {
+	global.visualization.bar = function (settings) {
 		var bar = {},
 			// settings
 			data, $svg, svg,
@@ -979,7 +979,7 @@
 				max: data.length - 1,
 				step: 1
 			}, onSliderPositionChange);
-			visualization = global.viz.bar({
+			visualization = global.visualization.bar({
 				data: data,
 				svg: svg,
 				$svg: $svg,

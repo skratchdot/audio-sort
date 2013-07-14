@@ -8,7 +8,7 @@
 		clickValue = -1,
 		isClicking = false;
 
-	global.viz.bar = function (settings) {
+	global.visualization.bar = function (settings) {
 		var bar = {},
 			// settings
 			data, $svg, svg,

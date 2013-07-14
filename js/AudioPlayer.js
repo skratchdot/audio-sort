@@ -237,7 +237,7 @@
 				max: data.length - 1,
 				step: 1
 			}, onSliderPositionChange);
-			visualization = global.viz.bar({
+			visualization = global.visualization.bar({
 				data: data,
 				svg: svg,
 				$svg: $svg,
