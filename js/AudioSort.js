@@ -314,7 +314,7 @@
 		players.sort = AudioPlayer.create('#sort-section', {
 			env: env,
 			pluck: pluck,
-			isLooping: false,
+			isLooping: true,
 			hasMarkers: true,
 			onPlayerButtonClickCallback: function (e) {
 				if (e.action !== 'loop') {
