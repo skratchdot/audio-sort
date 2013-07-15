@@ -33,6 +33,9 @@
 		pluck,
 		// Ace Editor
 		aceEditor,
+		// AutoPlay
+		$sortAutoPlay,
+		triggerAutoPlay = false,
 		// Helper Variables
 		displayCache = {},
 		baseData = [],
@@ -203,6 +206,9 @@
 		$item.addClass('active');
 		updateDisplayCache('#sort-display', $item.text());
 		selected.sort = $item.find('a').data('sort');
+		if ($sortAutoPlay.hasClass('active')) {
+			triggerAutoPlay = true;
+		}
 		doSort();
 	};
 	
@@ -393,10 +399,11 @@
 		if (event.data.key === workerKey) {
 			players.sort.setData(event.data.frames || []);
 			players.sort.goToFirst();
-			if (isSortPlaying) {
+			if (isSortPlaying || triggerAutoPlay) {
 				clickPlayButton();
 			} 
 		}
+		triggerAutoPlay = false;
 	};
 
 	workerOnError = function (event) {
@@ -465,6 +472,8 @@
 		AudioSort.createSlider('#tempo-container', defaults.tempo, onSliderTempo);
 		AudioSort.createSlider('#center-note-container', defaults.centerNote, onSliderCenterNote);
 		AudioSort.createSlider('#data-size-container', defaults.dataSize, onSliderDataSize);
+		// cache a few items
+		$sortAutoPlay = $('#sort-autoplay');
 		// handle button clicks
 		$('#sort-modal-open').on('click', onSortModalClick);
 		$('#add-algorithm-btn').on('click', onAddAlgorithmModalClick);
