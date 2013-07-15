@@ -18,7 +18,7 @@
 			data, interval, env, pluck, visualization, selectedVisualization = 'bar',
 			// Functions
 			_init, drawSvg, ensureIntervalIndex, intervalCallback,
-			getMidiNumber, getMidiNumberHelper, getPlayIndices,
+			getMidiNumber, getMidiNumberHelper,
 			refreshSliderPosition,
 			// Event Listeners
 			onPlayerButtonClick,
@@ -167,14 +167,6 @@
 			return degrees[position % degreeSize] + (Math.floor(position / degreeSize) * octaveSize);
 		};
 
-		getPlayIndices = function (snapshotItem) {
-			var ret = [];
-			if (snapshotItem.indices.length) {
-				ret.push(snapshotItem.indices[0]);
-			}
-			return ret;
-		};
-
 		intervalCallback = function () {
 			var midi, info, i, currentItem;
 			if (isPlaying) {
@@ -269,6 +261,9 @@
 			if (global.visualization.hasOwnProperty(visualizationName) && selectedVisualization !== visualizationName) {
 				selectedVisualization = visualizationName;
 				shouldInit = true;
+			}
+			if (shouldInit) {
+				$svg.empty();
 			}
 			if (shouldInit || forceInit) {
 				visualization = global.visualization[selectedVisualization]({
