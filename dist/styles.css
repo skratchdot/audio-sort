@@ -8030,12 +8030,14 @@ header h1 small a {
 
 header .breadcrumb {
 	background: transparent;
-	border-bottom:2px dotted #ccc;
-	border-radius:0px 0px 0px 0px;
+	margin: 6px 0 12px 0;
+	padding: 0;
+	text-align: right;
 }
 
-#header-nav ul {
-	float:right;
+#social-header {
+	float: right;
+	display: block;
 }
 
 .mobile-break {
@@ -8123,6 +8125,12 @@ footer hr {
 	#header-nav ul.breadcrumb {
 		float: none;
 		border: 0;
+	}
+	#header-nav ul.breadcrumb {
+		text-align: center;
+	}
+	#social-header {
+		display: none;
 	}
 	footer .footer-built-with,
 	footer .footer-copy {

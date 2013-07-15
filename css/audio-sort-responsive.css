@@ -18,6 +18,12 @@
 		float: none;
 		border: 0;
 	}
+	#header-nav ul.breadcrumb {
+		text-align: center;
+	}
+	#social-header {
+		display: none;
+	}
 	footer .footer-built-with,
 	footer .footer-copy {
 		float: none;
