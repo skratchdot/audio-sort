@@ -49,19 +49,6 @@ module.exports = function(grunt) {
 				],
 				dest: 'dist/styles.css'
 			},
-			libs: {
-				src: [
-					'js/_lib/jquery-2.0.3.js',
-					'js/_lib/bootstrap.js',
-					'js/_lib/bootstrap-slider.js',
-					'js/_lib/chosen.jquery.js',
-					'js/_lib/subcollider.js',
-					'js/_lib/timbre.js',
-					'js/_lib/d3.v3.js',
-					'js/_lib/js_beautify.js'
-				],
-				dest: 'dist/libs.js'
-			},
 			sort: {
 				src: [
 					'js/fn/*.js',
@@ -93,7 +80,6 @@ module.exports = function(grunt) {
 		uglify: {
 			dist: {
 				files: {
-					'dist/libs.min.js': ['dist/libs.js'],
 					'dist/sort.min.js': ['dist/sort.js'],
 					'dist/worker.min.js': ['dist/worker.js']
 				}
