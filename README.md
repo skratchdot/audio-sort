@@ -51,7 +51,7 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 - [sorting-algorithms.com](http://www.sorting-algorithms.com/)
 
-- [sortvis.org](http://sortvis.org/index.html/)
+- [sortvis.org](http://sortvis.org/index.html)
 
 - [corte.si](http://corte.si/posts/code/visualisingsorting/index.html)
 
