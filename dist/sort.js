@@ -516,8 +516,10 @@
 			// settings
 			data = [], $svg, svg,
 			flattenedLines = [], numFlattenedLines = 0, frameLength = 0,
+			lines,
 			// functions
 			_init,
+			drawFlattenedLines,
 			initFlattenedLines;
 		
 		_init = function (settings) {
@@ -539,6 +541,7 @@
 			svg.attr('preserveAspectRatio', 'none');
 			svg.attr('viewBox', '0 0 ' + (frameLength - 1) + ' ' + numFlattenedLines);
 			$svg.empty();
+			drawFlattenedLines();
 		};
 
 		initFlattenedLines = function () {
@@ -578,12 +581,8 @@
 			}
 		};
 
-		flat.draw = function (index, playIds) {
-			var info, line, lines;
-			
-			if (typeof playIds === 'undefined') {
-				playIds = [];
-			}
+		drawFlattenedLines = function (index) {
+			var info, line;
 
 			// store info
 			if (data.length > 0) {
@@ -626,6 +625,13 @@
 
 			return info;
 		};
+
+		flat.draw = function (index) {
+			lines.attr('stroke', function (d) {
+				return d.playIndexes.indexOf(index) >= 0 ? '#c80000' : d.color;
+			});
+		};
+		
 
 		_init(settings);
 		return flat;
