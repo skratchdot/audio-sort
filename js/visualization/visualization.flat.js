@@ -1,7 +1,7 @@
 /*global d3 */
 (function (global) {
 	'use strict';
-	
+
 	global.visualization.flat = function (settings) {
 		var flat = {},
 			// settings
@@ -12,7 +12,7 @@
 			_init,
 			drawFlattenedLines,
 			initFlattenedLines;
-		
+
 		_init = function (settings) {
 			data = settings.data;
 			svg = settings.svg;
@@ -123,10 +123,10 @@
 				return d.playIndexes.indexOf(index) >= 0 ? d.playColor : d.dataColor;
 			});
 		};
-		
+
 
 		_init(settings);
 		return flat;
 	};
-	
+
 }(this));

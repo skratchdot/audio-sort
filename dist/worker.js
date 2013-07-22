@@ -42,7 +42,7 @@
 		};
 		return result;
 	};
-	
+
 	frameCheck = function (type) {
 		if (_frames.length === 0 || (recent.hasOwnProperty(type) && recent[type].length)) {
 			addFrame();
@@ -135,7 +135,7 @@
 			_array.push(copyObject(inputArray[i]));
 		}
 	};
-	
+
 	AS.end = function (token) {
 		var i, lastFrameArray;
 		if (_token === token) {
@@ -162,7 +162,7 @@
 	AS.length = function () {
 		return _array.length;
 	};
-	
+
 	AS.size = AS.length;
 
 	AS.lt = function (one, two) {
@@ -211,7 +211,7 @@
 		AS.clearHighlight();
 		mark('highlight', arguments);
 	};
-	
+
 	AS.get = function (index) {
 		return copyObject(_array[index]);
 	};

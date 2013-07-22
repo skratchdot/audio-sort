@@ -10,5 +10,5 @@
 		}
 		return global.fn.shuffle(ret);
 	};
-	
+
 }(this));

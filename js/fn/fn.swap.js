@@ -1,6 +1,6 @@
 (function (global) {
 	'use strict';
-	
+
 	global.fn.swap = function (arr, one, two) {
 		var len = arr.length, tempOne, tempTwo;
 		one = parseInt(one, 10) || 0;
@@ -13,5 +13,5 @@
 		}
 		return arr;
 	};
-	
+
 }(this));

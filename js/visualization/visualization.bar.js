@@ -35,14 +35,14 @@
 				// select some items
 				circle = svg.selectAll('circle.' + property).data(info.arr);
 				len = info.arr.length;
-	
+
 				// create
 				circle.enter().append('circle');
-				
+
 				// determine our radius and our y position
 				radius = 100 / (Math.max(len, 20) * 4);
 				cy = 100 - (level * 10) + '%';
-	
+
 				// update
 				circle
 					.attr('cy', cy)
@@ -57,22 +57,22 @@
 					.attr('style', function (d) {
 						return d[property] ? '' : 'display:none';
 					});
-	
+
 				// exit
 				circle.exit().remove();
 			}
 		};
-	
+
 		getIndexAndValueFromMouse = function (e) {
 			var index, value, $this = $(e.currentTarget),
 				$parent = $this.parent(), parentOffset,
 				relX, relY, w, h, n = 0, min = 0;
-	
+
 			// set relative positions
 			parentOffset = $parent.offset();
 			relX = e.pageX - parentOffset.left;
 			relY = e.pageY - parentOffset.top;
-	
+
 			// account for border/margin/padding
 			relX = relX - parseInt($parent.css('border-left-width'), 10);
 			relX = relX - parseInt($parent.css('margin-left'), 10);
@@ -80,43 +80,43 @@
 			relY = relY - parseInt($parent.css('border-top-width'), 10);
 			relY = relY - parseInt($parent.css('margin-top'), 10);
 			relY = relY - parseInt($parent.css('padding-top'), 10);
-	
+
 			// store widths and heights
 			w = $this.parent().width();
 			h = $this.parent().height();
-	
+
 			// get datasize
 			if (data.length > 0) {
 				n = data[0].arr.length;
 				min = n - 1;
 			}
-	
+
 			// set index/value
 			index = Math.floor((relX / w) * n);
 			value = Math.floor((relY / h) * n);
-	
+
 			// account for div/0
 			index = isFinite(index) ? index : 0;
 			value = isFinite(value) ? value : 0;
-	
+
 			// handle offset errors
 			index = Math.min(min, index);
 			value = Math.min(min, value);
 			value = min - value;
-	
+
 			return {
 				index: index,
 				value: value
 			};
 		};
-		
+
 		bar.onMouseMove = function (e) {
 			var result = getIndexAndValueFromMouse(e), $rect;
 			if (hoverIndex !== result.index) {
 				hoverIndex = result.index;
 				$rect = $svg.find('rect');
 				$rect.attr('opacity', 1);
-				$rect.eq(hoverIndex).attr('opacity', 0.5);						
+				$rect.eq(hoverIndex).attr('opacity', 0.5);
 			}
 			hoverValue = result.value;
 			if (isClicking && (hoverIndex !== clickIndex || hoverValue !== clickValue)) {

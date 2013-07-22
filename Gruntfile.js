@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 
 	// Project configuration.
 	grunt.initConfig({
-		pkg: '<json:package.json>',		
+		pkg: '<json:package.json>',
 		nodeunit: {
 			files: ['test/**/*_test.js'],
 		},

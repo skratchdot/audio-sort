@@ -21,7 +21,7 @@
 		}
 		return ret;
 	};
-	
+
 }(this));
 (function (global) {
 	'use strict';
@@ -35,11 +35,11 @@
 		}
 		return global.fn.shuffle(ret);
 	};
-	
+
 }(this));
 (function (global) {
 	'use strict';
-	
+
 	global.fn.datagen.randomDupes = function (size) {
 		var i, ret = [];
 		for (i = 0; i < size; i++) {
@@ -47,27 +47,27 @@
 		}
 		return ret;
 	};
-	
+
 }(this));
 (function (global) {
 	'use strict';
-	
+
 	global.fn.datagen.randomUnique = function (size) {
 		return global.fn.shuffle(global.fn.datagen.sorted(size));
 	};
-	
+
 }(this));
 (function (global) {
 	'use strict';
-	
+
 	global.fn.datagen.reverse = function (size) {
 		return global.fn.datagen.sorted(size).reverse();
 	};
-	
+
 }(this));
 (function (global) {
 	'use strict';
-	
+
 	global.fn.datagen.sorted = function (size) {
 		var i, ret = [];
 		for (i = 0; i < size; i++) {
@@ -75,15 +75,15 @@
 		}
 		return ret;
 	};
-	
+
 }(this));
 (function (global) {
 	'use strict';
-	
+
 	global.fn.random = function (min, max) {
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	};
-	
+
 }(this));
 (function (global) {
 	'use strict';
@@ -101,11 +101,11 @@
 		}
 		return arr;
 	};
-	
+
 }(this));
 (function (global) {
 	'use strict';
-	
+
 	global.fn.swap = function (arr, one, two) {
 		var len = arr.length, tempOne, tempTwo;
 		one = parseInt(one, 10) || 0;
@@ -118,7 +118,7 @@
 		}
 		return arr;
 	};
-	
+
 }(this));
 (function (global) {
 	'use strict';
@@ -260,7 +260,7 @@
 
 			}
 		};
-		
+
 		quickSort();
 	};
 
@@ -344,14 +344,14 @@
 				// select some items
 				circle = svg.selectAll('circle.' + property).data(info.arr);
 				len = info.arr.length;
-	
+
 				// create
 				circle.enter().append('circle');
-				
+
 				// determine our radius and our y position
 				radius = 100 / (Math.max(len, 20) * 4);
 				cy = 100 - (level * 10) + '%';
-	
+
 				// update
 				circle
 					.attr('cy', cy)
@@ -366,22 +366,22 @@
 					.attr('style', function (d) {
 						return d[property] ? '' : 'display:none';
 					});
-	
+
 				// exit
 				circle.exit().remove();
 			}
 		};
-	
+
 		getIndexAndValueFromMouse = function (e) {
 			var index, value, $this = $(e.currentTarget),
 				$parent = $this.parent(), parentOffset,
 				relX, relY, w, h, n = 0, min = 0;
-	
+
 			// set relative positions
 			parentOffset = $parent.offset();
 			relX = e.pageX - parentOffset.left;
 			relY = e.pageY - parentOffset.top;
-	
+
 			// account for border/margin/padding
 			relX = relX - parseInt($parent.css('border-left-width'), 10);
 			relX = relX - parseInt($parent.css('margin-left'), 10);
@@ -389,43 +389,43 @@
 			relY = relY - parseInt($parent.css('border-top-width'), 10);
 			relY = relY - parseInt($parent.css('margin-top'), 10);
 			relY = relY - parseInt($parent.css('padding-top'), 10);
-	
+
 			// store widths and heights
 			w = $this.parent().width();
 			h = $this.parent().height();
-	
+
 			// get datasize
 			if (data.length > 0) {
 				n = data[0].arr.length;
 				min = n - 1;
 			}
-	
+
 			// set index/value
 			index = Math.floor((relX / w) * n);
 			value = Math.floor((relY / h) * n);
-	
+
 			// account for div/0
 			index = isFinite(index) ? index : 0;
 			value = isFinite(value) ? value : 0;
-	
+
 			// handle offset errors
 			index = Math.min(min, index);
 			value = Math.min(min, value);
 			value = min - value;
-	
+
 			return {
 				index: index,
 				value: value
 			};
 		};
-		
+
 		bar.onMouseMove = function (e) {
 			var result = getIndexAndValueFromMouse(e), $rect;
 			if (hoverIndex !== result.index) {
 				hoverIndex = result.index;
 				$rect = $svg.find('rect');
 				$rect.attr('opacity', 1);
-				$rect.eq(hoverIndex).attr('opacity', 0.5);						
+				$rect.eq(hoverIndex).attr('opacity', 0.5);
 			}
 			hoverValue = result.value;
 			if (isClicking && (hoverIndex !== clickIndex || hoverValue !== clickValue)) {
@@ -510,7 +510,7 @@
 /*global d3 */
 (function (global) {
 	'use strict';
-	
+
 	global.visualization.flat = function (settings) {
 		var flat = {},
 			// settings
@@ -521,7 +521,7 @@
 			_init,
 			drawFlattenedLines,
 			initFlattenedLines;
-		
+
 		_init = function (settings) {
 			data = settings.data;
 			svg = settings.svg;
@@ -632,12 +632,12 @@
 				return d.playIndexes.indexOf(index) >= 0 ? d.playColor : d.dataColor;
 			});
 		};
-		
+
 
 		_init(settings);
 		return flat;
 	};
-	
+
 }(this));
 (function (global) {
 	'use strict';
@@ -683,7 +683,7 @@
 		};
 		return result;
 	};
-	
+
 	frameCheck = function (type) {
 		if (_frames.length === 0 || (recent.hasOwnProperty(type) && recent[type].length)) {
 			addFrame();
@@ -776,7 +776,7 @@
 			_array.push(copyObject(inputArray[i]));
 		}
 	};
-	
+
 	AS.end = function (token) {
 		var i, lastFrameArray;
 		if (_token === token) {
@@ -803,7 +803,7 @@
 	AS.length = function () {
 		return _array.length;
 	};
-	
+
 	AS.size = AS.length;
 
 	AS.lt = function (one, two) {
@@ -852,7 +852,7 @@
 		AS.clearHighlight();
 		mark('highlight', arguments);
 	};
-	
+
 	AS.get = function (index) {
 		return copyObject(_array[index]);
 	};
@@ -1038,7 +1038,7 @@
 
 			return playMidi + AudioSort.getSelected('centerNote') - centerMidi;
 		};
-		
+
 		getMidiNumberHelper = function (degrees, degreeSize, octaveSize, position) {
 			return degrees[position % degreeSize] + (Math.floor(position / degreeSize) * octaveSize);
 		};
@@ -1184,7 +1184,7 @@
 			isPlaying = false;
 			interval.stop();
 		};
-		
+
 		player.isPlaying = function () {
 			return isPlaying;
 		};
@@ -1306,7 +1306,7 @@
 			}
 		}
 	};
-	
+
 	getBaseDataAsPlayableObjects = function (playIndex) {
 		var i, objectArray = [];
 		// convert baseData to an array of drawable/playable objects
@@ -1645,7 +1645,7 @@
 			players.sort.goToFirst();
 			if (isSortPlaying || triggerAutoPlay) {
 				clickPlayButton();
-			} 
+			}
 		}
 		triggerAutoPlay = false;
 	};

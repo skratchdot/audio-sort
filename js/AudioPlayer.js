@@ -162,7 +162,7 @@
 
 			return playMidi + AudioSort.getSelected('centerNote') - centerMidi;
 		};
-		
+
 		getMidiNumberHelper = function (degrees, degreeSize, octaveSize, position) {
 			return degrees[position % degreeSize] + (Math.floor(position / degreeSize) * octaveSize);
 		};
@@ -308,7 +308,7 @@
 			isPlaying = false;
 			interval.stop();
 		};
-		
+
 		player.isPlaying = function () {
 			return isPlaying;
 		};

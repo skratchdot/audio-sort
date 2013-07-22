@@ -97,7 +97,7 @@
 			}
 		}
 	};
-	
+
 	getBaseDataAsPlayableObjects = function (playIndex) {
 		var i, objectArray = [];
 		// convert baseData to an array of drawable/playable objects
@@ -436,7 +436,7 @@
 			players.sort.goToFirst();
 			if (isSortPlaying || triggerAutoPlay) {
 				clickPlayButton();
-			} 
+			}
 		}
 		triggerAutoPlay = false;
 	};

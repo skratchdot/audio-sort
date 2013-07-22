@@ -14,5 +14,5 @@
 		}
 		return arr;
 	};
-	
+
 }(this));
