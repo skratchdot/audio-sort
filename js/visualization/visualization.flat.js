@@ -25,6 +25,8 @@
 				frameLength = 0;
 				flattenedLines = [];
 			}
+			$svg.empty();
+			svg.attr('viewBox', '0 0 0 0');
 			svg.attr('preserveAspectRatio', 'none');
 			svg.attr('viewBox', '0 0 ' + (frameLength - 1) + ' ' + numFlattenedLines);
 			$svg.empty();
