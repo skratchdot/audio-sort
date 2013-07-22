@@ -355,6 +355,7 @@
 			allowClick: true,
 			onClick: function (index, value) {
 				baseData[index] = value;
+				maxData[index] = getScale(0, baseData.length - 1, 0, maxData.length - 1)(value);
 				players.base.setData(getBaseDataAsFrames());
 				clearTimeout(clickTimer);
 				clickTimer = setTimeout(doSort, clickDelay);
