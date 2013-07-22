@@ -1,4 +1,4 @@
-/*global $, sc, ace, js_beautify, AudioPlayer, Worker */
+/*global $, sc, ace, d3, js_beautify, AudioPlayer, Worker */
 (function (global) {
 	'use strict';
 
@@ -56,6 +56,8 @@
 		buildSortOptions,
 		clickPlayButton,
 		doSort,
+		generateData,
+		getScale,
 		getBaseDataAsFrames,
 		getBaseDataAsPlayableObjects,
 		getNoteName,
@@ -178,8 +180,7 @@
 
 	onSliderDataSize = function (e) {
 		onSlider('dataSize', '#data-size-display', e);
-		baseData = maxData.slice(0, selected.dataSize);
-		players.base.setData(getBaseDataAsFrames());
+		generateData(false);
 		doSort();
 	};
 
@@ -190,8 +191,7 @@
 	onAudioDataButton = function () {
 		var action = $(this).data('action');
 		if (global.fn.datagen.hasOwnProperty(action)) {
-			baseData = global.fn.datagen[action](selected.dataSize);
-			players.base.setData(getBaseDataAsFrames());
+			generateData(true, action);
 			doSort();
 		}
 	};
@@ -211,7 +211,41 @@
 		}
 		doSort();
 	};
-	
+
+	getScale = function (domainMin, domainMax, rangeMin, rangeMax) {
+		return d3.scale.linear()
+			.domain([domainMin, domainMax])
+			.range([rangeMin, rangeMax]);
+	};
+
+	generateData = function (regenerateMaxData, action) {
+		var i, scale, slice;
+		if (regenerateMaxData) {
+			if (global.fn.datagen.hasOwnProperty(action)) {
+				baseData = global.fn.datagen[action](selected.dataSize);
+				maxData = global.fn.datagen[action](defaults.dataSize.max);
+				slice = maxData.slice(0, selected.dataSize);
+				scale = getScale(
+					0,
+					baseData.length - 1,
+					d3.min(slice),
+					d3.max(slice));
+				// we always want our current "baseData" when re-sizing
+				for (i = 0; i < baseData.length; i++) {
+					maxData[i] =  Math.round(scale(baseData[i]));
+				}
+			}
+		} else {
+			baseData = maxData.slice(0, selected.dataSize);
+			scale = getScale(d3.min(baseData), d3.max(baseData), 0, baseData.length - 1);
+			// normalize data
+			for (i = 0; i < baseData.length; i++) {
+				baseData[i] = Math.round(scale(maxData[i]));
+			}
+		}
+		players.base.setData(getBaseDataAsFrames());
+	};
+
 	addAceEditor = function (container) {
 		var $container = $(container),
 			id = 'id_' + (new Date()).getTime();
@@ -462,9 +496,7 @@
 		// setup audio and audio players
 		setupPlayers();
 		// setup base data
-		baseData = global.fn.datagen.randomUnique(selected.dataSize);
-		maxData = global.fn.datagen.sorted(defaults.dataSize.max);
-		players.base.setData(getBaseDataAsFrames());
+		generateData(true, 'randomUnique');
 		// populate our scale drop down
 		populateSelect('#scale-select', '#scale_select_chzn', onScaleChange);
 		// create some of our sliders
