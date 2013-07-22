@@ -7,7 +7,7 @@
 			// settings
 			data = [], $svg, svg,
 			flattenedLines = [], numFlattenedLines = 0, frameLength = 0,
-			lines,
+			dataColor = 'steelblue', playColor = '#c80000', lines,
 			// functions
 			_init,
 			drawFlattenedLines,
@@ -47,7 +47,8 @@
 					ids.push(id);
 					flattenedLines[i] = {
 						id: id,
-						color: d3.rgb('steelblue').darker((i - half) / half).toString(),
+						dataColor: d3.rgb(dataColor).darker((i - half) / half).toString(),
+						playColor: d3.rgb(playColor).darker((i - half) / half).toString(),
 						playIndexes: [],
 						lineData: []
 					};
@@ -103,7 +104,7 @@
 					return d.id;
 				})
 				.attr('stroke', function (d) {
-					return d.playIndexes.indexOf(index) >= 0 ? '#c80000' : d.color;
+					return d.playIndexes.indexOf(index) >= 0 ? d.playColor : d.dataColor;
 				})
 				.attr('fill', 'none')
 				.attr('stroke-width', 0.5)
@@ -119,7 +120,7 @@
 
 		flat.draw = function (index) {
 			lines.attr('stroke', function (d) {
-				return d.playIndexes.indexOf(index) >= 0 ? '#c80000' : d.color;
+				return d.playIndexes.indexOf(index) >= 0 ? d.playColor : d.dataColor;
 			});
 		};
 		
