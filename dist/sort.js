@@ -1655,15 +1655,29 @@
 	};
 
 	doSort = function () {
+		workerKey = (new Date()).getTime();
+
+		// browsers that don't support Web Workers will behave slowly
 		if (typeof Worker === 'undefined') {
+			AS.init(baseData, workerKey);
+			global.sort[selected.sort]();
+			workerOnMessage({
+				data: {
+					key: workerKey,
+					frames: AS.end(workerKey)
+				}
+			});
 			return;
 		}
+
+		// we should terminate our previous worker
 		if (worker !== null) {
 			worker.removeEventListener('message', workerOnMessage, false);
 			worker.removeEventListener('error', workerOnError, false);
 			worker.terminate();
 		}
-		workerKey = (new Date()).getTime();
+
+		// perform sort in worker thread
 		worker = new Worker(workerUrl);
 		worker.addEventListener('message', workerOnMessage, false);
 		worker.addEventListener('error', workerOnError, false);
