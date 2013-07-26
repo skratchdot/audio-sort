@@ -8,15 +8,29 @@ html, body {
 	background-image: radial-gradient(circle farthest-corner at center, #ffffff 0%, #fbfefe 100%);
 }
 
-header, footer, svg, #sort-options {
+header, footer, svg, #sort-options, #scale-options {
 	background: url(../img/gradient_squares.png) repeat !important;
+}
+
+#settings {
+	margin: 0;
+}
+
+#settings-content {
+	background: #fff;
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+	padding: 20px;
+	height: 214px;
+	overflow: visible;
 }
 
 #base-chart svg {
 	cursor: pointer;
 }
 
-svg, #sort-options {
+svg, #sort-options, #scale-options {
 	border: 1px solid #999;
 	border-radius: 5px;
 }
@@ -109,10 +123,29 @@ svg, #sort-options {
 	margin-bottom: 3px;
 }
 
-#sort-options {
+#sort-options, #scale-options {
 	height: 200px;
 	overflow: auto;
 	margin: 0;
+}
+
+#scale-options {
+	margin-top: 8px;
+	height: 160px;
+}
+
+#scale-options > li {
+	font-size: 12px;
+	line-height: 16px;
+}
+
+#scale-options > li a {
+	margin: 0;
+	padding: 5px 12px;
+}
+
+#scale-filter {
+	width: 90%;
 }
 
 #sort-options-header {

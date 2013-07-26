@@ -1262,6 +1262,7 @@
 		addAceEditor,
 		onSaveAlgorithmEdit,
 		onSaveAlgorithmNew,
+		onScaleFilter,
 		buildSortOptions,
 		clickPlayButton,
 		doSort,
@@ -1273,7 +1274,6 @@
 		getSortedScaleNames,
 		getTempoString,
 		onAudioDataButton,
-		onScaleChange,
 		onSlider,
 		onSliderCenterNote,
 		onSliderDataSize,
@@ -1284,7 +1284,7 @@
 		onSortVisualizationButton,
 		onAddAlgorithmModalClick,
 		playerButtonCallback,
-		populateSelect,
+		populateScaleOptions,
 		setupPlayers,
 		updateDisplayCache;
 
@@ -1391,10 +1391,6 @@
 		onSlider('dataSize', '#data-size-display', e);
 		generateData(false);
 		doSort();
-	};
-
-	onScaleChange = function (e) {
-		selected.scale = e.target.value;
 	};
 
 	onAudioDataButton = function () {
@@ -1601,12 +1597,11 @@
 		return names;
 	};
 
-	populateSelect = function (originalSelector, chosenSelector, fnOnScaleChange) {
+	populateScaleOptions = function (selector) {
 		var currentKey, lastKey, scale, scaleNames,
 			numPitches, numDegrees,
-			$select, $optgroup, $option;
+			$ul = $(selector), $li, htmlString = '';
 
-		$select = $(originalSelector);
 		scaleNames = getSortedScaleNames();
 		$.each(scaleNames, function (index, scaleName) {
 			// loop variables
@@ -1614,28 +1609,54 @@
 			numPitches = scale.pitchesPerOctave();
 			numDegrees = scale.degrees().length;
 			currentKey = numPitches + '_' + numDegrees;
-			// setup optgroup
 			if (currentKey !== lastKey) {
-				if (lastKey) {
-					$select.append($optgroup);
-				}
 				lastKey = currentKey;
-				$optgroup = $('<optgroup />')
-					.attr('label', 'Octave: ' + numPitches + ' / Notes: ' + numDegrees);
+				$li = $('<li />').addClass('disabled').wrapInner(
+					$('<a href="javascript:void(0);"></a>').text(
+						'Octave: ' + numPitches + ' / Notes: ' + numDegrees
+					)
+				);
+				htmlString += $li.wrap('<div />').parent().html();
 			}
-			// add option
-			$option = $('<option />')
-				.val(scaleName)
-				.text(scale.name);
-			// make sure default item is selected
-			if (selected.scale === scaleName) {
-				$option.attr('selected', 'selected');
-			}
-			$optgroup.append($option);
+			$li = $('<li />').attr('data-scale', scaleName).wrapInner(
+				$('<a href="javascript:void(0);"></a>').text(scale.name)
+			);
+			htmlString += $li.wrap('<div />').parent().html();
 		});
-		$select.append($optgroup);
-		$(originalSelector).chosen().change(fnOnScaleChange);
-		$(chosenSelector).width('100%');
+		$ul.append(htmlString);
+		$ul.on('click', 'li', function () {
+			var $this = $(this);
+			if (!$this.hasClass('disabled')) {
+				$ul.find('li').removeClass('active');
+				$this.addClass('active');
+				selected.scale = $this.data('scale');
+				updateDisplayCache('#scale-display', $this.text());
+			}
+		});
+	};
+
+	onScaleFilter = function () {
+		var show = false,
+			val = $.trim($(this).val()),
+			regex = new RegExp(val, 'i');
+		if (val === '') {
+			$('#scale-options li').show();
+		} else {
+			$.each($('#scale-options li').get().reverse(), function (index, item) {
+				var $item = $(item);
+				if ($item.hasClass('disabled')) {
+					$item.css('display', show ? 'block' : 'none');
+					show = false;
+				} else {
+					if (regex.test($item.text())) {
+						$item.show();
+						show = true;
+					} else {
+						$item.hide();
+					}
+				}
+			});
+		}
 	};
 
 	workerOnMessage = function (event) {
@@ -1722,7 +1743,17 @@
 		// setup base data
 		generateData(true, 'randomUnique');
 		// populate our scale drop down
-		populateSelect('#scale-select', '#scale_select_chzn', onScaleChange);
+		populateScaleOptions('#scale-options');
+		updateDisplayCache(
+			'#scale-display',
+			$('#scale-options li[data-scale="' + selected.scale + '"]').text()
+		);
+		$('#scale-filter')
+			.on('keyup', onScaleFilter)
+			.on('focus', function () {
+				$(this).val('');
+				$('#scale-options li').show();
+			});
 		// create some of our sliders
 		AudioSort.createSlider('#volume-container', defaults.volume, onSliderVolume);
 		AudioSort.createSlider('#tempo-container', defaults.tempo, onSliderTempo);

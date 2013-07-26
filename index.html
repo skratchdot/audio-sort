@@ -14,32 +14,50 @@ layout: default
 	</div>
 	<div class="row">
 		<div class="span4">
-			<div>
-				<strong>Volume:</strong>
-				<em id="volume-display" class="pull-right">&nbsp;</em>
+			<ul id="settings" class="nav nav-tabs">
+				<li class="active"><a href="#audio" data-toggle="tab">Audio</a></li>
+				<li><a href="#scale" data-toggle="tab">Scale</a></li>
+				<li><a href="#saved" data-toggle="tab">Save</a></li>
+			</ul>
+			<div id="settings-content" class="tab-content">
+				<div class="tab-pane active" id="audio">
+					<div>
+						<strong>Volume:</strong>
+						<em id="volume-display" class="pull-right">&nbsp;</em>
+					</div>
+					<div id="volume-container"></div>
+					<div>
+						<strong>Tempo:</strong>
+						<em id="tempo-display" class="pull-right">&nbsp;</em>
+					</div>
+					<div id="tempo-container"></div>
+					<div>
+						<strong>Center Note:</strong>
+						<em id="center-note-display" class="pull-right">&nbsp;</em>
+					</div>
+					<div id="center-note-container"></div>
+					<div>
+						<strong>Data Size:</strong>
+						<em id="data-size-display" class="pull-right">&nbsp;</em>
+					</div>
+					<div id="data-size-container"></div>
+					<div>&nbsp;</div>
+				</div>
+				<div class="tab-pane" id="scale">
+					<div style="margin-bottom:5px;">
+					    <strong class="pull-left">Scale:</strong>
+					    <em id="scale-display" class="pull-right">&nbsp;</em>
+					    <div class="clearfix"></div>
+					</div>
+					<input id="scale-filter" type="text" class="input-medium search-query" placeholder="Filter Scale Names" />
+					<ul id="scale-options" class="nav nav-pills nav-stacked">
+					</ul>
+				</div>
+				<div class="tab-pane" id="saved">
+					<h3>Coming Soon.</h3>
+					<h4>Soon you will be able to save and load settings from this panel.</h4>
+				</div>
 			</div>
-			<div id="volume-container"></div>
-			<div>
-				<strong>Tempo:</strong>
-				<em id="tempo-display" class="pull-right">&nbsp;</em>
-			</div>
-			<div id="tempo-container"></div>
-			<div>
-				<strong>Center Note:</strong>
-				<em id="center-note-display" class="pull-right">&nbsp;</em>
-			</div>
-			<div id="center-note-container"></div>
-			<div>
-				<strong>Data Size:</strong>
-				<em id="data-size-display" class="pull-right">&nbsp;</em>
-			</div>
-			<div id="data-size-container"></div>
-			<div>
-				<strong>Scale:</strong>
-				<em id="scale-display" class="pull-right">&nbsp;</em>
-			</div>
-			<select id="scale-select"></select>
-			<div>&nbsp;</div>
 		</div>
 		<div class="span8">
 			<div id="base-player" class="player-buttons">
@@ -78,13 +96,13 @@ layout: default
 	</div>
 	<div class="row">
 		<div class="span3">
-			<div id="sort-options-header">
+			<div id="sort-options-header" class="clearfix">
 				<strong>Sort:</strong>
 				<div id="sort-modal-open" class="pull-right btn btn-info btn-mini pull-right">
 					<em id="sort-display">&nbsp;</em>
 					<i class="icon-white icon-info-sign"></i>
 				</div>
-				<div class="clearfix" style="height:1px;overflow:hidden;">&nbsp;</div>
+				<div class="clearfix" style="height:1px;overflow:hidden;float:none;">&nbsp;</div>
 			</div>
 			<ul id="sort-options" class="nav nav-pills nav-stacked"></ul>
 			<div>

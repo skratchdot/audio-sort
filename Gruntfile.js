@@ -43,7 +43,6 @@ module.exports = function(grunt) {
 					'css/bootstrap.css',
 					'css/bootstrap-responsive.css',
 					'css/slider.css',
-					'css/chosen.css',
 					'css/audio-sort.css',
 					'css/audio-sort-responsive.css'
 				],

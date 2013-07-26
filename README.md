@@ -32,8 +32,6 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 - [bootstrap-slider](http://www.eyecon.ro/bootstrap-slider/)
 
-- [chosen](http://harvesthq.github.io/chosen/)
-
 - [JS Beautifier](http://jsbeautifier.org/)
 
 
