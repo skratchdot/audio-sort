@@ -74,12 +74,7 @@
 		};
 
 		drawFlattenedLines = function (index) {
-			var info, line;
-
-			// store info
-			if (data.length > 0) {
-				info = data[index];
-			}
+			var line;
 
 			// create our line function
 			line = d3.svg.line()
@@ -114,14 +109,16 @@
 
 			// exit
 			lines.exit().remove();
-
-			return info;
 		};
 
 		flat.draw = function (index) {
 			lines.attr('stroke', function (d) {
 				return d.playIndexes.indexOf(index) >= 0 ? d.playColor : d.dataColor;
 			});
+
+			if (data.length > 0) {
+				return data[index];
+			}
 		};
 
 
