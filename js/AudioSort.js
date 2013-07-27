@@ -8,11 +8,11 @@
 		// Default Settings
 		defaults = {
 			volume: { value: 0.25, min: 0, max: 1, step: 0.01 },
-			tempo: { value: 120, min: 20, max: 300, step: 1 },
+			tempo: { value: 90, min: 20, max: 300, step: 1 },
 			centerNote: { value: 69, min: 0, max: 127, step: 1 },
 			scale: { value: 'chromatic' },
 			sort: { value: 'bubble' },
-			dataSize: { value: 25, min: 4, max: 48, step: 1 }
+			dataSize: { value: 12, min: 4, max: 48, step: 1 }
 		},
 		// Currently Selected Items
 		selected = {
@@ -63,7 +63,6 @@
 		getBaseDataAsPlayableObjects,
 		getNoteName,
 		getSortedScaleNames,
-		getTempoString,
 		onAudioDataButton,
 		onSlider,
 		onSliderCenterNote,
@@ -168,7 +167,7 @@
 	};
 
 	onSliderTempo = function (e) {
-		var tempo = getTempoString();
+		var tempo = AudioSort.getTempoString();
 		onSlider('tempo', '#tempo-display', e);
 		players.base.setTempo(tempo);
 		players.sort.setTempo(tempo);
@@ -329,10 +328,6 @@
 		$modal.find('#new-sort-name').val('');
 		addAceEditor('#new-sort-algorithm');
 		$modal.modal();
-	};
-
-	getTempoString = function () {
-		return 'bpm' + (parseFloat(selected.tempo) || 120) + ' l16';
 	};
 
 	playerButtonCallback = function (player, action) {
@@ -523,6 +518,10 @@
 		return selected.hasOwnProperty(key) ? selected[key] : defaultValue;
 	};
 
+	AudioSort.getTempoString = function () {
+		return 'bpm' + (parseFloat(selected.tempo) || defaults.tempo) + ' l16';
+	};
+ 
 	AudioSort.init = function (webWorkerUrl) {
 		if (typeof webWorkerUrl === 'string') {
 			workerUrl = webWorkerUrl;

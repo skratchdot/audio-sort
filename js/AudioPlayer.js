@@ -63,7 +63,7 @@
 					this.pause();
 				}
 			});
-			interval = timbre('interval', { interval: AudioSort.getSelected('tempo') }, intervalCallback);
+			interval = timbre('interval', { interval: AudioSort.getTempoString() }, intervalCallback);
 
 			// listen for player button clicks
 			$container.find('.player-buttons').on('click', '.btn', onPlayerButtonClick);
