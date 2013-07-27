@@ -331,7 +331,7 @@
 	};
 
 	playerButtonCallback = function (player, action) {
-		if (action === 'play' || action === 'reverse') {
+		if (action === 'play' || action === 'reverse' || action === 'stop') {
 			player.stop();
 		}
 	};
