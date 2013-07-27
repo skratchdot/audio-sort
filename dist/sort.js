@@ -1475,7 +1475,7 @@
 	};
 
 	onSortModalClick = function () {
-		var $modal = $('#sort-modal'),
+		var $modal = $('#modal-sort'),
 			selectedSort = global.sort[selected.sort],
 			fnArray,
 			fnText;
@@ -1508,7 +1508,7 @@
 
 	onSaveAlgorithmEdit = function () {
 		global.sort[selected.sort] = new Fn(aceEditor.getValue());
-		$('#sort-modal').modal('hide');
+		$('#modal-sort').modal('hide');
 	};
 
 	onSaveAlgorithmNew = function () {
@@ -1525,12 +1525,12 @@
 			global.sort[id].memory = '';
 			global.sort[id].method = '';
 		}
-		$('#add-algorithm-modal').modal('hide');
+		$('#modal-add-algorithm').modal('hide');
 		buildSortOptions('#sort-options');
 	};
 
 	onAddAlgorithmModalClick = function () {
-		var $modal = $('#add-algorithm-modal');
+		var $modal = $('#modal-add-algorithm');
 		$modal.find('#new-sort-name').val('');
 		addAceEditor('#new-sort-algorithm');
 		$modal.modal();
@@ -1758,7 +1758,7 @@
 		// cache a few items
 		$sortAutoPlay = $('#sort-autoplay');
 		// handle button clicks
-		$('#sort-modal-open').on('click', onSortModalClick);
+		$('#modal-sort-open').on('click', onSortModalClick);
 		$('#add-algorithm-btn').on('click', onAddAlgorithmModalClick);
 		$('#save-algorithm-edit').on('click', onSaveAlgorithmEdit);
 		$('#save-algorithm-new').on('click', onSaveAlgorithmNew);

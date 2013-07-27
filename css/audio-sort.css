@@ -179,11 +179,21 @@ header {
 
 header h1 a.home-link {
 	color: #333;
+	text-transform: uppercase;
+	font-family: Impact, Haettenschweiler, "Franklin Gothic Bold", Charcoal, "Helvetica Inserat", "Bitstream Vera Sans Bold", "Arial Black", sans serif;
 }
 
 header h1 small a {
 	font-size: 20px;
 	color: #c80000;
+}
+
+#header-author {
+	text-decoration: none;
+}
+
+#header-author:hover span {
+	text-decoration: underline;
 }
 
 header .breadcrumb {
