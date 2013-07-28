@@ -1,4 +1,4 @@
-/*global $, sc, ace, d3, js_beautify, AudioPlayer, Worker */
+/*global $, sc, ace, d3, js_beautify, AudioPlayer, Worker, Blob, Uint8Array, saveAs */
 (function (global) {
 	'use strict';
 
@@ -70,6 +70,8 @@
 		onSliderTempo,
 		onSliderVolume,
 		onSortOptionSelected,
+		onMidiExportClick,
+		onMidiSave,
 		onSortModalClick,
 		onSortVisualizationButton,
 		onAddAlgorithmModalClick,
@@ -266,6 +268,41 @@
 				aceEditor.getSession().setAnnotations(annotationsNew);
 			}
 		});
+	};
+
+	onMidiExportClick = function () {
+		var $modal = $('#modal-midi-export');
+
+		// setup a default file name
+		$('#new-file-name').attr('placeholder', 'AudioSort_' + (new Date()).getTime()).val('');
+
+		$('#midi-export-btn').attr('data-midi-export', $(this).data('midiExport'));
+
+		$modal.modal();
+	};
+
+	onMidiSave = function () {
+		var byteNumbers, blob,
+			playerType = $('#midi-export-btn').attr('data-midi-export'),
+			$filename = $('#new-file-name'),
+			filename = $.trim($filename.val());
+
+		// use placeholder if a filename wasn't entered
+		if (filename === '') {
+			filename = $filename.attr('placeholder');
+		}
+		filename += '.mid';
+
+		// save file
+		if (players.hasOwnProperty(playerType)) {
+			byteNumbers = $.map(players[playerType].getMidiBytes().split(''), function (item) {
+				return item.charCodeAt(0);
+			});
+			blob = new Blob([new Uint8Array(byteNumbers)], {
+				type: 'audio/midi'
+			});
+			saveAs(blob, filename);
+		}
 	};
 
 	onSortModalClick = function () {
@@ -552,6 +589,8 @@
 		// cache a few items
 		$sortAutoPlay = $('#sort-autoplay');
 		// handle button clicks
+		$('span[data-midi-export]').on('click', onMidiExportClick);
+		$('#midi-export-btn').on('click', onMidiSave);
 		$('#modal-sort-open').on('click', onSortModalClick);
 		$('#add-algorithm-btn').on('click', onAddAlgorithmModalClick);
 		$('#save-algorithm-edit').on('click', onSaveAlgorithmEdit);

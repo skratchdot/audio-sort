@@ -18,6 +18,7 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 - [TODO List](https://github.com/skratchdot/audio-sort/blob/gh-pages/TODO.md)
 
+
 ## Built With
 
 - [timbre.js](http://mohayonao.github.io/timbre.js/)
@@ -33,6 +34,12 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 - [bootstrap-slider](http://www.eyecon.ro/bootstrap-slider/)
 
 - [JS Beautifier](http://jsbeautifier.org/)
+
+- [JsMidGen](https://github.com/dingram/jsmidgen)
+
+- [Blob.js](https://github.com/eligrey/Blob.js)
+
+- [FileSaver.js](https://github.com/eligrey/FileSaver.js)
 
 
 ## See Also / Credits

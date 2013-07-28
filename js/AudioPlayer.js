@@ -1,4 +1,4 @@
-/*global $, timbre, d3, sc, AudioSort */
+/*global $, timbre, d3, sc, AudioSort, Midi */
 (function (global) {
 	'use strict';
 	global.AudioPlayer = {};
@@ -323,6 +323,49 @@
 			intervalIndex = data.length - 1;
 			ensureIntervalIndex();
 			drawSvg();
+		};
+
+		player.getMidiBytes = function () {
+			var i, j,
+				midiFile, midiTrack,
+				channel = 0, duration = 64,
+				info, currentItem, midiNumber, play;
+
+			// setup midi file
+			midiFile = new Midi.File();
+			midiTrack = new Midi.Track();
+			midiTrack.setTempo(AudioSort.getSelected('tempo'));
+			midiFile.addTrack(midiTrack);
+
+			// build midi track
+			for (i = 0; i < data.length; i++) {
+				info = data[i];
+				play = [];
+				// get the notes we need to play
+				for (j = 0; j < info.arr.length; j++) {
+					currentItem = info.arr[j];
+					if (currentItem.play) {
+						midiNumber = getMidiNumber(currentItem.value);
+						if (midiNumber >= 0 && midiNumber < 128) {
+							play.push(midiNumber);
+						}
+					}
+				}
+				// note on
+				for (j = 0; j < play.length; j++) {
+					if (j === 0) {
+						midiTrack.noteOn(channel, play[j], duration);
+					} else {
+						midiTrack.noteOn(channel, play[j]);
+					}
+				}
+				// note off
+				for (j = 0; j < play.length; j++) {
+					midiTrack.noteOff(channel, play[j]);
+				}
+			}
+
+			return midiFile.toBytes();
 		};
 
 		// initialize player

@@ -14,11 +14,7 @@
 
 - Add popovers on sort selection with info about the sort's performance
 
-- Add "export to midi" button(s)
-
 - Add "stats panel" toggle buttons
-
-- Allow data to be set by clicking on the svg node
 
 - Allow defaults to be set via url parameters
 
@@ -26,3 +22,8 @@
 
 - Fix the play intervalCallback() function. Shouldn't be looping so much in there. The
   program was running faster before I re-factored a bunch of stuff and added this stupid loop.
+
+- <del>Add "export to midi" button(s)</del>
+
+- <del>Allow data to be set by clicking on the svg node</del>
+  

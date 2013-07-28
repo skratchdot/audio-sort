@@ -10,6 +10,8 @@ layout: default
 				modify the data set you will be sorting.
 				preview how the data sounds and set playback options.
 			</small>
+			<span data-midi-export="base" class="btn btn-mini btn-primary pull-right">Export As Midi</span>
+			<div class="clearfix"></div>
 		</h4>
 	</div>
 	<div class="row">
@@ -92,6 +94,8 @@ layout: default
 				choose a sorting algorithm to visualize and
 				audibilize how the algorithm works.
 			</small>
+			<span data-midi-export="sort" class="btn btn-mini btn-primary pull-right">Export As Midi</span>
+			<div class="clearfix"></div>
 		</h4>
 	</div>
 	<div class="row">
@@ -161,5 +165,6 @@ layout: default
 	</div>
 </section>
 {% include modal-add-algorithm.html %}
+{% include modal-midi-export.html %}
 {% include modal-sort.html %}
 {% include footer.html %}
