@@ -877,6 +877,8 @@
 	global.AudioPlayer = {};
 	global.AudioPlayer.create = function (containerSelector, options) {
 		var player = {},
+			// Config Values
+			canvasBackground = '#f3f3f3',
 			// State Variables
 			isLooping, isPlaying, isReverse,
 			intervalIndex, hasMarkers, allowHover, allowClick, onClick,
@@ -888,7 +890,7 @@
 			// Cached d3 items
 			svg,
 			// Data
-			data, interval, env, pluck, visualization, selectedVisualization = 'bar',
+			data, interval, env, waveGenerator, visualization, selectedVisualization = 'bar',
 			// Functions
 			_init, drawSvg, ensureIntervalIndex, intervalCallback,
 			getMidiNumber, getMidiNumberHelper,
@@ -925,17 +927,8 @@
 			svg = d3.select('#' + $svg.attr('id'));
 			onPlayerButtonClickCallback = options.onPlayerButtonClickCallback || null;
 
-			// setup audio interval and envelopes
-			env = timbre('perc', { a: 50, r: 2500 });
-			pluck = timbre('PluckGen', {
-				env: env,
-				mul: AudioSort.getSelected('volume'),
-				poly: 10
-			}).on('ended', function () {
-				if (!isPlaying) {
-					this.pause();
-				}
-			});
+			// setup audio envelopes/generators and interval
+			player.refreshWaveGenerator();
 			interval = timbre('interval', { interval: AudioSort.getTempoString() }, intervalCallback);
 
 			// listen for player button clicks
@@ -1054,7 +1047,7 @@
 						if (currentItem.play) {
 							midi = getMidiNumber(currentItem.value);
 							if (midi >= 0 && midi < 128) {
-								pluck.noteOn(midi, 64);
+								waveGenerator.noteOn(midi, 64);
 							}
 						}
 					}
@@ -1155,7 +1148,7 @@
 		};
 
 		player.setVolume = function (volume) {
-			pluck.set({mul: volume});
+			waveGenerator.set({mul: volume});
 		};
 
 		player.play = function (reverse) {
@@ -1173,7 +1166,7 @@
 				}
 			}
 			isReverse = reverse === true ? true : false;
-			pluck.play();
+			waveGenerator.play();
 			interval.start();
 		};
 
@@ -1241,6 +1234,66 @@
 			return midiFile.toBytes();
 		};
 
+		player.refreshWaveGenerator = function () {
+			var waveInfo = AudioSort.getSelectedWaveformInfo();
+			$.each([env, waveGenerator], function (index, obj) {
+				$.each(['pause', 'removeAllListeners'], function (index, key) {
+					if (obj && typeof obj[key] === 'function') {
+						obj[key]();
+					}
+				});
+			});
+			env = timbre('adshr', {
+				a: waveInfo.a,
+				d: waveInfo.d,
+				s: waveInfo.s,
+				h: waveInfo.h,
+				r: waveInfo.r
+			});
+			waveGenerator = timbre(waveInfo.gen, {
+				env: env,
+				mul: AudioSort.getSelected('volume') * waveInfo.mul,
+				poly: waveInfo.poly || 10
+			}).on('ended', function () {
+				if (!isPlaying) {
+					this.pause();
+				}
+			});
+			if (waveInfo.gen === 'OscGen') {
+				waveGenerator.set('osc', timbre(AudioSort.getSelected('waveform')));
+			}
+			if (isPlaying) {
+				waveGenerator.play();
+			}
+		};
+
+		player.drawEnvelopeCanvas = function () {
+			// ADSHR
+			if (env && typeof env.plot === 'function') {
+				env.plot({
+					target: $('#waveform-adshr-canvas').get(0),
+					background: canvasBackground
+				});
+			}
+		};
+
+		player.drawWaveformCanvases = function () {
+			var canvas, context;
+			// ADSHR
+			player.drawEnvelopeCanvas();
+			// Waveform
+			canvas = $('#waveform-canvas').get(0);
+			if (waveGenerator && waveGenerator.osc) {
+				waveGenerator.osc.plot({
+					target: canvas,
+					background: canvasBackground
+				});
+			} else {
+				context = canvas.getContext('2d');
+				context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+			}
+		};
+
 		// initialize player
 		_init();
 
@@ -1261,7 +1314,9 @@
 			centerNote: { value: 69, min: 0, max: 127, step: 1 },
 			scale: { value: 'chromatic' },
 			sort: { value: 'bubble' },
-			dataSize: { value: 12, min: 4, max: 48, step: 1 }
+			dataSize: { value: 12, min: 4, max: 48, step: 1 },
+			audioType: { value: 'waveform' },
+			waveform: { value: 'string' }
 		},
 		// Currently Selected Items
 		selected = {
@@ -1270,8 +1325,22 @@
 			centerNote: defaults.centerNote.value,
 			scale: defaults.scale.value,
 			sort: defaults.sort.value,
-			dataSize: defaults.dataSize.value
+			dataSize: defaults.dataSize.value,
+			audioType: defaults.audioType.value,
+			waveform: defaults.waveform.value
 		},
+		// Waveform Data
+		waveform = {
+			'string': { gen: 'PluckGen', poly: 10, mul: 1, a: 50, d: 300, s: 0.5, h: 500, r: 2500 },
+			'sin':    { gen: 'OscGen', poly: 10, mul: 1, a: 50, d: 300, s: 0.5, h: 200, r: 300 },
+			'cos':    { gen: 'OscGen', poly: 10, mul: 1, a: 50, d: 300, s: 0.5, h: 200, r: 300 },
+			'pulse':  { gen: 'OscGen', poly: 10, mul: 0.25, a: 50, d: 300, s: 0.5, h: 200, r: 300 },
+			'tri':    { gen: 'OscGen', poly: 10, mul: 1, a: 50, d: 300, s: 0.5, h: 200, r: 300 },
+			'saw':    { gen: 'OscGen', poly: 10, mul: 0.25, a: 50, d: 300, s: 0.5, h: 200, r: 300 },
+			'fami':   { gen: 'OscGen', poly: 10, mul: 1, a: 50, d: 300, s: 0.5, h: 200, r: 300 },
+			'konami': { gen: 'OscGen', poly: 10, mul: 0.4, a: 50, d: 300, s: 0.5, h: 200, r: 300 }
+		},
+		waveformSliders = {},
 		// Audio players
 		players = {
 			base: null,
@@ -1300,6 +1369,11 @@
 		workerOnError,
 		// Functions
 		addAceEditor,
+		populateWaveformButtons,
+		updateWaveformDisplays,
+		setSliderWaveformFromSelected,
+		onAudioTypeButtonClick,
+		onAudioTypeTabLinkClick,
 		onSaveAlgorithmEdit,
 		onSaveAlgorithmNew,
 		onScaleFilter,
@@ -1318,6 +1392,8 @@
 		onSliderDataSize,
 		onSliderTempo,
 		onSliderVolume,
+		onSliderWaveform,
+		onWaveformButtonClick,
 		onSortOptionSelected,
 		onMidiExportClick,
 		onMidiSave,
@@ -1346,6 +1422,32 @@
 				}
 			}
 		}
+	};
+	
+	populateWaveformButtons = function () {
+		var html = '';
+		$.each(waveform, function (waveformName) {
+			html += $('<button />')
+				.addClass('btn btn-mini' + (waveformName === selected.waveform ? ' active' : ''))
+				.attr('type', 'button')
+				.attr('data-waveform', waveformName)
+				.text(waveformName)
+				.wrap('<div />').parent().html();
+		});
+		$('#waveform .btn-group').html(html);
+	};
+
+	onWaveformButtonClick = function () {
+		var $this = $(this);
+		selected.waveform = $this.attr('data-waveform');
+		// update slider values
+		setSliderWaveformFromSelected();
+		// update text on audio tab
+		updateDisplayCache('#audio-type-display', 'waveform: ' + selected.waveform);
+		// start using new selection
+		players.base.refreshWaveGenerator();
+		players.sort.refreshWaveGenerator();
+		players.base.drawWaveformCanvases();
 	};
 
 	getBaseDataAsPlayableObjects = function (playIndex) {
@@ -1402,6 +1504,31 @@
 		displayCache[selector].text(value);
 	};
 
+	onAudioTypeButtonClick = function () {
+		var $this = $(this),
+			$tabs = $('#settings li[data-audio-type]'),
+			$tabLink = $('#audio-type-tab-link'),
+			audioType = $this.attr('data-audio-type'),
+			audioTypeName = $this.text(),
+			displayName;
+		// set selected type
+		selected.audioType = audioType;
+		displayName = audioType;
+		if (selected.audioType === 'waveform') {
+			displayName += ': ' + selected.waveform;
+		}
+		updateDisplayCache('#audio-type-display', displayName);
+		// update settings link
+		$tabLink.text(audioTypeName.toLowerCase() + ' settings');
+		// show correct tab
+		$tabs.removeClass('hidden');
+		$tabs.filter('[data-audio-type!="' + audioType + '"]').addClass('hidden');
+	};
+
+	onAudioTypeTabLinkClick = function () {
+		$('#settings li[data-audio-type]:visible a').click();
+	};
+
 	onSlider = function (key, selector, event, fnFormat) {
 		if (event) {
 			selected[key] = event.value;
@@ -1434,6 +1561,17 @@
 		doSort();
 	};
 
+	onSliderWaveform = function (e) {
+		var $slider = $(e.target),
+			$container = $slider.parents('[data-adshr]:first'),
+			adshr = $container.attr('data-adshr');
+		waveform[selected.waveform][adshr] = (adshr === 's') ? e.value.toFixed(2) : e.value;
+		updateWaveformDisplays();
+		players.base.refreshWaveGenerator();
+		players.sort.refreshWaveGenerator();
+		players.base.drawEnvelopeCanvas();
+	};
+
 	onAudioDataButton = function () {
 		var action = $(this).data('action');
 		if (global.fn.datagen.hasOwnProperty(action)) {
@@ -1456,6 +1594,21 @@
 			triggerAutoPlay = true;
 		}
 		doSort();
+	};
+
+	updateWaveformDisplays = function () {
+		updateDisplayCache('#waveform-adshr-attack-display', waveform[selected.waveform].a);
+		updateDisplayCache('#waveform-adshr-decay-display', waveform[selected.waveform].d);
+		updateDisplayCache('#waveform-adshr-sustain-display', waveform[selected.waveform].s);
+		updateDisplayCache('#waveform-adshr-hold-display', waveform[selected.waveform].h);
+		updateDisplayCache('#waveform-adshr-release-display', waveform[selected.waveform].r);
+	};
+
+	setSliderWaveformFromSelected = function () {
+		$.each(['a', 'd', 's', 'h', 'r'], function (index, key) {
+			waveformSliders[key].slider('setValue', waveform[selected.waveform][key]);
+		});
+		updateWaveformDisplays();
 	};
 
 	getScale = function (domainMin, domainMax, rangeMin, rangeMax) {
@@ -1804,6 +1957,10 @@
 		return selected.hasOwnProperty(key) ? selected[key] : defaultValue;
 	};
 
+	AudioSort.getSelectedWaveformInfo = function () {
+		return waveform[selected.waveform];
+	};
+
 	AudioSort.getTempoString = function () {
 		return 'bpm' + (parseFloat(selected.tempo) || defaults.tempo) + ' l16';
 	};
@@ -1814,6 +1971,8 @@
 		}
 		// build our sort options
 		buildSortOptions('#sort-options');
+		// build waveform buttons
+		populateWaveformButtons();
 		// setup audio and audio players
 		setupPlayers();
 		// setup base data
@@ -1835,9 +1994,29 @@
 		AudioSort.createSlider('#tempo-container', defaults.tempo, onSliderTempo);
 		AudioSort.createSlider('#center-note-container', defaults.centerNote, onSliderCenterNote);
 		AudioSort.createSlider('#data-size-container', defaults.dataSize, onSliderDataSize);
+		// create our waveform sliders
+		waveformSliders.a = AudioSort.createSlider('#waveform-adshr-attack-container', {
+			value: waveform[selected.waveform].a, min: 10, max: 500, step: 5
+		}, onSliderWaveform);
+		waveformSliders.d = AudioSort.createSlider('#waveform-adshr-decay-container', {
+			value: waveform[selected.waveform].d, min: 10, max: 2000, step: 5
+		}, onSliderWaveform);
+		waveformSliders.s = AudioSort.createSlider('#waveform-adshr-sustain-container', {
+			value: waveform[selected.waveform].s, min: 0, max: 1, step: 0.01
+		}, onSliderWaveform);
+		waveformSliders.h = AudioSort.createSlider('#waveform-adshr-hold-container', {
+			value: waveform[selected.waveform].h, min: 10, max: 3000, step: 5
+		}, onSliderWaveform);
+		waveformSliders.r = AudioSort.createSlider('#waveform-adshr-release-container', {
+			value: waveform[selected.waveform].r, min: 10, max: 3000, step: 5
+		}, onSliderWaveform);
 		// cache a few items
 		$sortAutoPlay = $('#sort-autoplay');
 		// handle button clicks
+		$('#audio-type-container .btn').on('click', onAudioTypeButtonClick);
+		$('#audio-type-tab-link').on('click', onAudioTypeTabLinkClick);
+		$('#audio-type-container .btn[data-audio-type="' + selected.audioType + '"]').click();
+		$('#waveform .btn-group .btn').on('click', onWaveformButtonClick);
 		$('span[data-midi-export]').on('click', onMidiExportClick);
 		$('#midi-export-btn').on('click', onMidiSave);
 		$('#modal-sort-open').on('click', onSortModalClick);
@@ -1848,6 +2027,8 @@
 		$('#sort-options').on('click', 'li', onSortOptionSelected);
 		$('.sort-visualization').on('click', onSortVisualizationButton);
 		$('#sort-options [data-sort=' + selected.sort + ']').click();
+		// draw envelope canvas
+		players.base.drawWaveformCanvases();
 		// update slider selction text
 		updateDisplayCache('#volume-display', selected.volume);
 		updateDisplayCache('#tempo-display', selected.tempo);

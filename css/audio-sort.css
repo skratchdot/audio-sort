@@ -8,7 +8,7 @@ html, body {
 	background-image: radial-gradient(circle farthest-corner at center, #ffffff 0%, #fbfefe 100%);
 }
 
-header, footer, svg, #sort-options, #scale-options {
+header, footer, svg, #sort-options, #scale-options, #waveform canvas {
 	background: url(../img/gradient_squares.png) repeat !important;
 }
 
@@ -26,11 +26,32 @@ header, footer, svg, #sort-options, #scale-options {
 	overflow: visible;
 }
 
+#waveform .waveform-section {
+	width: 48%;
+}
+
+#waveform .btn-group {
+	width: 100%;
+	white-space: normal;
+}
+
+#waveform .btn-group .btn {
+	width: 50%;
+	margin: 0;
+	border-radius: 0px;
+}
+
+#waveform canvas {
+	width: 100%;
+	height:55px;
+	margin-bottom: 5px;
+}
+
 #base-chart svg {
 	cursor: pointer;
 }
 
-svg, #sort-options, #scale-options {
+svg, #sort-options, #scale-options, #waveform canvas {
 	border: 1px solid #999;
 	border-radius: 5px;
 }

@@ -4,6 +4,8 @@
 	global.AudioPlayer = {};
 	global.AudioPlayer.create = function (containerSelector, options) {
 		var player = {},
+			// Config Values
+			canvasBackground = '#f3f3f3',
 			// State Variables
 			isLooping, isPlaying, isReverse,
 			intervalIndex, hasMarkers, allowHover, allowClick, onClick,
@@ -15,7 +17,7 @@
 			// Cached d3 items
 			svg,
 			// Data
-			data, interval, env, pluck, visualization, selectedVisualization = 'bar',
+			data, interval, env, waveGenerator, visualization, selectedVisualization = 'bar',
 			// Functions
 			_init, drawSvg, ensureIntervalIndex, intervalCallback,
 			getMidiNumber, getMidiNumberHelper,
@@ -52,17 +54,8 @@
 			svg = d3.select('#' + $svg.attr('id'));
 			onPlayerButtonClickCallback = options.onPlayerButtonClickCallback || null;
 
-			// setup audio interval and envelopes
-			env = timbre('perc', { a: 50, r: 2500 });
-			pluck = timbre('PluckGen', {
-				env: env,
-				mul: AudioSort.getSelected('volume'),
-				poly: 10
-			}).on('ended', function () {
-				if (!isPlaying) {
-					this.pause();
-				}
-			});
+			// setup audio envelopes/generators and interval
+			player.refreshWaveGenerator();
 			interval = timbre('interval', { interval: AudioSort.getTempoString() }, intervalCallback);
 
 			// listen for player button clicks
@@ -181,7 +174,7 @@
 						if (currentItem.play) {
 							midi = getMidiNumber(currentItem.value);
 							if (midi >= 0 && midi < 128) {
-								pluck.noteOn(midi, 64);
+								waveGenerator.noteOn(midi, 64);
 							}
 						}
 					}
@@ -282,7 +275,7 @@
 		};
 
 		player.setVolume = function (volume) {
-			pluck.set({mul: volume});
+			waveGenerator.set({mul: volume});
 		};
 
 		player.play = function (reverse) {
@@ -300,7 +293,7 @@
 				}
 			}
 			isReverse = reverse === true ? true : false;
-			pluck.play();
+			waveGenerator.play();
 			interval.start();
 		};
 
@@ -366,6 +359,66 @@
 			}
 
 			return midiFile.toBytes();
+		};
+
+		player.refreshWaveGenerator = function () {
+			var waveInfo = AudioSort.getSelectedWaveformInfo();
+			$.each([env, waveGenerator], function (index, obj) {
+				$.each(['pause', 'removeAllListeners'], function (index, key) {
+					if (obj && typeof obj[key] === 'function') {
+						obj[key]();
+					}
+				});
+			});
+			env = timbre('adshr', {
+				a: waveInfo.a,
+				d: waveInfo.d,
+				s: waveInfo.s,
+				h: waveInfo.h,
+				r: waveInfo.r
+			});
+			waveGenerator = timbre(waveInfo.gen, {
+				env: env,
+				mul: AudioSort.getSelected('volume') * waveInfo.mul,
+				poly: waveInfo.poly || 10
+			}).on('ended', function () {
+				if (!isPlaying) {
+					this.pause();
+				}
+			});
+			if (waveInfo.gen === 'OscGen') {
+				waveGenerator.set('osc', timbre(AudioSort.getSelected('waveform')));
+			}
+			if (isPlaying) {
+				waveGenerator.play();
+			}
+		};
+
+		player.drawEnvelopeCanvas = function () {
+			// ADSHR
+			if (env && typeof env.plot === 'function') {
+				env.plot({
+					target: $('#waveform-adshr-canvas').get(0),
+					background: canvasBackground
+				});
+			}
+		};
+
+		player.drawWaveformCanvases = function () {
+			var canvas, context;
+			// ADSHR
+			player.drawEnvelopeCanvas();
+			// Waveform
+			canvas = $('#waveform-canvas').get(0);
+			if (waveGenerator && waveGenerator.osc) {
+				waveGenerator.osc.plot({
+					target: canvas,
+					background: canvasBackground
+				});
+			} else {
+				context = canvas.getContext('2d');
+				context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+			}
 		};
 
 		// initialize player

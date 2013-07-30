@@ -18,47 +18,17 @@ layout: default
 		<div class="span4">
 			<ul id="settings" class="nav nav-tabs">
 				<li class="active"><a href="#audio" data-toggle="tab">Audio</a></li>
+				<li data-audio-type="waveform"><a href="#waveform" data-toggle="tab">Waveform</a></li>
+				<li data-audio-type="soundfont" class="hidden"><a href="#soundfont" data-toggle="tab">SoundFont</a></li>
 				<li><a href="#scale" data-toggle="tab">Scale</a></li>
 				<li><a href="#saved" data-toggle="tab">Save</a></li>
 			</ul>
 			<div id="settings-content" class="tab-content">
-				<div class="tab-pane active" id="audio">
-					<div>
-						<strong>Volume:</strong>
-						<em id="volume-display" class="pull-right">&nbsp;</em>
-					</div>
-					<div id="volume-container"></div>
-					<div>
-						<strong>Tempo:</strong>
-						<em id="tempo-display" class="pull-right">&nbsp;</em>
-					</div>
-					<div id="tempo-container"></div>
-					<div>
-						<strong>Center Note:</strong>
-						<em id="center-note-display" class="pull-right">&nbsp;</em>
-					</div>
-					<div id="center-note-container"></div>
-					<div>
-						<strong>Data Size:</strong>
-						<em id="data-size-display" class="pull-right">&nbsp;</em>
-					</div>
-					<div id="data-size-container"></div>
-					<div>&nbsp;</div>
-				</div>
-				<div class="tab-pane" id="scale">
-					<div style="margin-bottom:5px;">
-					    <strong class="pull-left">Scale:</strong>
-					    <em id="scale-display" class="pull-right">&nbsp;</em>
-					    <div class="clearfix"></div>
-					</div>
-					<input id="scale-filter" type="text" class="input-medium search-query" placeholder="Filter Scale Names" />
-					<ul id="scale-options" class="nav nav-pills nav-stacked">
-					</ul>
-				</div>
-				<div class="tab-pane" id="saved">
-					<h3>Coming Soon.</h3>
-					<h4>Soon you will be able to save and load settings from this panel.</h4>
-				</div>
+				{% include pane-audio.html %}
+				{% include pane-waveform.html %}
+				{% include pane-soundfont.html %}
+				{% include pane-scale.html %}
+				{% include pane-saved.html %}
 			</div>
 		</div>
 		<div class="span8">

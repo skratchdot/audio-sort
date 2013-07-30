@@ -8,8 +8,6 @@
 
 - Improve visualizations / transitions. Allow filtering of what to show / play.
 
-- Add audio controls: string synth vs sin vs saw vs tri, etc
-
 - Add "use defaults" button for audio controls
 
 - Add popovers on sort selection with info about the sort's performance
@@ -26,4 +24,5 @@
 - <del>Add "export to midi" button(s)</del>
 
 - <del>Allow data to be set by clicking on the svg node</del>
-  
+
+- <del>Add audio controls: string synth vs sin vs saw vs tri, etc</del>

@@ -1,7 +1,13 @@
 @media (max-width: 979px) {
+	#settings {
+		font-size: 9px;
+	}
 }
 
 @media (max-width: 767px) {
+	#settings {
+		font-size: 14px;
+	}
 	body {
 		padding: 0;
 	}
@@ -39,6 +45,9 @@
 }
 
 @media (max-width: 480px) {
+	#settings {
+		font-size: 9px;
+	}
 	#header-title h1 {
 		font-size: 22px;
 	}
