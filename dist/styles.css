@@ -7425,7 +7425,7 @@ html, body {
 }
 
 header, footer, svg, #sort-options, #scale-options, #waveform canvas {
-	background: url(../img/gradient_squares.png) repeat !important;
+	background: url(../img/gradient_squares.png) repeat;
 }
 
 #settings {
@@ -7461,6 +7461,7 @@ header, footer, svg, #sort-options, #scale-options, #waveform canvas {
 	width: 100%;
 	height:55px;
 	margin-bottom: 5px;
+	background-position: -20px 27px;
 }
 
 #base-chart svg {

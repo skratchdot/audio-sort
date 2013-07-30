@@ -878,7 +878,7 @@
 	global.AudioPlayer.create = function (containerSelector, options) {
 		var player = {},
 			// Config Values
-			canvasBackground = '#f3f3f3',
+			canvasBackground = 'rgba(255, 255, 255, 0)',
 			// State Variables
 			isLooping, isPlaying, isReverse,
 			intervalIndex, hasMarkers, allowHover, allowClick, onClick,
@@ -892,7 +892,7 @@
 			// Data
 			data, interval, env, waveGenerator, visualization, selectedVisualization = 'bar',
 			// Functions
-			_init, drawSvg, ensureIntervalIndex, intervalCallback,
+			_init, clearCanvas, drawSvg, ensureIntervalIndex, intervalCallback,
 			getMidiNumber, getMidiNumberHelper,
 			refreshSliderPosition,
 			// Event Listeners
@@ -962,6 +962,11 @@
 				});
 			}
 
+		};
+
+		clearCanvas = function (canvas) {
+			var context = canvas.getContext('2d');
+			context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 		};
 
 		drawSvg = function () {
@@ -1268,29 +1273,28 @@
 		};
 
 		player.drawEnvelopeCanvas = function () {
+			var canvas = $('#waveform-adshr-canvas').get(0);
 			// ADSHR
+			clearCanvas(canvas);
 			if (env && typeof env.plot === 'function') {
 				env.plot({
-					target: $('#waveform-adshr-canvas').get(0),
+					target: canvas,
 					background: canvasBackground
 				});
 			}
 		};
 
 		player.drawWaveformCanvases = function () {
-			var canvas, context;
+			var canvas = $('#waveform-canvas').get(0);
 			// ADSHR
 			player.drawEnvelopeCanvas();
 			// Waveform
-			canvas = $('#waveform-canvas').get(0);
+			clearCanvas(canvas);
 			if (waveGenerator && waveGenerator.osc) {
 				waveGenerator.osc.plot({
 					target: canvas,
 					background: canvasBackground
 				});
-			} else {
-				context = canvas.getContext('2d');
-				context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 			}
 		};
 
