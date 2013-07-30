@@ -1541,11 +1541,13 @@
 	};
 
 	onSliderVolume = function (e) {
+		var volume;
 		onSlider('volume', '#volume-display', e, function (val) {
 			return val.toFixed(2);
 		});
-		players.base.setVolume(selected.volume);
-		players.sort.setVolume(selected.volume);
+		volume = waveform[selected.waveform].mul * selected.volume;
+		players.base.setVolume(volume);
+		players.sort.setVolume(volume);
 	};
 
 	onSliderTempo = function (e) {
