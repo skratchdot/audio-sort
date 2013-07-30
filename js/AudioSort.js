@@ -1,4 +1,4 @@
-/*global $, sc, ace, d3, js_beautify, AudioPlayer, Worker, Blob, Uint8Array, saveAs */
+/*global $, sc, ace, d3, js_beautify, timbre, AudioPlayer, Worker, Blob, Uint8Array, saveAs */
 (function (global) {
 	'use strict';
 
@@ -666,6 +666,11 @@
 	AudioSort.init = function (webWorkerUrl) {
 		if (typeof webWorkerUrl === 'string') {
 			workerUrl = webWorkerUrl;
+		}
+		// when using a mobile device, decrease samplerate.
+		// idea taken from: http://mohayonao.github.io/timbre.js/misc/js/common.js
+		if (timbre.envmobile) {
+			timbre.setup({samplerate:timbre.samplerate * 0.5});
 		}
 		// build our sort options
 		buildSortOptions('#sort-options');
