@@ -7424,8 +7424,8 @@ html, body {
 	background-image: radial-gradient(circle farthest-corner at center, #ffffff 0%, #fbfefe 100%);
 }
 
-header, footer, svg, #sort-options, #scale-options, #waveform canvas {
-	background: url(../img/gradient_squares.png) repeat;
+#header, #footer, svg, #sort-options, #scale-options, #waveform canvas {
+	background: #e6e6e6 url(../img/gradient_squares.png) repeat;
 }
 
 #settings {
@@ -7610,18 +7610,17 @@ svg, #sort-options, #scale-options, #waveform canvas {
 	width: 100%;
 }
 
-header {
-	background: #e6e6e6;
+#header {
 	border-bottom:1px solid #999;
 }
 
-header h1 a.home-link {
+#header h1 a.home-link {
 	color: #333;
 	text-transform: uppercase;
 	font-family: Impact, Haettenschweiler, "Franklin Gothic Bold", Charcoal, "Helvetica Inserat", "Bitstream Vera Sans Bold", "Arial Black", sans serif;
 }
 
-header h1 small a {
+#header h1 small a {
 	font-size: 20px;
 	color: #c80000;
 }
@@ -7634,7 +7633,7 @@ header h1 small a {
 	text-decoration: underline;
 }
 
-header .breadcrumb {
+#header .breadcrumb {
 	background: transparent;
 	margin: 6px 0 5px 0;
 	padding: 0;
@@ -7657,28 +7656,27 @@ header .breadcrumb {
 	height: 45px;
 }
 
-footer {
+#footer {
 	bottom:0;
 	left:0;
-	background-color: #e6e6e6;
 }
 
-footer .footer-built-with {
+#footer .footer-built-with {
 	margin: 10px;
 	float: left;
 }
 
-footer .footer-copy {
+#footer .footer-copy {
 	margin: 10px;
 	float: right;
 }
 
-footer .footer-copy img {
+#footer .footer-copy img {
 	width: 16px;
 	height: 16px;
 }
 
-footer hr {
+#footer hr {
 	padding: 0;
 	margin: 0;
 	border-color: #999;
@@ -7744,14 +7742,14 @@ footer hr {
 	#social-header {
 		display: none;
 	}
-	footer .footer-built-with,
-	footer .footer-copy {
+	#footer .footer-built-with,
+	#footer .footer-copy {
 		float: none;
 	}
-	footer .footer-built-with {
+	#footer .footer-built-with {
 		display: none;
 	}
-	footer {
+	#footer {
 		margin: 0;
 		padding: 0;
 		text-align: center;

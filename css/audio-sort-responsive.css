@@ -30,14 +30,14 @@
 	#social-header {
 		display: none;
 	}
-	footer .footer-built-with,
-	footer .footer-copy {
+	#footer .footer-built-with,
+	#footer .footer-copy {
 		float: none;
 	}
-	footer .footer-built-with {
+	#footer .footer-built-with {
 		display: none;
 	}
-	footer {
+	#footer {
 		margin: 0;
 		padding: 0;
 		text-align: center;
