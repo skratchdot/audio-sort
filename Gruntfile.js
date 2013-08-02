@@ -10,7 +10,8 @@ module.exports = function(grunt) {
 		},
 		jshint: {
 			options: {
-				jshintrc: '.jshintrc'
+				jshintrc: '.jshintrc',
+				ignores: ['js/AudioSort.instruments.js']
 			},
 			gruntfile: {
 				src: 'Gruntfile.js'
@@ -54,8 +55,10 @@ module.exports = function(grunt) {
 					'js/sort/*.js',
 					'js/visualization/*.js',
 					'js/AS.js',
+					'js/AudioHelper.js',
 					'js/AudioPlayer.js',
-					'js/AudioSort.js'
+					'js/AudioSort.js',
+					'js/AudioSort.instruments.js'
 				],
 				dest: 'dist/sort.js'
 			},
@@ -77,6 +80,9 @@ module.exports = function(grunt) {
 			}
 		},
 		uglify: {
+			options: {
+				preserveComments: 'some'
+			},
 			dist: {
 				files: {
 					'dist/sort.min.js': ['dist/sort.js'],

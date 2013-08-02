@@ -1,3 +1,11 @@
+/*!
+ * Project: Audio Sort
+ *    File: SortWorker.js
+ *  Source: https://github.com/skratchdot/audio-sort/
+ *
+ * Copyright (c) 2013 skratchdot
+ * Licensed under the MIT license.
+ */
 /*global sort */
 (function (global) {
 	'use strict';

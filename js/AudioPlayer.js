@@ -1,4 +1,12 @@
-/*global $, timbre, d3, sc, AudioSort, Midi */
+/*!
+ * Project: Audio Sort
+ *    File: AudioPlayer.js
+ *  Source: https://github.com/skratchdot/audio-sort/
+ *
+ * Copyright (c) 2013 skratchdot
+ * Licensed under the MIT license.
+ */
+/*global $, timbre, d3, AudioHelper, AudioSort, Midi */
 (function (global) {
 	'use strict';
 	global.AudioPlayer = {};
@@ -20,7 +28,6 @@
 			data, interval, env, waveGenerator, visualization, selectedVisualization = 'bar',
 			// Functions
 			_init, clearCanvas, drawSvg, ensureIntervalIndex, intervalCallback,
-			getMidiNumber, getMidiNumberHelper,
 			refreshSliderPosition,
 			// Event Listeners
 			onPlayerButtonClick,
@@ -145,28 +152,8 @@
 			intervalIndex = Math.max(intervalIndex, 0);
 		};
 
-		getMidiNumber = function (playValue) {
-			var scale, octaveSize, degrees, degreeSize, centerValue, playMidi, centerMidi;
-
-			// get some info from our current scale
-			scale = sc.ScaleInfo.at(AudioSort.getSelected('scale'));
-			octaveSize = scale.pitchesPerOctave();
-			degrees = scale.degrees();
-			degreeSize = degrees.length;
-			centerValue = Math.floor(AudioSort.getSelected('dataSize') / 2);
-
-			playMidi = getMidiNumberHelper(degrees, degreeSize, octaveSize, playValue);
-			centerMidi = getMidiNumberHelper(degrees, degreeSize, octaveSize, centerValue);
-
-			return playMidi + AudioSort.getSelected('centerNote') - centerMidi;
-		};
-
-		getMidiNumberHelper = function (degrees, degreeSize, octaveSize, position) {
-			return degrees[position % degreeSize] + (Math.floor(position / degreeSize) * octaveSize);
-		};
-
 		intervalCallback = function () {
-			var midi, info, i, currentItem;
+			var midi, info, i, currentItem, selectedAudioType;
 			if (isPlaying) {
 				ensureIntervalIndex();
 				refreshSliderPosition();
@@ -174,12 +161,19 @@
 				// play if possible
 				if (data.length > 0) {
 					info = data[intervalIndex];
+					selectedAudioType = AudioSort.getSelected('audioType');
 					for (i = 0; i < info.arr.length; i++) {
 						currentItem = info.arr[i];
 						if (currentItem.play) {
-							midi = getMidiNumber(currentItem.value);
+							midi = AudioHelper.getMidiNumber(currentItem.value);
 							if (midi >= 0 && midi < 128) {
-								waveGenerator.noteOn(midi, 64);
+								if (selectedAudioType === 'waveform') {
+									waveGenerator.noteOn(midi, 64);
+								} else if (selectedAudioType === 'soundfont') {
+									timbre.soundfont.play(midi, false, {
+										mul: AudioSort.getSelected('volume') * 1.5
+									});
+								}
 							}
 						}
 					}
@@ -298,7 +292,9 @@
 				}
 			}
 			isReverse = reverse === true ? true : false;
-			waveGenerator.play();
+			if (AudioSort.getSelected('audioType') === 'waveform') {
+				waveGenerator.play();
+			}
 			interval.start();
 		};
 
@@ -343,7 +339,7 @@
 				for (j = 0; j < info.arr.length; j++) {
 					currentItem = info.arr[j];
 					if (currentItem.play) {
-						midiNumber = getMidiNumber(currentItem.value);
+						midiNumber = AudioHelper.getMidiNumber(currentItem.value);
 						if (midiNumber >= 0 && midiNumber < 128) {
 							play.push(midiNumber);
 						}
@@ -394,7 +390,7 @@
 			if (waveInfo.gen === 'OscGen') {
 				waveGenerator.set('osc', timbre(AudioSort.getSelected('waveform')));
 			}
-			if (isPlaying) {
+			if (isPlaying && AudioSort.getSelected('audioType') === 'waveform') {
 				waveGenerator.play();
 			}
 		};

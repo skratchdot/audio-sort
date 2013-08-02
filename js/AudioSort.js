@@ -1,4 +1,12 @@
-/*global $, sc, ace, d3, js_beautify, timbre, AudioPlayer, Worker, Blob, Uint8Array, saveAs */
+/*!
+ * Project: Audio Sort
+ *    File: AudioSort.js
+ *  Source: https://github.com/skratchdot/audio-sort/
+ *
+ * Copyright (c) 2013 skratchdot
+ * Licensed under the MIT license.
+ */
+/*global $, sc, ace, d3, js_beautify, timbre, AudioHelper, AudioPlayer, Worker, Blob, Uint8Array, saveAs */
 (function (global) {
 	'use strict';
 
@@ -14,7 +22,8 @@
 			sort: { value: 'bubble' },
 			dataSize: { value: 12, min: 4, max: 48, step: 1 },
 			audioType: { value: 'waveform' },
-			waveform: { value: 'string' }
+			waveform: { value: 'string' },
+			soundfont: { value: 0 }
 		},
 		// Currently Selected Items
 		selected = {
@@ -25,7 +34,8 @@
 			sort: defaults.sort.value,
 			dataSize: defaults.dataSize.value,
 			audioType: defaults.audioType.value,
-			waveform: defaults.waveform.value
+			waveform: defaults.waveform.value,
+			soundfont: defaults.soundfont.value
 		},
 		// Waveform Data
 		waveform = {
@@ -74,7 +84,7 @@
 		onAudioTypeTabLinkClick,
 		onSaveAlgorithmEdit,
 		onSaveAlgorithmNew,
-		onScaleFilter,
+		onOptionBoxFilter,
 		buildSortOptions,
 		clickPlayButton,
 		doSort,
@@ -100,6 +110,8 @@
 		onAddAlgorithmModalClick,
 		playerButtonCallback,
 		populateScaleOptions,
+		populateSoundfontOptions,
+		preloadSoundfonts,
 		setupPlayers,
 		updateDisplayCache;
 
@@ -214,6 +226,10 @@
 		displayName = audioType;
 		if (selected.audioType === 'waveform') {
 			displayName += ': ' + selected.waveform;
+			players.base.refreshWaveGenerator();
+			players.sort.refreshWaveGenerator();
+		} else if (selected.audioType === 'soundfont') {
+			displayName = $('#soundfont-options li.active').text();
 		}
 		updateDisplayCache('#audio-type-display', displayName);
 		// update settings link
@@ -221,6 +237,7 @@
 		// show correct tab
 		$tabs.removeClass('hidden');
 		$tabs.filter('[data-audio-type!="' + audioType + '"]').addClass('hidden');
+		preloadSoundfonts();
 	};
 
 	onAudioTypeTabLinkClick = function () {
@@ -253,6 +270,7 @@
 
 	onSliderCenterNote = function (e) {
 		onSlider('centerNote', '#center-note-display', e, getNoteName);
+		preloadSoundfonts();
 	};
 
 	onSliderDataSize = function (e) {
@@ -343,6 +361,7 @@
 			}
 		}
 		players.base.setData(getBaseDataAsFrames());
+		preloadSoundfonts();
 	};
 
 	addAceEditor = function (container) {
@@ -556,18 +575,75 @@
 				$this.addClass('active');
 				selected.scale = $this.data('scale');
 				updateDisplayCache('#scale-display', $this.text());
+				preloadSoundfonts();
 			}
 		});
 	};
 
-	onScaleFilter = function () {
+	populateSoundfontOptions = function (selector) {
+		var i, instrument, group = '',
+			$ul = $(selector), $li, htmlString = '';
+		for (i = 0; i < AudioSort.instruments.length; i++) {
+			instrument = AudioSort.instruments[i];
+			// output group
+			if (group !== instrument.group) {
+				group = instrument.group;
+				$li = $('<li />').addClass('disabled').wrapInner(
+					$('<a href="javascript:void(0);"></a>').text(
+						instrument.group
+					)
+				);
+				htmlString += $li.wrap('<div />').parent().html();
+			}
+			// output instrument
+			$li = $('<li />').attr('data-soundfont', instrument.val).wrapInner(
+				$('<a href="javascript:void(0);"></a>').text(instrument.name)
+			);
+			if (selected.soundfont === i) {
+				$li.addClass('active');
+			}
+			htmlString += $li.wrap('<div />').parent().html();
+		}
+		htmlString += $li.wrap('<div />').parent().html();
+		$ul.append(htmlString);
+		$ul.on('click', 'li', function () {
+			var $this = $(this);
+			if (!$this.hasClass('disabled')) {
+				$ul.find('li').removeClass('active');
+				$this.addClass('active');
+				selected.soundfont = $this.data('soundfont');
+				timbre.soundfont.setInstrument(selected.soundfont);
+				updateDisplayCache('#soundfont-display', $this.text());
+				updateDisplayCache('#audio-type-display', $this.text());
+				preloadSoundfonts();
+			}
+		});
+	};
+
+	preloadSoundfonts = function () {
+		var i, midiNotes = [], midi;
+		if (selected.audioType === 'soundfontX') {
+			for (i = 0; i < baseData.length; i++) {
+				midi = AudioHelper.getMidiNumber(baseData[i]);
+				if (midiNotes.indexOf(midi) === -1 && midi >= 0 && midi < 128) {
+					midiNotes.push(midi);
+				}
+			}
+			timbre.soundfont.preload(midiNotes);
+		}
+	};
+
+	onOptionBoxFilter = function () {
 		var show = false,
-			val = $.trim($(this).val()),
+			$this = $(this),
+			listId = $this.attr('data-list-id'),
+			$listItems = $('#' + listId + ' li'),
+			val = $.trim($this.val()),
 			regex = new RegExp(val, 'i');
 		if (val === '') {
-			$('#scale-options li').show();
+			$listItems.show();
 		} else {
-			$.each($('#scale-options li').get().reverse(), function (index, item) {
+			$.each($listItems.get().reverse(), function (index, item) {
 				var $item = $(item);
 				if ($item.hasClass('disabled')) {
 					$item.css('display', show ? 'block' : 'none');
@@ -664,7 +740,7 @@
 	AudioSort.getTempoString = function () {
 		return 'bpm' + (parseFloat(selected.tempo) || defaults.tempo) + ' l16';
 	};
- 
+
 	AudioSort.init = function (webWorkerUrl) {
 		if (typeof webWorkerUrl === 'string') {
 			workerUrl = webWorkerUrl;
@@ -682,17 +758,29 @@
 		setupPlayers();
 		// setup base data
 		generateData(true, 'randomUnique');
-		// populate our scale drop down
+		// populate our scale dropdown
 		populateScaleOptions('#scale-options');
 		updateDisplayCache(
 			'#scale-display',
 			$('#scale-options li[data-scale="' + selected.scale + '"]').text()
 		);
 		$('#scale-filter')
-			.on('keyup', onScaleFilter)
+			.on('keyup', onOptionBoxFilter)
 			.on('focus', function () {
 				$(this).val('');
 				$('#scale-options li').show();
+			});
+		// populate our soundfont dropdown
+		populateSoundfontOptions('#soundfont-options');
+		updateDisplayCache(
+			'#soundfont-display',
+			$('#soundfont-options li[data-soundfont="' + selected.soundfont + '"]').text()
+		);
+		$('#soundfont-filter')
+			.on('keyup', onOptionBoxFilter)
+			.on('focus', function () {
+				$(this).val('');
+				$('#soundfont-options li').show();
 			});
 		// create some of our sliders
 		AudioSort.createSlider('#volume-container', defaults.volume, onSliderVolume);

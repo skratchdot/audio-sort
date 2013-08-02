@@ -7424,7 +7424,7 @@ html, body {
 	background-image: radial-gradient(circle farthest-corner at center, #ffffff 0%, #fbfefe 100%);
 }
 
-#header, #footer, svg, #sort-options, #scale-options, #waveform canvas {
+#header, #footer, svg, #sort-options, .option-box, #waveform canvas {
 	background: #e6e6e6 url(../img/gradient_squares.png) repeat;
 }
 
@@ -7468,7 +7468,7 @@ html, body {
 	cursor: pointer;
 }
 
-svg, #sort-options, #scale-options, #waveform canvas {
+svg, #sort-options, .option-box, #waveform canvas {
 	border: 1px solid #999;
 	border-radius: 5px;
 }
@@ -7557,32 +7557,28 @@ svg, #sort-options, #scale-options, #waveform canvas {
 	margin: 0 2%;
 }
 
-#scale-display {
-	margin-bottom: 3px;
-}
-
-#sort-options, #scale-options {
+#sort-options, .option-box {
 	height: 200px;
 	overflow: auto;
 	margin: 0;
 }
 
-#scale-options {
+.option-box {
 	margin-top: 8px;
 	height: 160px;
 }
 
-#scale-options > li {
+.option-box > li {
 	font-size: 12px;
 	line-height: 16px;
 }
 
-#scale-options > li a {
+.option-box > li a {
 	margin: 0;
 	padding: 5px 12px;
 }
 
-#scale-filter {
+#scale-filter, #soundfont-filter {
 	width: 90%;
 }
 

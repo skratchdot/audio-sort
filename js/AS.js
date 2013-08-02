@@ -1,3 +1,11 @@
+/*!
+ * Project: Audio Sort
+ *    File: AS.js
+ *  Source: https://github.com/skratchdot/audio-sort/
+ *
+ * Copyright (c) 2013 skratchdot
+ * Licensed under the MIT license.
+ */
 (function (global) {
 	'use strict';
 
