@@ -608,14 +608,13 @@
 			}
 			// output instrument
 			$li = $('<li />').attr('data-soundfont', instrument.val).wrapInner(
-				$('<a href="javascript:void(0);"></a>').text(instrument.name)
+				$('<a href="javascript:void(0);"></a>').text(i + ': ' + instrument.name)
 			);
 			if (selected.soundfont === i) {
 				$li.addClass('active');
 			}
 			htmlString += $li.wrap('<div />').parent().html();
 		}
-		htmlString += $li.wrap('<div />').parent().html();
 		$ul.append(htmlString);
 		$ul.on('click', 'li', function () {
 			var $this = $(this);

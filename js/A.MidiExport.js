@@ -51,7 +51,7 @@
 			}
 			$option = $('<option></option>')
 				.val(i)
-				.text(instrument.name);
+				.text(i + ': ' + instrument.name);
 			if (i === 0) {
 				$option.attr('selected', 'selected');
 			}
