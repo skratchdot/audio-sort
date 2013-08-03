@@ -395,17 +395,25 @@
 		var $modal = $('#modal-midi-export');
 
 		// setup a default file name
-		$('#new-file-name').attr('placeholder', 'AudioSort_' + (new Date()).getTime()).val('');
+		$('#midi-export-name').attr('placeholder', 'AudioSort_' + (new Date()).getTime()).val('');
 
+		// populate channels
+		A.MidiExport.populateChannels('#midi-export-channel');
+
+		// populate instruments
+		A.MidiExport.populateInstruments('#midi-export-instrument');
+
+		// store the source of our data so onMidiSave() can use it
 		$('#midi-export-btn').attr('data-midi-export', $(this).data('midiExport'));
 
+		// open the modal
 		$modal.modal();
 	};
 
 	onMidiSave = function () {
 		var byteNumbers, blob,
 			playerType = $('#midi-export-btn').attr('data-midi-export'),
-			$filename = $('#new-file-name'),
+			$filename = $('#midi-export-name'),
 			filename = $.trim($filename.val());
 
 		// use placeholder if a filename wasn't entered
@@ -416,7 +424,10 @@
 
 		// save file
 		if (players.hasOwnProperty(playerType)) {
-			byteNumbers = $.map(players[playerType].getMidiBytes().split(''), function (item) {
+			byteNumbers = $.map(players[playerType]
+				.getMidiBytes(selected.tempo,
+						$('#midi-export-channel').val(),
+						$('#midi-export-instrument').val()).split(''), function (item) {
 				return item.charCodeAt(0);
 			});
 			blob = new Blob([new Uint8Array(byteNumbers)], {

@@ -924,6 +924,70 @@
 }(this));
 /*!
  * Project: Audio Sort
+ *    File: A.MidiExport.js
+ *  Source: https://github.com/skratchdot/audio-sort/
+ *
+ * Copyright (c) 2013 skratchdot
+ * Licensed under the MIT license.
+ */
+/*global $, A */
+(function (global) {
+	'use strict';
+
+	var MidiExport = {};
+
+	MidiExport.populateChannels = function (selector) {
+		var i, $select = $(selector), $option, html = '', numChannels = 16;
+
+		// empty select
+		$select.empty();
+
+		// populate select
+		for (i = 0; i < numChannels; i++) {
+			$option = $('<option></option>')
+				.val(i)
+				.text(i);
+			if (i === 0) {
+				$option.attr('selected', 'selected');
+			}
+			html += $option.wrap('<div />').parent().html();
+		}
+		$select.append(html);
+	};
+
+	MidiExport.populateInstruments = function (selector) {
+		var i, instrument, group = '',
+			$select = $(selector), $optGroup, $option;
+
+		// empty select
+		$select.empty();
+
+		// populate select
+		for (i = 0; i < A.instruments.length; i++) {
+			instrument = A.instruments[i];
+			if (group !== instrument.group) {
+				group = instrument.group;
+				if ($optGroup) {
+					$select.append($optGroup);
+				}
+				$optGroup = $('<optgroup></optgroup>')
+					.attr('label', group);
+			}
+			$option = $('<option></option>')
+				.val(i)
+				.text(instrument.name);
+			if (i === 0) {
+				$option.attr('selected', 'selected');
+			}
+			$optGroup.append($option);
+		}
+		$select.append($optGroup);
+	};
+
+	global.A.MidiExport = MidiExport;
+}(this));
+/*!
+ * Project: Audio Sort
  *    File: A.Player.js
  *  Source: https://github.com/skratchdot/audio-sort/
  *
@@ -1243,22 +1307,24 @@
 			drawSvg();
 		};
 
-		player.getMidiBytes = function () {
+		player.getMidiBytes = function (tempo, channel, instrument) {
 			var i, j,
 				midiFile, midiTrack,
-				channel = 0, duration = 64,
+				duration = 64, totalDuration = 0,
 				info, currentItem, midiNumber, play;
 
 			// setup midi file
 			midiFile = new Midi.File();
 			midiTrack = new Midi.Track();
-			midiTrack.setTempo(A.Sort.getSelected('tempo'));
+			midiTrack.setTempo(tempo);
+			midiTrack.setInstrument(channel, instrument);
 			midiFile.addTrack(midiTrack);
 
 			// build midi track
 			for (i = 0; i < data.length; i++) {
 				info = data[i];
 				play = [];
+				totalDuration += duration;
 				// get the notes we need to play
 				for (j = 0; j < info.arr.length; j++) {
 					currentItem = info.arr[j];
@@ -1282,6 +1348,13 @@
 					midiTrack.noteOff(channel, play[j]);
 				}
 			}
+
+			// extend track so the last note plays
+			midiTrack.addEvent(new Midi.MetaEvent({
+				type: Midi.MetaEvent.COPYRIGHT,
+				data: 'Audio Sort <skratchdot.com>',
+				time: totalDuration + 1024
+			}));
 
 			return midiFile.toBytes();
 		};
@@ -1748,17 +1821,25 @@
 		var $modal = $('#modal-midi-export');
 
 		// setup a default file name
-		$('#new-file-name').attr('placeholder', 'AudioSort_' + (new Date()).getTime()).val('');
+		$('#midi-export-name').attr('placeholder', 'AudioSort_' + (new Date()).getTime()).val('');
 
+		// populate channels
+		A.MidiExport.populateChannels('#midi-export-channel');
+
+		// populate instruments
+		A.MidiExport.populateInstruments('#midi-export-instrument');
+
+		// store the source of our data so onMidiSave() can use it
 		$('#midi-export-btn').attr('data-midi-export', $(this).data('midiExport'));
 
+		// open the modal
 		$modal.modal();
 	};
 
 	onMidiSave = function () {
 		var byteNumbers, blob,
 			playerType = $('#midi-export-btn').attr('data-midi-export'),
-			$filename = $('#new-file-name'),
+			$filename = $('#midi-export-name'),
 			filename = $.trim($filename.val());
 
 		// use placeholder if a filename wasn't entered
@@ -1769,7 +1850,10 @@
 
 		// save file
 		if (players.hasOwnProperty(playerType)) {
-			byteNumbers = $.map(players[playerType].getMidiBytes().split(''), function (item) {
+			byteNumbers = $.map(players[playerType]
+				.getMidiBytes(selected.tempo,
+						$('#midi-export-channel').val(),
+						$('#midi-export-instrument').val()).split(''), function (item) {
 				return item.charCodeAt(0);
 			});
 			blob = new Blob([new Uint8Array(byteNumbers)], {

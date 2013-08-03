@@ -57,6 +57,7 @@ module.exports = function(grunt) {
 					'js/AS.js',
 					'js/_A.js',
 					'js/A.Helper.js',
+					'js/A.MidiExport.js',
 					'js/A.Player.js',
 					'js/A.Sort.js',
 					'js/A.instruments.js'

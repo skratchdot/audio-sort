@@ -319,22 +319,24 @@
 			drawSvg();
 		};
 
-		player.getMidiBytes = function () {
+		player.getMidiBytes = function (tempo, channel, instrument) {
 			var i, j,
 				midiFile, midiTrack,
-				channel = 0, duration = 64,
+				duration = 64, totalDuration = 0,
 				info, currentItem, midiNumber, play;
 
 			// setup midi file
 			midiFile = new Midi.File();
 			midiTrack = new Midi.Track();
-			midiTrack.setTempo(A.Sort.getSelected('tempo'));
+			midiTrack.setTempo(tempo);
+			midiTrack.setInstrument(channel, instrument);
 			midiFile.addTrack(midiTrack);
 
 			// build midi track
 			for (i = 0; i < data.length; i++) {
 				info = data[i];
 				play = [];
+				totalDuration += duration;
 				// get the notes we need to play
 				for (j = 0; j < info.arr.length; j++) {
 					currentItem = info.arr[j];
@@ -358,6 +360,13 @@
 					midiTrack.noteOff(channel, play[j]);
 				}
 			}
+
+			// extend track so the last note plays
+			midiTrack.addEvent(new Midi.MetaEvent({
+				type: Midi.MetaEvent.COPYRIGHT,
+				data: 'Audio Sort <skratchdot.com>',
+				time: totalDuration + 1024
+			}));
 
 			return midiFile.toBytes();
 		};
