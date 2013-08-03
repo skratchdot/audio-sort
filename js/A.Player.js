@@ -1,16 +1,16 @@
 /*!
  * Project: Audio Sort
- *    File: AudioPlayer.js
+ *    File: A.Player.js
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot
  * Licensed under the MIT license.
  */
-/*global $, timbre, d3, AudioHelper, AudioSort, Midi */
+/*global $, timbre, d3, A, Midi */
 (function (global) {
 	'use strict';
-	global.AudioPlayer = {};
-	global.AudioPlayer.create = function (containerSelector, options) {
+	global.A.Player = {};
+	global.A.Player.create = function (containerSelector, options) {
 		var player = {},
 			// Config Values
 			canvasBackground = 'rgba(255, 255, 255, 0)',
@@ -63,7 +63,7 @@
 
 			// setup audio envelopes/generators and interval
 			player.refreshWaveGenerator();
-			interval = timbre('interval', { interval: AudioSort.getTempoString() }, intervalCallback);
+			interval = timbre('interval', { interval: A.Sort.getTempoString() }, intervalCallback);
 
 			// listen for player button clicks
 			$container.find('.player-buttons').on('click', '.btn', onPlayerButtonClick);
@@ -161,17 +161,17 @@
 				// play if possible
 				if (data.length > 0) {
 					info = data[intervalIndex];
-					selectedAudioType = AudioSort.getSelected('audioType');
+					selectedAudioType = A.Sort.getSelected('audioType');
 					for (i = 0; i < info.arr.length; i++) {
 						currentItem = info.arr[i];
 						if (currentItem.play) {
-							midi = AudioHelper.getMidiNumber(currentItem.value);
+							midi = A.Helper.getMidiNumber(currentItem.value);
 							if (midi >= 0 && midi < 128) {
 								if (selectedAudioType === 'waveform') {
 									waveGenerator.noteOn(midi, 64);
 								} else if (selectedAudioType === 'soundfont') {
 									timbre.soundfont.play(midi, false, {
-										mul: AudioSort.getSelected('volume') * 1.5
+										mul: A.Sort.getSelected('volume') * 1.5
 									});
 								}
 							}
@@ -239,7 +239,7 @@
 		player.setData = function (d) {
 			var selector = containerSelector + ' .position-container';
 			data = d;
-			$slider = AudioSort.createSlider(selector, {
+			$slider = A.Sort.createSlider(selector, {
 				value: 0,
 				min: 0,
 				max: data.length - 1,
@@ -292,7 +292,7 @@
 				}
 			}
 			isReverse = reverse === true ? true : false;
-			if (AudioSort.getSelected('audioType') === 'waveform') {
+			if (A.Sort.getSelected('audioType') === 'waveform') {
 				waveGenerator.play();
 			}
 			interval.start();
@@ -328,7 +328,7 @@
 			// setup midi file
 			midiFile = new Midi.File();
 			midiTrack = new Midi.Track();
-			midiTrack.setTempo(AudioSort.getSelected('tempo'));
+			midiTrack.setTempo(A.Sort.getSelected('tempo'));
 			midiFile.addTrack(midiTrack);
 
 			// build midi track
@@ -339,7 +339,7 @@
 				for (j = 0; j < info.arr.length; j++) {
 					currentItem = info.arr[j];
 					if (currentItem.play) {
-						midiNumber = AudioHelper.getMidiNumber(currentItem.value);
+						midiNumber = A.Helper.getMidiNumber(currentItem.value);
 						if (midiNumber >= 0 && midiNumber < 128) {
 							play.push(midiNumber);
 						}
@@ -363,7 +363,7 @@
 		};
 
 		player.refreshWaveGenerator = function () {
-			var waveInfo = AudioSort.getSelectedWaveformInfo();
+			var waveInfo = A.Sort.getSelectedWaveformInfo();
 			$.each([env, waveGenerator], function (index, obj) {
 				$.each(['pause', 'removeAllListeners'], function (index, key) {
 					if (obj && typeof obj[key] === 'function') {
@@ -380,7 +380,7 @@
 			});
 			waveGenerator = timbre(waveInfo.gen, {
 				env: env,
-				mul: AudioSort.getSelected('volume') * waveInfo.mul,
+				mul: A.Sort.getSelected('volume') * waveInfo.mul,
 				poly: waveInfo.poly || 10
 			}).on('ended', function () {
 				if (!isPlaying) {
@@ -388,9 +388,9 @@
 				}
 			});
 			if (waveInfo.gen === 'OscGen') {
-				waveGenerator.set('osc', timbre(AudioSort.getSelected('waveform')));
+				waveGenerator.set('osc', timbre(A.Sort.getSelected('waveform')));
 			}
-			if (isPlaying && AudioSort.getSelected('audioType') === 'waveform') {
+			if (isPlaying && A.Sort.getSelected('audioType') === 'waveform') {
 				waveGenerator.play();
 			}
 		};

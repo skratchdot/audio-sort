@@ -1,16 +1,16 @@
 /*!
  * Project: Audio Sort
- *    File: AudioHelper.js
+ *    File: A.Helper.js
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot
  * Licensed under the MIT license.
  */
-/*global sc, AudioSort */
+/*global sc, A */
 (function (global) {
 	'use strict';
 
-	var AudioHelper = {},
+	var Helper = {},
 		// functions
 		getMidiNumberHelper;
 
@@ -18,22 +18,22 @@
 		return degrees[position % degreeSize] + (Math.floor(position / degreeSize) * octaveSize);
 	};
 
-	AudioHelper.getMidiNumber = function (playValue) {
+	Helper.getMidiNumber = function (playValue) {
 		var scale, octaveSize, degrees, degreeSize, centerValue, playMidi, centerMidi;
 
 		// get some info from our current scale
-		scale = sc.ScaleInfo.at(AudioSort.getSelected('scale'));
+		scale = sc.ScaleInfo.at(A.Sort.getSelected('scale'));
 		octaveSize = scale.pitchesPerOctave();
 		degrees = scale.degrees();
 		degreeSize = degrees.length;
-		centerValue = Math.floor(AudioSort.getSelected('dataSize') / 2);
+		centerValue = Math.floor(A.Sort.getSelected('dataSize') / 2);
 
 		playMidi = getMidiNumberHelper(degrees, degreeSize, octaveSize, playValue);
 		centerMidi = getMidiNumberHelper(degrees, degreeSize, octaveSize, centerValue);
 
-		return playMidi + AudioSort.getSelected('centerNote') - centerMidi;
+		return playMidi + A.Sort.getSelected('centerNote') - centerMidi;
 	};
 
-	// add AudioHelper to the global scope
-	global.AudioHelper = AudioHelper;
+	// add Helper to the global scope
+	global.A.Helper = Helper;
 }(this));

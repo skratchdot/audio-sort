@@ -12,8 +12,6 @@
 
 - Add popovers on sort selection with info about the sort's performance
 
-- Add "stats panel" toggle buttons
-
 - Allow defaults to be set via url parameters
 
 - Add "share settings" button which would populate the url based on your current settings
@@ -26,3 +24,5 @@
 - <del>Allow data to be set by clicking on the svg node</del>
 
 - <del>Add audio controls: string synth vs sin vs saw vs tri, etc</del>
+
+- NO LONGER VALID: <del>Add "stats panel" toggle buttons</del>

@@ -1,16 +1,16 @@
 /*!
  * Project: Audio Sort
- *    File: AudioSort.js
+ *    File: A.Sort.js
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot
  * Licensed under the MIT license.
  */
-/*global $, sc, ace, d3, js_beautify, timbre, AudioHelper, AudioPlayer, Worker, Blob, Uint8Array, saveAs */
+/*global $, sc, ace, d3, js_beautify, timbre, A, Worker, Blob, Uint8Array, saveAs */
 (function (global) {
 	'use strict';
 
-	var AudioSort = {},
+	var Sort = {},
 		// Pass jshint
 		Fn = Function,
 		// Default Settings
@@ -262,7 +262,7 @@
 	};
 
 	onSliderTempo = function (e) {
-		var tempo = AudioSort.getTempoString();
+		var tempo = Sort.getTempoString();
 		onSlider('tempo', '#tempo-display', e);
 		players.base.setTempo(tempo);
 		players.sort.setTempo(tempo);
@@ -495,7 +495,7 @@
 	};
 
 	setupPlayers = function () {
-		players.base = AudioPlayer.create('#base-section', {
+		players.base = A.Player.create('#base-section', {
 			env: env,
 			pluck: pluck,
 			isLooping: true,
@@ -513,7 +513,7 @@
 				playerButtonCallback(players.sort, e.action);
 			}
 		});
-		players.sort = AudioPlayer.create('#sort-section', {
+		players.sort = A.Player.create('#sort-section', {
 			env: env,
 			pluck: pluck,
 			isLooping: true,
@@ -583,8 +583,8 @@
 	populateSoundfontOptions = function (selector) {
 		var i, instrument, group = '',
 			$ul = $(selector), $li, htmlString = '';
-		for (i = 0; i < AudioSort.instruments.length; i++) {
-			instrument = AudioSort.instruments[i];
+		for (i = 0; i < A.instruments.length; i++) {
+			instrument = A.instruments[i];
 			// output group
 			if (group !== instrument.group) {
 				group = instrument.group;
@@ -624,7 +624,7 @@
 		var i, midiNotes = [], midi;
 		if (selected.audioType === 'soundfontX') {
 			for (i = 0; i < baseData.length; i++) {
-				midi = AudioHelper.getMidiNumber(baseData[i]);
+				midi = A.Helper.getMidiNumber(baseData[i]);
 				if (midiNotes.indexOf(midi) === -1 && midi >= 0 && midi < 128) {
 					midiNotes.push(midi);
 				}
@@ -710,7 +710,7 @@
 		});
 	};
 
-	AudioSort.createSlider = function (selector, obj, onChange) {
+	Sort.createSlider = function (selector, obj, onChange) {
 		var $container = $(selector), $elem = $('<div class="audio-sort-slider"></div>'), $slider;
 		$container.empty();
 		$elem.appendTo($container);
@@ -729,19 +729,19 @@
 		return $slider;
 	};
 
-	AudioSort.getSelected = function (key, defaultValue) {
+	Sort.getSelected = function (key, defaultValue) {
 		return selected.hasOwnProperty(key) ? selected[key] : defaultValue;
 	};
 
-	AudioSort.getSelectedWaveformInfo = function () {
+	Sort.getSelectedWaveformInfo = function () {
 		return waveform[selected.waveform];
 	};
 
-	AudioSort.getTempoString = function () {
+	Sort.getTempoString = function () {
 		return 'bpm' + (parseFloat(selected.tempo) || defaults.tempo) + ' l16';
 	};
 
-	AudioSort.init = function (webWorkerUrl) {
+	Sort.init = function (webWorkerUrl) {
 		if (typeof webWorkerUrl === 'string') {
 			workerUrl = webWorkerUrl;
 		}
@@ -783,24 +783,24 @@
 				$('#soundfont-options li').show();
 			});
 		// create some of our sliders
-		AudioSort.createSlider('#volume-container', defaults.volume, onSliderVolume);
-		AudioSort.createSlider('#tempo-container', defaults.tempo, onSliderTempo);
-		AudioSort.createSlider('#center-note-container', defaults.centerNote, onSliderCenterNote);
-		AudioSort.createSlider('#data-size-container', defaults.dataSize, onSliderDataSize);
+		Sort.createSlider('#volume-container', defaults.volume, onSliderVolume);
+		Sort.createSlider('#tempo-container', defaults.tempo, onSliderTempo);
+		Sort.createSlider('#center-note-container', defaults.centerNote, onSliderCenterNote);
+		Sort.createSlider('#data-size-container', defaults.dataSize, onSliderDataSize);
 		// create our waveform sliders
-		waveformSliders.a = AudioSort.createSlider('#waveform-adshr-attack-container', {
+		waveformSliders.a = Sort.createSlider('#waveform-adshr-attack-container', {
 			value: waveform[selected.waveform].a, min: 10, max: 500, step: 5
 		}, onSliderWaveform);
-		waveformSliders.d = AudioSort.createSlider('#waveform-adshr-decay-container', {
+		waveformSliders.d = Sort.createSlider('#waveform-adshr-decay-container', {
 			value: waveform[selected.waveform].d, min: 10, max: 2000, step: 5
 		}, onSliderWaveform);
-		waveformSliders.s = AudioSort.createSlider('#waveform-adshr-sustain-container', {
+		waveformSliders.s = Sort.createSlider('#waveform-adshr-sustain-container', {
 			value: waveform[selected.waveform].s, min: 0, max: 1, step: 0.01
 		}, onSliderWaveform);
-		waveformSliders.h = AudioSort.createSlider('#waveform-adshr-hold-container', {
+		waveformSliders.h = Sort.createSlider('#waveform-adshr-hold-container', {
 			value: waveform[selected.waveform].h, min: 10, max: 3000, step: 5
 		}, onSliderWaveform);
-		waveformSliders.r = AudioSort.createSlider('#waveform-adshr-release-container', {
+		waveformSliders.r = Sort.createSlider('#waveform-adshr-release-container', {
 			value: waveform[selected.waveform].r, min: 10, max: 3000, step: 5
 		}, onSliderWaveform);
 		// cache a few items
@@ -829,5 +829,5 @@
 		updateDisplayCache('#data-size-display', selected.dataSize);
 	};
 
-	global.AudioSort = AudioSort;
+	global.A.Sort = Sort;
 }(this));

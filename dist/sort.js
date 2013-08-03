@@ -879,19 +879,23 @@
 
 	global.AS = AS;
 }(this));
+(function (global) {
+	'use strict';
+	global.A = global.A || {};
+}(this));
 /*!
  * Project: Audio Sort
- *    File: AudioHelper.js
+ *    File: A.Helper.js
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot
  * Licensed under the MIT license.
  */
-/*global sc, AudioSort */
+/*global sc, A */
 (function (global) {
 	'use strict';
 
-	var AudioHelper = {},
+	var Helper = {},
 		// functions
 		getMidiNumberHelper;
 
@@ -899,38 +903,38 @@
 		return degrees[position % degreeSize] + (Math.floor(position / degreeSize) * octaveSize);
 	};
 
-	AudioHelper.getMidiNumber = function (playValue) {
+	Helper.getMidiNumber = function (playValue) {
 		var scale, octaveSize, degrees, degreeSize, centerValue, playMidi, centerMidi;
 
 		// get some info from our current scale
-		scale = sc.ScaleInfo.at(AudioSort.getSelected('scale'));
+		scale = sc.ScaleInfo.at(A.Sort.getSelected('scale'));
 		octaveSize = scale.pitchesPerOctave();
 		degrees = scale.degrees();
 		degreeSize = degrees.length;
-		centerValue = Math.floor(AudioSort.getSelected('dataSize') / 2);
+		centerValue = Math.floor(A.Sort.getSelected('dataSize') / 2);
 
 		playMidi = getMidiNumberHelper(degrees, degreeSize, octaveSize, playValue);
 		centerMidi = getMidiNumberHelper(degrees, degreeSize, octaveSize, centerValue);
 
-		return playMidi + AudioSort.getSelected('centerNote') - centerMidi;
+		return playMidi + A.Sort.getSelected('centerNote') - centerMidi;
 	};
 
-	// add AudioHelper to the global scope
-	global.AudioHelper = AudioHelper;
+	// add Helper to the global scope
+	global.A.Helper = Helper;
 }(this));
 /*!
  * Project: Audio Sort
- *    File: AudioPlayer.js
+ *    File: A.Player.js
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot
  * Licensed under the MIT license.
  */
-/*global $, timbre, d3, AudioHelper, AudioSort, Midi */
+/*global $, timbre, d3, A, Midi */
 (function (global) {
 	'use strict';
-	global.AudioPlayer = {};
-	global.AudioPlayer.create = function (containerSelector, options) {
+	global.A.Player = {};
+	global.A.Player.create = function (containerSelector, options) {
 		var player = {},
 			// Config Values
 			canvasBackground = 'rgba(255, 255, 255, 0)',
@@ -983,7 +987,7 @@
 
 			// setup audio envelopes/generators and interval
 			player.refreshWaveGenerator();
-			interval = timbre('interval', { interval: AudioSort.getTempoString() }, intervalCallback);
+			interval = timbre('interval', { interval: A.Sort.getTempoString() }, intervalCallback);
 
 			// listen for player button clicks
 			$container.find('.player-buttons').on('click', '.btn', onPlayerButtonClick);
@@ -1081,17 +1085,17 @@
 				// play if possible
 				if (data.length > 0) {
 					info = data[intervalIndex];
-					selectedAudioType = AudioSort.getSelected('audioType');
+					selectedAudioType = A.Sort.getSelected('audioType');
 					for (i = 0; i < info.arr.length; i++) {
 						currentItem = info.arr[i];
 						if (currentItem.play) {
-							midi = AudioHelper.getMidiNumber(currentItem.value);
+							midi = A.Helper.getMidiNumber(currentItem.value);
 							if (midi >= 0 && midi < 128) {
 								if (selectedAudioType === 'waveform') {
 									waveGenerator.noteOn(midi, 64);
 								} else if (selectedAudioType === 'soundfont') {
 									timbre.soundfont.play(midi, false, {
-										mul: AudioSort.getSelected('volume') * 1.5
+										mul: A.Sort.getSelected('volume') * 1.5
 									});
 								}
 							}
@@ -1159,7 +1163,7 @@
 		player.setData = function (d) {
 			var selector = containerSelector + ' .position-container';
 			data = d;
-			$slider = AudioSort.createSlider(selector, {
+			$slider = A.Sort.createSlider(selector, {
 				value: 0,
 				min: 0,
 				max: data.length - 1,
@@ -1212,7 +1216,7 @@
 				}
 			}
 			isReverse = reverse === true ? true : false;
-			if (AudioSort.getSelected('audioType') === 'waveform') {
+			if (A.Sort.getSelected('audioType') === 'waveform') {
 				waveGenerator.play();
 			}
 			interval.start();
@@ -1248,7 +1252,7 @@
 			// setup midi file
 			midiFile = new Midi.File();
 			midiTrack = new Midi.Track();
-			midiTrack.setTempo(AudioSort.getSelected('tempo'));
+			midiTrack.setTempo(A.Sort.getSelected('tempo'));
 			midiFile.addTrack(midiTrack);
 
 			// build midi track
@@ -1259,7 +1263,7 @@
 				for (j = 0; j < info.arr.length; j++) {
 					currentItem = info.arr[j];
 					if (currentItem.play) {
-						midiNumber = AudioHelper.getMidiNumber(currentItem.value);
+						midiNumber = A.Helper.getMidiNumber(currentItem.value);
 						if (midiNumber >= 0 && midiNumber < 128) {
 							play.push(midiNumber);
 						}
@@ -1283,7 +1287,7 @@
 		};
 
 		player.refreshWaveGenerator = function () {
-			var waveInfo = AudioSort.getSelectedWaveformInfo();
+			var waveInfo = A.Sort.getSelectedWaveformInfo();
 			$.each([env, waveGenerator], function (index, obj) {
 				$.each(['pause', 'removeAllListeners'], function (index, key) {
 					if (obj && typeof obj[key] === 'function') {
@@ -1300,7 +1304,7 @@
 			});
 			waveGenerator = timbre(waveInfo.gen, {
 				env: env,
-				mul: AudioSort.getSelected('volume') * waveInfo.mul,
+				mul: A.Sort.getSelected('volume') * waveInfo.mul,
 				poly: waveInfo.poly || 10
 			}).on('ended', function () {
 				if (!isPlaying) {
@@ -1308,9 +1312,9 @@
 				}
 			});
 			if (waveInfo.gen === 'OscGen') {
-				waveGenerator.set('osc', timbre(AudioSort.getSelected('waveform')));
+				waveGenerator.set('osc', timbre(A.Sort.getSelected('waveform')));
 			}
-			if (isPlaying && AudioSort.getSelected('audioType') === 'waveform') {
+			if (isPlaying && A.Sort.getSelected('audioType') === 'waveform') {
 				waveGenerator.play();
 			}
 		};
@@ -1349,17 +1353,17 @@
 }(this));
 /*!
  * Project: Audio Sort
- *    File: AudioSort.js
+ *    File: A.Sort.js
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot
  * Licensed under the MIT license.
  */
-/*global $, sc, ace, d3, js_beautify, timbre, AudioHelper, AudioPlayer, Worker, Blob, Uint8Array, saveAs */
+/*global $, sc, ace, d3, js_beautify, timbre, A, Worker, Blob, Uint8Array, saveAs */
 (function (global) {
 	'use strict';
 
-	var AudioSort = {},
+	var Sort = {},
 		// Pass jshint
 		Fn = Function,
 		// Default Settings
@@ -1611,7 +1615,7 @@
 	};
 
 	onSliderTempo = function (e) {
-		var tempo = AudioSort.getTempoString();
+		var tempo = Sort.getTempoString();
 		onSlider('tempo', '#tempo-display', e);
 		players.base.setTempo(tempo);
 		players.sort.setTempo(tempo);
@@ -1844,7 +1848,7 @@
 	};
 
 	setupPlayers = function () {
-		players.base = AudioPlayer.create('#base-section', {
+		players.base = A.Player.create('#base-section', {
 			env: env,
 			pluck: pluck,
 			isLooping: true,
@@ -1862,7 +1866,7 @@
 				playerButtonCallback(players.sort, e.action);
 			}
 		});
-		players.sort = AudioPlayer.create('#sort-section', {
+		players.sort = A.Player.create('#sort-section', {
 			env: env,
 			pluck: pluck,
 			isLooping: true,
@@ -1932,8 +1936,8 @@
 	populateSoundfontOptions = function (selector) {
 		var i, instrument, group = '',
 			$ul = $(selector), $li, htmlString = '';
-		for (i = 0; i < AudioSort.instruments.length; i++) {
-			instrument = AudioSort.instruments[i];
+		for (i = 0; i < A.instruments.length; i++) {
+			instrument = A.instruments[i];
 			// output group
 			if (group !== instrument.group) {
 				group = instrument.group;
@@ -1973,7 +1977,7 @@
 		var i, midiNotes = [], midi;
 		if (selected.audioType === 'soundfontX') {
 			for (i = 0; i < baseData.length; i++) {
-				midi = AudioHelper.getMidiNumber(baseData[i]);
+				midi = A.Helper.getMidiNumber(baseData[i]);
 				if (midiNotes.indexOf(midi) === -1 && midi >= 0 && midi < 128) {
 					midiNotes.push(midi);
 				}
@@ -2059,7 +2063,7 @@
 		});
 	};
 
-	AudioSort.createSlider = function (selector, obj, onChange) {
+	Sort.createSlider = function (selector, obj, onChange) {
 		var $container = $(selector), $elem = $('<div class="audio-sort-slider"></div>'), $slider;
 		$container.empty();
 		$elem.appendTo($container);
@@ -2078,19 +2082,19 @@
 		return $slider;
 	};
 
-	AudioSort.getSelected = function (key, defaultValue) {
+	Sort.getSelected = function (key, defaultValue) {
 		return selected.hasOwnProperty(key) ? selected[key] : defaultValue;
 	};
 
-	AudioSort.getSelectedWaveformInfo = function () {
+	Sort.getSelectedWaveformInfo = function () {
 		return waveform[selected.waveform];
 	};
 
-	AudioSort.getTempoString = function () {
+	Sort.getTempoString = function () {
 		return 'bpm' + (parseFloat(selected.tempo) || defaults.tempo) + ' l16';
 	};
 
-	AudioSort.init = function (webWorkerUrl) {
+	Sort.init = function (webWorkerUrl) {
 		if (typeof webWorkerUrl === 'string') {
 			workerUrl = webWorkerUrl;
 		}
@@ -2132,24 +2136,24 @@
 				$('#soundfont-options li').show();
 			});
 		// create some of our sliders
-		AudioSort.createSlider('#volume-container', defaults.volume, onSliderVolume);
-		AudioSort.createSlider('#tempo-container', defaults.tempo, onSliderTempo);
-		AudioSort.createSlider('#center-note-container', defaults.centerNote, onSliderCenterNote);
-		AudioSort.createSlider('#data-size-container', defaults.dataSize, onSliderDataSize);
+		Sort.createSlider('#volume-container', defaults.volume, onSliderVolume);
+		Sort.createSlider('#tempo-container', defaults.tempo, onSliderTempo);
+		Sort.createSlider('#center-note-container', defaults.centerNote, onSliderCenterNote);
+		Sort.createSlider('#data-size-container', defaults.dataSize, onSliderDataSize);
 		// create our waveform sliders
-		waveformSliders.a = AudioSort.createSlider('#waveform-adshr-attack-container', {
+		waveformSliders.a = Sort.createSlider('#waveform-adshr-attack-container', {
 			value: waveform[selected.waveform].a, min: 10, max: 500, step: 5
 		}, onSliderWaveform);
-		waveformSliders.d = AudioSort.createSlider('#waveform-adshr-decay-container', {
+		waveformSliders.d = Sort.createSlider('#waveform-adshr-decay-container', {
 			value: waveform[selected.waveform].d, min: 10, max: 2000, step: 5
 		}, onSliderWaveform);
-		waveformSliders.s = AudioSort.createSlider('#waveform-adshr-sustain-container', {
+		waveformSliders.s = Sort.createSlider('#waveform-adshr-sustain-container', {
 			value: waveform[selected.waveform].s, min: 0, max: 1, step: 0.01
 		}, onSliderWaveform);
-		waveformSliders.h = AudioSort.createSlider('#waveform-adshr-hold-container', {
+		waveformSliders.h = Sort.createSlider('#waveform-adshr-hold-container', {
 			value: waveform[selected.waveform].h, min: 10, max: 3000, step: 5
 		}, onSliderWaveform);
-		waveformSliders.r = AudioSort.createSlider('#waveform-adshr-release-container', {
+		waveformSliders.r = Sort.createSlider('#waveform-adshr-release-container', {
 			value: waveform[selected.waveform].r, min: 10, max: 3000, step: 5
 		}, onSliderWaveform);
 		// cache a few items
@@ -2178,11 +2182,11 @@
 		updateDisplayCache('#data-size-display', selected.dataSize);
 	};
 
-	global.AudioSort = AudioSort;
+	global.A.Sort = Sort;
 }(this));
 /*!
  * Project: Audio Sort
- *    File: AudioSort.instruments.js
+ *    File: A.instruments.js
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot
@@ -2191,7 +2195,7 @@
 (function (global) {
 	'use strict';
 
-	global.AudioSort.instruments = [
+	global.A.instruments = [
 	  { "val": 0, "name": "Acoustic Grand Piano", "group": "Piano"}
 	, { "val": 1, "name": "Bright Acoustic Piano", "group": "Piano"}
 	, { "val": 2, "name": "Electric Grand Piano", "group": "Piano"}

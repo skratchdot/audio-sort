@@ -1,6 +1,6 @@
 /*!
  * Project: Audio Sort
- *    File: AudioSort.instruments.js
+ *    File: A.instruments.js
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot
@@ -9,7 +9,7 @@
 (function (global) {
 	'use strict';
 
-	global.AudioSort.instruments = [
+	global.A.instruments = [
 	  { "val": 0, "name": "Acoustic Grand Piano", "group": "Piano"}
 	, { "val": 1, "name": "Bright Acoustic Piano", "group": "Piano"}
 	, { "val": 2, "name": "Electric Grand Piano", "group": "Piano"}
