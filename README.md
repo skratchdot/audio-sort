@@ -68,6 +68,10 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 ### Audio
 
+- [Sound Of Sorting: Downloadable App](http://panthema.net/2013/sound-of-sorting/)
+
+- [Youtube: 15 Sorting Algorithms in 6 Minutes](https://www.youtube.com/watch?v=kPRA0W1kECg)
+
 - [Youtube: What different sorting algorithms sound like](http://www.youtube.com/watch?v=t8g-iYGHpEA)
 
 - [Youtube: Heapsort audibilization](http://www.youtube.com/watch?v=iXAjiDQbPSw)
@@ -87,6 +91,8 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 - [Sorting Out Sorting - Part 4](http://www.youtube.com/watch?v=wdcoRfS8edM)
 
 ### Implementations
+
+- [Sound Of Sorting](https://github.com/bingmann/sound-of-sorting)
 
 - [wikibooks.org](http://en.wikibooks.org/wiki/Algorithm_Implementation/Sorting)
 
