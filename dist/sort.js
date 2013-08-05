@@ -1709,7 +1709,7 @@
 		var $slider = $(e.target),
 			$container = $slider.parents('[data-adshr]:first'),
 			adshr = $container.attr('data-adshr');
-		waveform[selected.waveform][adshr] = (adshr === 's') ? e.value.toFixed(2) : e.value;
+		waveform[selected.waveform][adshr] = (adshr === 's') ? parseFloat(e.value.toFixed(2)) : e.value;
 		updateWaveformDisplays();
 		players.base.refreshWaveGenerator();
 		players.sort.refreshWaveGenerator();
