@@ -7706,6 +7706,16 @@ svg, #sort-options, .option-box, #waveform canvas {
 	border-top: 1px solid #333;
 }
 
+#about .hero-unit {
+	margin-top: 40px;
+	text-align: center;
+}
+
+#about .hero-unit h1 {
+	text-transform: uppercase;
+	font-family: Impact, Haettenschweiler, "Franklin Gothic Bold", Charcoal, "Helvetica Inserat", "Bitstream Vera Sans Bold", "Arial Black", sans serif;
+}
+
 @media (max-width: 979px) {
 	#settings {
 		font-size: 9px;

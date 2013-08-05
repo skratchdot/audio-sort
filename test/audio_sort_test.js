@@ -1,6 +1,7 @@
 'use strict';
 
 var sort = require('../dist/sort.js'),
+	A = sort.A,
 	sizes = [5, 10],
 	sortedFive = [0, 1, 2, 3, 4],
 	sortedTen = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -49,6 +50,11 @@ exports['AudioSortTests'] = {
 		test.expect(2);
 		test.deepEqual(sort.fn.datagen.sorted(5), sortedFive, 'array is not sorted');
 		test.deepEqual(sort.fn.datagen.sorted(10), sortedTen, 'array is not sorted');
+		test.done();
+	},
+	'instruments length': function (test) {
+		test.expect(1);
+		test.equal(A.instruments.length, 128);
 		test.done();
 	}
 };

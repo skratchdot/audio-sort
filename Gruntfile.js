@@ -128,7 +128,7 @@ module.exports = function(grunt) {
 
 	// Default task.
 	grunt.registerTask('default', ['jshint', 'concat', 'cssmin', 'nodeunit']);
-	grunt.registerTask('build', ['jshint', 'concat', 'cssmin', 'uglify', 'nodeunit']);
+	grunt.registerTask('build', ['jshint', 'concat', 'cssmin', 'uglify', 'nodeunit', 'jekyll']);
 	grunt.registerTask('server', ['connect']);
 
 };
