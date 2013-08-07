@@ -239,7 +239,7 @@
 		player.setData = function (d) {
 			var selector = containerSelector + ' .position-container';
 			data = d;
-			$slider = A.Sort.createSlider(selector, {
+			$slider = A.Helper.createSlider(selector, {
 				value: 0,
 				min: 0,
 				max: data.length - 1,

@@ -6,7 +6,7 @@
  * Copyright (c) 2013 skratchdot
  * Licensed under the MIT license.
  */
-/*global sc, A */
+/*global A, $, sc */
 (function (global) {
 	'use strict';
 
@@ -32,6 +32,25 @@
 		centerMidi = getMidiNumberHelper(degrees, degreeSize, octaveSize, centerValue);
 
 		return playMidi + A.Sort.getSelected('centerNote') - centerMidi;
+	};
+
+	Helper.createSlider = function (selector, obj, onChange) {
+		var $container = $(selector), $elem = $('<div class="audio-sort-slider"></div>'), $slider;
+		$container.empty();
+		$elem.appendTo($container);
+		$slider = $elem.slider({
+			value: obj.value,
+			min: obj.min,
+			max: obj.max,
+			step: obj.step,
+			orientation: 'horizontal',
+			selection: 'none',
+			tooltip: 'hide'
+		});
+		$slider.on('slide', onChange);
+		$slider.on('slideStop', onChange);
+		$(selector + ' .slider').width('100%');
+		return $slider;
 	};
 
 	// add Helper to the global scope

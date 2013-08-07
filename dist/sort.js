@@ -891,7 +891,7 @@
  * Copyright (c) 2013 skratchdot
  * Licensed under the MIT license.
  */
-/*global sc, A */
+/*global A, $, sc */
 (function (global) {
 	'use strict';
 
@@ -917,6 +917,25 @@
 		centerMidi = getMidiNumberHelper(degrees, degreeSize, octaveSize, centerValue);
 
 		return playMidi + A.Sort.getSelected('centerNote') - centerMidi;
+	};
+
+	Helper.createSlider = function (selector, obj, onChange) {
+		var $container = $(selector), $elem = $('<div class="audio-sort-slider"></div>'), $slider;
+		$container.empty();
+		$elem.appendTo($container);
+		$slider = $elem.slider({
+			value: obj.value,
+			min: obj.min,
+			max: obj.max,
+			step: obj.step,
+			orientation: 'horizontal',
+			selection: 'none',
+			tooltip: 'hide'
+		});
+		$slider.on('slide', onChange);
+		$slider.on('slideStop', onChange);
+		$(selector + ' .slider').width('100%');
+		return $slider;
 	};
 
 	// add Helper to the global scope
@@ -1227,7 +1246,7 @@
 		player.setData = function (d) {
 			var selector = containerSelector + ' .position-container';
 			data = d;
-			$slider = A.Sort.createSlider(selector, {
+			$slider = A.Helper.createSlider(selector, {
 				value: 0,
 				min: 0,
 				max: data.length - 1,
@@ -2146,25 +2165,6 @@
 		});
 	};
 
-	Sort.createSlider = function (selector, obj, onChange) {
-		var $container = $(selector), $elem = $('<div class="audio-sort-slider"></div>'), $slider;
-		$container.empty();
-		$elem.appendTo($container);
-		$slider = $elem.slider({
-			value: obj.value,
-			min: obj.min,
-			max: obj.max,
-			step: obj.step,
-			orientation: 'horizontal',
-			selection: 'none',
-			tooltip: 'hide'
-		});
-		$slider.on('slide', onChange);
-		$slider.on('slideStop', onChange);
-		$(selector + ' .slider').width('100%');
-		return $slider;
-	};
-
 	Sort.getSelected = function (key, defaultValue) {
 		return selected.hasOwnProperty(key) ? selected[key] : defaultValue;
 	};
@@ -2219,24 +2219,24 @@
 				$('#soundfont-options li').show();
 			});
 		// create some of our sliders
-		Sort.createSlider('#volume-container', defaults.volume, onSliderVolume);
-		Sort.createSlider('#tempo-container', defaults.tempo, onSliderTempo);
-		Sort.createSlider('#center-note-container', defaults.centerNote, onSliderCenterNote);
-		Sort.createSlider('#data-size-container', defaults.dataSize, onSliderDataSize);
+		A.Helper.createSlider('#volume-container', defaults.volume, onSliderVolume);
+		A.Helper.createSlider('#tempo-container', defaults.tempo, onSliderTempo);
+		A.Helper.createSlider('#center-note-container', defaults.centerNote, onSliderCenterNote);
+		A.Helper.createSlider('#data-size-container', defaults.dataSize, onSliderDataSize);
 		// create our waveform sliders
-		waveformSliders.a = Sort.createSlider('#waveform-adshr-attack-container', {
+		waveformSliders.a = A.Helper.createSlider('#waveform-adshr-attack-container', {
 			value: waveform[selected.waveform].a, min: 10, max: 500, step: 5
 		}, onSliderWaveform);
-		waveformSliders.d = Sort.createSlider('#waveform-adshr-decay-container', {
+		waveformSliders.d = A.Helper.createSlider('#waveform-adshr-decay-container', {
 			value: waveform[selected.waveform].d, min: 10, max: 2000, step: 5
 		}, onSliderWaveform);
-		waveformSliders.s = Sort.createSlider('#waveform-adshr-sustain-container', {
+		waveformSliders.s = A.Helper.createSlider('#waveform-adshr-sustain-container', {
 			value: waveform[selected.waveform].s, min: 0, max: 1, step: 0.01
 		}, onSliderWaveform);
-		waveformSliders.h = Sort.createSlider('#waveform-adshr-hold-container', {
+		waveformSliders.h = A.Helper.createSlider('#waveform-adshr-hold-container', {
 			value: waveform[selected.waveform].h, min: 10, max: 3000, step: 5
 		}, onSliderWaveform);
-		waveformSliders.r = Sort.createSlider('#waveform-adshr-release-container', {
+		waveformSliders.r = A.Helper.createSlider('#waveform-adshr-release-container', {
 			value: waveform[selected.waveform].r, min: 10, max: 3000, step: 5
 		}, onSliderWaveform);
 		// cache a few items
