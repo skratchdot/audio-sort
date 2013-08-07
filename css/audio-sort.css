@@ -8,8 +8,8 @@ html, body {
 	background-image: radial-gradient(circle farthest-corner at center, #ffffff 0%, #fbfefe 100%);
 }
 
-#header, #footer, svg, #sort-options, .option-box, #waveform canvas {
-	background: #e6e6e6 url(../img/gradient_squares.png) repeat;
+#header, #footer, svg, .hero-unit, #sort-options, .option-box, #waveform canvas {
+	background: #e6e6e6 url(../img/gradient_squares.png) repeat center center;
 }
 
 #settings {
