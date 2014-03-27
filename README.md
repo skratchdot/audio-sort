@@ -66,6 +66,12 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 - [Youtube: Visualization Of QuickSort](http://www.youtube.com/watch?v=aXXWXz5rF64)
 
+### Other Web Apps
+
+- [Assortment - webcloud.se](http://webcloud.se/Assortment/)
+
+- [Sounds Of Sorting - caseyrule.com](http://www.caseyrule.com/projects/sounds-of-sorting/)
+
 ### Audio
 
 - [Sound Of Sorting: Downloadable App](http://panthema.net/2013/sound-of-sorting/)
