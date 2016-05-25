@@ -68,6 +68,8 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 - [Visualizing Algorithms by Mike Bostock](https://bost.ocks.org/mike/algorithms/)
 
+- [Algorithm Visualizer](https://github.com/parkjs814/AlgorithmVisualizer)
+
 ### Other Web Apps
 
 - [Assortment - webcloud.se](http://webcloud.se/Assortment/)
