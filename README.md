@@ -76,6 +76,10 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 - [VisuAlgo](http://visualgo.net/)
 
+- [Illustrated-Algorithms](https://illustrated-algorithms.now.sh/)
+
+- [Sorting Algorithms Visualised - Blog Post on http://macr.ae/](http://macr.ae/article/sorting-algorithms.html)
+
 ### Other Web Apps
 
 - [Assortment - webcloud.se](http://webcloud.se/Assortment/)
