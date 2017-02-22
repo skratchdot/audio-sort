@@ -1,9 +1,9 @@
 {
 	"name": "audio-sort",
 	"description": "Listen to sorting algorithms",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"homepage": "https://github.com/skratchdot/audio-sort",
-	"author" : "skratchdot",
+	"author": "skratchdot",
 	"repository": {
 		"type": "git",
 		"url": "git://github.com/skratchdot/audio-sort.git"
@@ -24,15 +24,20 @@
 		"test": "grunt nodeunit"
 	},
 	"devDependencies": {
-		"grunt-contrib-jshint": "~0.6.0",
-		"grunt-contrib-nodeunit": "~0.2.0",
-		"grunt-contrib-connect": "~0.3.0",
-		"grunt-contrib-concat": "~0.3.0",
-		"grunt-contrib-cssmin": "~0.6.1",
-		"grunt-contrib-uglify": "~0.2.2",
-		"grunt-contrib-watch": "~0.4.4",
-		"grunt-jekyll": "~0.3.8",
-		"grunt": "~0.4.1"
+		"grunt": "^1.0.1",
+		"grunt-contrib-concat": "^1.0.1",
+		"grunt-contrib-connect": "^1.0.2",
+		"grunt-contrib-cssmin": "^2.0.0",
+		"grunt-contrib-jshint": "^1.1.0",
+		"grunt-contrib-nodeunit": "^1.0.0",
+		"grunt-contrib-uglify": "^2.1.0",
+		"grunt-contrib-watch": "^1.0.0",
+		"grunt-jekyll": "^0.4.6"
 	},
-	"keywords": ["audio","sort","sorting","algorithms"]
+	"keywords": [
+		"audio",
+		"sort",
+		"sorting",
+		"algorithms"
+	]
 }
