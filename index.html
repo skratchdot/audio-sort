@@ -1,7 +1,45 @@
----
-layout: default
----
-{% include header.html %}
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Audio Sort by skratchdot</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="description" content="audio, sorting algorithms, visualizations" />
+	<meta name="author" content="skratchdot.com" />
+	<link rel="shortcut icon" type="image/png" href="img/favicon.ico" />
+	<!-- styles -->
+	<link href="dist/styles.min.css" rel="stylesheet" />
+</head>
+<body>
+	<div id="wrapper">
+		<!-- header -->
+		<header id="header">
+			<div class="container">
+				<div class="row">
+					<div id="header-title" class="span6">
+						<h1>
+							<a href="index.html" class="home-link">Audio Sort</a>
+							<small>
+								<a id="header-author" href="http://skratchdot.com/">
+									<span>by skratchdot</span><sub>✪</sub>
+								</a>
+							 </small>
+						</h1>
+					</div>
+					<div id="header-nav" class="span6">
+						<ul class="breadcrumb">
+							<li><a href="index.html">Home</a> <span class="divider">/</span></li>
+							<li><a href="about.html">About</a> <span class="divider">/</span></li>
+							<li><a href="api.html">API</a> <span class="divider">/</span></li>
+							<li><a href="https://github.com/skratchdot/audio-sort/" target="_blank">Source</a></li>
+						</ul>
+						<div id="social-header">
+							<a class="addthis_button" href="http://www.addthis.com/bookmark.php?v=300&amp;pubid=ra-4f95a18f2f5627c9"><img src="http://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
 <section class="container" id="base-section">
 	<div class="page-header">
 		<h4>
@@ -24,16 +62,127 @@ layout: default
 				<li class="hide"><a href="#save" data-toggle="tab">Save</a></li>
 			</ul>
 			<div id="settings-content" class="tab-content">
-				{% include pane-audio.html %}
-				{% include pane-waveform.html %}
-				{% include pane-soundfont.html %}
-				{% include pane-scale.html %}
-				{% include pane-save.html %}
+				<div class="tab-pane active" id="audio">
+	<div>
+		<strong>Volume:</strong>
+		<em id="volume-display" class="pull-right">&nbsp;</em>
+	</div>
+	<div id="volume-container"></div>
+	<div>
+		<strong>Tempo:</strong>
+		<em id="tempo-display" class="pull-right">&nbsp;</em>
+	</div>
+	<div id="tempo-container"></div>
+	<div>
+		<strong>Center Note:</strong>
+		<em id="center-note-display" class="pull-right">&nbsp;</em>
+	</div>
+	<div id="center-note-container"></div>
+	<div>
+		<strong>Data Size:</strong>
+		<em id="data-size-display" class="pull-right">&nbsp;</em>
+	</div>
+	<div id="data-size-container"></div>
+	<div>
+		<strong>Audio Type:</strong>
+		<em id="audio-type-display" class="pull-right">&nbsp;</em>
+	</div>
+	<div id="audio-type-container" class="text-center">
+		<div class="btn-group" data-toggle="buttons-radio">
+			<button data-audio-type="waveform" type="button" class="btn btn-mini active">Waveform</button>
+			<button data-audio-type="soundfont" type="button" class="btn btn-mini">SoundFont</button>
+		</div>
+		<br />
+		<small class="pull-right"><a id="audio-type-tab-link" href="javascript:void(0);">waveform settings</a></small>
+	</div>
+</div>
+
+				<div class="tab-pane" id="waveform">
+	<div class="pull-left waveform-section">
+		<div>
+			<strong>Attack:</strong>
+			<em id="waveform-adshr-attack-display" class="pull-right">&nbsp;</em>
+		</div>
+		<div data-adshr="a" id="waveform-adshr-attack-container"></div>
+
+		<div>
+			<strong>Decay:</strong>
+			<em id="waveform-adshr-decay-display" class="pull-right">&nbsp;</em>
+		</div>
+		<div data-adshr="d" id="waveform-adshr-decay-container"></div>
+
+		<div>
+			<strong>Sustain:</strong>
+			<em id="waveform-adshr-sustain-display" class="pull-right">&nbsp;</em>
+		</div>
+		<div data-adshr="s" id="waveform-adshr-sustain-container"></div>
+
+		<div>
+			<strong>Hold:</strong>
+			<em id="waveform-adshr-hold-display" class="pull-right">&nbsp;</em>
+		</div>
+		<div data-adshr="h" id="waveform-adshr-hold-container"></div>
+
+		<div>
+			<strong>Release:</strong>
+			<em id="waveform-adshr-release-display" class="pull-right">&nbsp;</em>
+		</div>
+		<div data-adshr="r" id="waveform-adshr-release-container"></div>
+	</div>
+	<div class="pull-right waveform-section">
+		<canvas id="waveform-adshr-canvas"></canvas>
+		<canvas id="waveform-canvas"></canvas>
+		<div class="btn-group" data-toggle="buttons-radio">
+		</div>
+	</div>
+</div>
+				<div class="tab-pane" id="soundfont">
+	<div style="margin-bottom:5px;">
+	    <strong class="pull-left">Soundfont:</strong>
+	    <em id="soundfont-display" class="pull-right">&nbsp;</em>
+	    <div class="clearfix"></div>
+	</div>
+	<input id="soundfont-filter" data-list-id="soundfont-options" type="text" class="input-medium search-query" placeholder="Filter Soundfont Names" />
+	<ul id="soundfont-options" class="nav nav-pills nav-stacked option-box">
+	</ul>
+</div>
+				<div class="tab-pane" id="scale">
+	<div style="margin-bottom:5px;">
+	    <strong class="pull-left">Scale:</strong>
+	    <em id="scale-display" class="pull-right">&nbsp;</em>
+	    <div class="clearfix"></div>
+	</div>
+	<input id="scale-filter" data-list-id="scale-options" type="text" class="input-medium search-query" placeholder="Filter Scale Names" />
+	<ul id="scale-options" class="nav nav-pills nav-stacked option-box">
+	</ul>
+</div>
+				<div class="tab-pane" id="save">
+	<h3>Coming Soon.</h3>
+	<h4>Soon you will be able to save and load settings from this panel.</h4>
+</div>
 			</div>
 		</div>
 		<div class="span8">
 			<div id="base-player" class="player-buttons">
-				{% include player-buttons.html %}
+				<span data-action="goToFirst" class="btn btn-mini btn-success">
+	<i class="icon-white icon-fast-backward"></i>
+</span>
+<span data-action="reverse" class="btn btn-mini btn-success">
+	<i class="icon-white icon-step-backward"></i>
+	Reverse
+</span>
+<span data-action="stop" class="btn btn-mini btn-success">
+	<i class="icon-white icon-stop"></i>
+	Stop
+</span>
+<span data-action="play" class="btn btn-mini btn-success">
+	Play
+	<i class="icon-white icon-step-forward"></i>
+</span>
+<span data-action="goToLast" class="btn btn-mini btn-success">
+	<i class="icon-white icon-fast-forward"></i>
+</span>
+
 				<div class="mobile-break">&nbsp;</div>
 				<span data-action="loop" class="btn btn-mini active"><i class="icon-repeat"></i> Loop?</span>
 				<div class="mobile-break">&nbsp;</div>
@@ -119,7 +268,25 @@ layout: default
 					<span class="swap-current"></span>
 				</div>
 				<div class="mobile-break">&nbsp;</div>
-				{% include player-buttons.html %}
+				<span data-action="goToFirst" class="btn btn-mini btn-success">
+	<i class="icon-white icon-fast-backward"></i>
+</span>
+<span data-action="reverse" class="btn btn-mini btn-success">
+	<i class="icon-white icon-step-backward"></i>
+	Reverse
+</span>
+<span data-action="stop" class="btn btn-mini btn-success">
+	<i class="icon-white icon-stop"></i>
+	Stop
+</span>
+<span data-action="play" class="btn btn-mini btn-success">
+	Play
+	<i class="icon-white icon-step-forward"></i>
+</span>
+<span data-action="goToLast" class="btn btn-mini btn-success">
+	<i class="icon-white icon-fast-forward"></i>
+</span>
+
 				<div class="mobile-break">&nbsp;</div>
 				<span data-action="loop" class="btn btn-mini active"><i class="icon-repeat"></i> Loop?</span>
 				<div class="mobile-break">&nbsp;</div>
@@ -134,8 +301,189 @@ layout: default
 		</div>
 	</div>
 </section>
-{% include modal-add-algorithm.html %}
-{% include modal-midi-export.html %}
-{% include modal-sort.html %}
-{% assign init_audio_sort = true %}
-{% include footer.html %}
+<div id="modal-add-algorithm" class="modal hide fade">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h3>Add Algorithm:</h3>
+	</div>
+	<div class="modal-body">
+		<form class="form-horizontal">
+			<div class="control-group">
+				<label class="control-label" for="new-sort-name">Algorithm Name:</label>
+				<div class="controls">
+					<input type="text" id="new-sort-name" placeholder="New Sort Name" />
+				</div>
+			</div>
+		</form>
+		<div id="new-sort-algorithm">
+		</div>
+	</div>
+	<div class="modal-footer">
+		<a href="javascript:void(0);" data-dismiss="modal" class="btn">Close</a>
+		<a href="javascript:void(0);" class="btn btn-primary" id="save-algorithm-new">Save changes</a>
+	</div>
+</div>
+<div id="modal-midi-export" class="modal hide fade">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h3>Midi Export:</h3>
+	</div>
+	<div class="modal-body">
+		<form class="form-horizontal">
+			<div class="control-group">
+				<label class="control-label" for="midi-export-name">File Name:</label>
+				<div class="controls">
+					<input type="text" id="midi-export-name" placeholder="New Filename" />.mid
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="midi-export-channel">Midi Channel:</label>
+				<div class="controls">
+					<select id="midi-export-channel"></select>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="midi-export-instrument">Midi Instrument:</label>
+				<div class="controls">
+					<select id="midi-export-instrument"></select>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<a href="javascript:void(0);" data-dismiss="modal" class="btn">Close</a>
+		<a href="javascript:void(0);" class="btn btn-primary" id="midi-export-btn">Export As Midi</a>
+	</div>
+</div>
+<div id="modal-sort" class="modal hide fade">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h3>Sort Information: <span class="sort-name"></span></h3>
+	</div>
+	<div class="modal-body">
+		<ul class="nav nav-tabs">
+			<li><a href="#sort-information" data-toggle="tab">Information</a></li>
+			<li><a href="#sort-algorithm" data-toggle="tab">Algorithm</a></li>
+			<!--
+			<li><a href="#sort-links" data-toggle="tab">Links</a></li>
+			-->
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane" id="sort-information">
+				<table class="table table-striped table-bordered">
+					<tbody>
+						<tr>
+							<th>Name:</th>
+							<td id="sort-info-display"></td>
+						</tr>
+						<tr>
+							<th>Stable:</th>
+							<td id="sort-info-stable"></td>
+						</tr>
+						<tr>
+							<th>Best Case:</th>
+							<td id="sort-info-best"></td>
+						</tr>
+						<tr>
+							<th>Worst Case:</th>
+							<td id="sort-info-worst"></td>
+						</tr>
+						<tr>
+							<th>Memory:</th>
+							<td id="sort-info-memory"></td>
+						</tr>
+						<tr>
+							<th>Method:</th>
+							<td id="sort-info-method"></td>
+						</tr>
+					</tbody>
+				</table>			
+			</div>
+			<div class="tab-pane" id="sort-algorithm">
+			</div>
+			<div class="tab-pane" id="sort-links">
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<a href="javascript:void(0);" data-dismiss="modal" class="btn">Close</a>
+		<a href="javascript:void(0);" class="btn btn-primary" id="save-algorithm-edit">Save changes</a>
+	</div>
+</div>
+
+
+		<div id="footer-spacer">&nbsp;</div>
+	</div>
+	<!-- footer -->
+	<footer id="footer">
+		<hr />
+		<div class="container">
+			<!-- built with -->
+			<div class="footer-built-with">
+				built with:
+				<a target="_blank" href="http://mohayonao.github.io/timbre.js/">timbre</a>,
+				<a target="_blank" href="http://mohayonao.github.io/subcollider.js/">subcollider</a>,
+				<a target="_blank" href="http://d3js.org/">d3</a>,
+				<a target="_blank" href="http://jquery.com/">jquery</a>,
+				<a target="_blank" href="http://twitter.github.com/bootstrap/">bootstrap</a>,
+				<a target="_blank" href="http://www.eyecon.ro/bootstrap-slider/">bootstrap-slider</a>, and
+				<a target="_blank" href="https://github.com/skratchdot/audio-sort/#built-with">others</a>
+			</div>
+			<!-- copyright -->
+			<div class="footer-copy">
+				&copy; 2013 <a class="footer-icon" href="http://skratchdot.com/">
+					skratchdot
+					<img alt="skratchdot" src="img/favicon.ico" />
+				</a>
+			</div>
+		</div>
+	</footer>
+
+	<!-- include scripts -->
+	<script type="text/javascript" charset="utf-8" src="js/lib/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/lib/bootstrap.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/lib/bootstrap-slider.min.js"></script>
+	<!--
+	<script type="text/javascript" charset="utf-8" src="js/lib/fastclick.min.js"></script>
+	-->
+	<script type="text/javascript" charset="utf-8" src="js/lib/timbre.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/lib/audio-jsonp.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/lib/timbre.mp3_decode.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/lib/timbre.soundfont.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/lib/subcollider.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/lib/d3.v3.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/lib/js_beautify.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/lib/ace/ace.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/lib/jsmidgen.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/lib/Blob.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/lib/FileSaver.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="dist/sort.js"></script>
+	
+	<script type="text/javascript" charset="utf-8">
+		$(document).ready(function () {
+			A.Sort.init('dist/worker.js');
+		});
+	</script>
+	
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		ga('create', 'UA-10768188-1', 'skratchdot.com');
+		ga('require', 'displayfeatures');
+		ga('send', 'pageview');
+	</script>
+	<script type="text/javascript">
+		var addthis_config = {"data_track_addressbar":true};
+		var addthis_share = {url:'http://skratchdot.com/projects/audio-sort/'};
+		$(document).ready(function () {
+			$.ajaxSetup({ cache: true });
+			$.getScript('http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4f95a18f2f5627c9&domready=1&async=1', function () {
+				addthis.init();
+			});
+		});
+	</script>
+</body>
+</html>
