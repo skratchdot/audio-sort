@@ -133,7 +133,7 @@
 			}
 		}
 	};
-	
+
 	populateWaveformButtons = function () {
 		var html = '';
 		$.each(waveform, function (waveformName) {
@@ -632,7 +632,7 @@
 
 	preloadSoundfonts = function () {
 		var i, midiNotes = [], midi;
-		if (selected.audioType === 'soundfontX') {
+		if (selected.audioType === 'soundfont') {
 			for (i = 0; i < baseData.length; i++) {
 				midi = A.Helper.getMidiNumber(baseData[i]);
 				if (midiNotes.indexOf(midi) === -1 && midi >= 0 && midi < 128) {
