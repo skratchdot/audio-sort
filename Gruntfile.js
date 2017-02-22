@@ -17,7 +17,7 @@ module.exports = function(grunt) {
 				src: 'Gruntfile.js'
 			},
 			lib: {
-				src: ['js/*.js', 'js/fn/*.js', 'js/sort/*.js', 'js/visualization/*.js']
+				src: ['js/*.js', 'js/fn/*.js', 'js/sort/*.js', '!js/sort/sort.heap.js', 'js/visualization/*.js']
 			},
 			test: {
 				src: ['test/**/*.js']
