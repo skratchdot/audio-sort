@@ -80,6 +80,8 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 - [Sorting Algorithms Visualised - Blog Post on http://macr.ae/](http://macr.ae/article/sorting-algorithms.html)
 
+- [Sorting Visualizations on imgur by FishyMcFishFace](https://imgur.com/gallery/RM3wl)
+
 ### Other Web Apps
 
 - [Assortment - webcloud.se](http://webcloud.se/Assortment/)
