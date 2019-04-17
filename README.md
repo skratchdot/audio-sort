@@ -94,6 +94,8 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 - [Youtube: 15 Sorting Algorithms in 6 Minutes](https://www.youtube.com/watch?v=kPRA0W1kECg)
 
+- [Youtube: 15 Sorting Algorithms charted for Guitar Hero/Clone Hero](https://www.youtube.com/watch?v=YyerMJlmtts)
+
 - [Youtube: What different sorting algorithms sound like](http://www.youtube.com/watch?v=t8g-iYGHpEA)
 
 - [Youtube: Heapsort audibilization](http://www.youtube.com/watch?v=iXAjiDQbPSw)
