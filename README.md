@@ -82,11 +82,23 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 - [Sorting Visualizations on imgur by FishyMcFishFace](https://imgur.com/gallery/RM3wl)
 
-### Other Web Apps
+- [Sorting Algorithms Animations](https://www.toptal.com/developers/sorting-algorithms/)
+
+- [Machine Learning visualizer](https://jeff3dx.github.io/mlearning)
+
+- [Python Algorithm Visualizations](https://pyalgoviz.appspot.com/)
+
+- [Morpheus - Visual Algorithm Simulator](https://rkarthick.github.io/morpheus-client/)
+
+- [Sorting Visualizer - Karim Elghamry](https://github.com/KarimElghamry/sorting-visualizer)
+
+
+### Other Audio Web Apps
 
 - [Assortment - webcloud.se](http://webcloud.se/Assortment/)
 
 - [Sounds Of Sorting - caseyrule.com](http://www.caseyrule.com/projects/sounds-of-sorting/)
+
 
 ### Audio
 
