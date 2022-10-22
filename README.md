@@ -4,9 +4,8 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 [![Audio Sort][2]][1]
 
-  [1]: http://projects.skratchdot.com/audio-sort/index.html
-  [2]: http://projects.skratchdot.com/audio-sort/img/preview.jpg
-
+[1]: http://projects.skratchdot.com/audio-sort/index.html
+[2]: http://projects.skratchdot.com/audio-sort/img/preview.jpg
 
 ## Audio Sort Links
 
@@ -17,7 +16,6 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 - [Source Code](https://github.com/skratchdot/audio-sort/)
 
 - [TODO List](https://github.com/skratchdot/audio-sort/blob/gh-pages/TODO.md)
-
 
 ## Built With
 
@@ -40,7 +38,6 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 - [Blob.js](https://github.com/eligrey/Blob.js)
 
 - [FileSaver.js](https://github.com/eligrey/FileSaver.js)
-
 
 ## See Also / Credits
 
@@ -92,13 +89,13 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 - [Sorting Visualizer - Karim Elghamry](https://github.com/KarimElghamry/sorting-visualizer)
 
+- [SortDemon](https://github.com/copperhuh/SortDemon)
 
 ### Other Audio Web Apps
 
 - [Assortment - webcloud.se](http://webcloud.se/Assortment/)
 
 - [Sounds Of Sorting - caseyrule.com](http://www.caseyrule.com/projects/sounds-of-sorting/)
-
 
 ### Audio
 
@@ -137,7 +134,6 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 - [Github User: escherba](https://github.com/escherba/algorithms-in-javascript/)
 
 - [Github User: nzakas](https://github.com/nzakas/computer-science-in-javascript/)
-
 
 ## License
 
