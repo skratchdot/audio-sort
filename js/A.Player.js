@@ -203,31 +203,33 @@
 		onPlayerButtonClick = function () {
 			var $item = $(this),
 				action = $item.data('action');
-			if (action === 'stop') {
-				player.stop();
-			} else if (action === 'play') {
-				player.play();
-			} else if (action === 'reverse') {
-				player.play(true);
-			} else if (action === 'goToFirst') {
-				player.goToFirst();
-			} else if (action === 'goToLast') {
-				player.goToLast();
-			} else if (action === 'loop') {
-				isLooping = !$item.hasClass('active');
-				if (isLooping) {
-					$item.addClass('active');
-				} else {
-					$item.removeClass('active');
+			timbre.fn._audioContext.resume().then(function () {
+				if (action === 'stop') {
+					player.stop();
+				} else if (action === 'play') {
+					player.play();
+				} else if (action === 'reverse') {
+					player.play(true);
+				} else if (action === 'goToFirst') {
+					player.goToFirst();
+				} else if (action === 'goToLast') {
+					player.goToLast();
+				} else if (action === 'loop') {
+					isLooping = !$item.hasClass('active');
+					if (isLooping) {
+						$item.addClass('active');
+					} else {
+						$item.removeClass('active');
+					}
 				}
-			}
-			refreshSliderPosition();
-			if (typeof onPlayerButtonClickCallback === 'function') {
-				onPlayerButtonClickCallback({
-					item: $item,
-					action: action
-				});
-			}
+				refreshSliderPosition();
+				if (typeof onPlayerButtonClickCallback === 'function') {
+					onPlayerButtonClickCallback({
+						item: $item,
+						action: action
+					});
+				}
+			});
 		};
 
 		onSliderPositionChange = function (e) {
