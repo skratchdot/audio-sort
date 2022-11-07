@@ -91,6 +91,8 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 - [SortDemon](https://github.com/copperhuh/SortDemon)
 
+- [Algorithm Visualizer](https://github.com/algorithm-visualizer/algorithm-visualizer)
+
 ### Other Audio Web Apps
 
 - [Assortment - webcloud.se](http://webcloud.se/Assortment/)
