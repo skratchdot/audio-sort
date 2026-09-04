@@ -18,8 +18,9 @@
 		}
 	],
 	"engines": {
-		"node": ">=18"
+		"node": ">=24"
 	},
+	"packageManager": "npm@11.19.0",
 	"scripts": {
 		"build": "npm run build:assets && npm run build:site",
 		"build:assets": "grunt build",
@@ -27,7 +28,12 @@
 		"clean": "node -e \"require('node:fs').rmSync('_site', { recursive: true, force: true })\"",
 		"serve": "npm run clean && eleventy --serve",
 		"start": "npm run build:assets && npm run serve",
-		"test": "grunt nodeunit",
+		"test": "vitest run",
+		"test:watch": "vitest --watch",
+		"lint": "oxlint --deny-warnings",
+		"fmt": "oxfmt",
+		"fmt:check": "oxfmt --check",
+		"check": "npm run lint && npm run fmt:check && npm test && npm run build",
 		"watch": "grunt watch"
 	},
 	"devDependencies": {
@@ -35,10 +41,11 @@
 		"grunt": "^1.5.3",
 		"grunt-contrib-concat": "^2.1.0",
 		"grunt-contrib-cssmin": "^4.0.0",
-		"grunt-contrib-jshint": "^3.2.0",
-		"grunt-contrib-nodeunit": "^4.0.0",
 		"grunt-contrib-uglify": "^5.2.2",
-		"grunt-contrib-watch": "^1.1.0"
+		"grunt-contrib-watch": "^1.1.0",
+		"oxfmt": "^0.66.0",
+		"oxlint": "^1.81.0",
+		"vitest": "^5.0.0"
 	},
 	"keywords": [
 		"audio",

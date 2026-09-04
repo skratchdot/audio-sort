@@ -1,18 +1,18 @@
-'use strict';
+"use strict";
 
-module.exports = function(eleventyConfig) {
-	['css', 'dist', 'img', 'js'].forEach(function(path) {
+module.exports = function (eleventyConfig) {
+	["css", "dist", "img", "js"].forEach(function (path) {
 		eleventyConfig.addPassthroughCopy(path);
 	});
-	eleventyConfig.addPassthroughCopy('.nojekyll');
+	eleventyConfig.addPassthroughCopy(".nojekyll");
 
 	return {
 		dir: {
-			input: '.',
-			includes: '_includes',
-			output: '_site'
+			input: ".",
+			includes: "_includes",
+			output: "_site",
 		},
-		htmlTemplateEngine: 'liquid',
-		templateFormats: ['html']
+		htmlTemplateEngine: "liquid",
+		templateFormats: ["html"],
 	};
 };
