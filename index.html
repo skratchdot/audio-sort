@@ -1,7 +1,4 @@
----
-layout: default
----
-{% include header.html %}
+{% include "header.html" %}
 <section class="container" id="base-section">
 	<div class="page-header">
 		<h4>
@@ -24,16 +21,16 @@ layout: default
 				<li class="hide"><a href="#save" data-toggle="tab">Save</a></li>
 			</ul>
 			<div id="settings-content" class="tab-content">
-				{% include pane-audio.html %}
-				{% include pane-waveform.html %}
-				{% include pane-soundfont.html %}
-				{% include pane-scale.html %}
-				{% include pane-save.html %}
+				{% include "pane-audio.html" %}
+				{% include "pane-waveform.html" %}
+				{% include "pane-soundfont.html" %}
+				{% include "pane-scale.html" %}
+				{% include "pane-save.html" %}
 			</div>
 		</div>
 		<div class="span8">
 			<div id="base-player" class="player-buttons">
-				{% include player-buttons.html %}
+				{% include "player-buttons.html" %}
 				<div class="mobile-break">&nbsp;</div>
 				<span data-action="loop" class="btn btn-mini active"><i class="icon-repeat"></i> Loop?</span>
 				<div class="mobile-break">&nbsp;</div>
@@ -119,7 +116,7 @@ layout: default
 					<span class="swap-current"></span>
 				</div>
 				<div class="mobile-break">&nbsp;</div>
-				{% include player-buttons.html %}
+				{% include "player-buttons.html" %}
 				<div class="mobile-break">&nbsp;</div>
 				<span data-action="loop" class="btn btn-mini active"><i class="icon-repeat"></i> Loop?</span>
 				<div class="mobile-break">&nbsp;</div>
@@ -134,8 +131,8 @@ layout: default
 		</div>
 	</div>
 </section>
-{% include modal-add-algorithm.html %}
-{% include modal-midi-export.html %}
-{% include modal-sort.html %}
+{% include "modal-add-algorithm.html" %}
+{% include "modal-midi-export.html" %}
+{% include "modal-sort.html" %}
 {% assign init_audio_sort = true %}
-{% include footer.html %}
+{% include "footer.html" %}
