@@ -9,10 +9,11 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 ## Development
 
-This site is built with [Eleventy](https://www.11ty.dev/) and requires Node.js 18 or newer.
+This site is built with [Eleventy](https://www.11ty.dev/) and requires Node.js 24 or newer.
+Use `nvm use` to select the Node 24 version also used in CI.
 
 ```sh
-npm install
+npm ci
 npm start
 ```
 
@@ -22,7 +23,47 @@ The production build is written to `_site`:
 npm run build
 ```
 
-Pull requests are built and tested by GitHub Actions. Updates to `main` are built and deployed to GitHub Pages automatically.
+Run all checks before submitting changes:
+
+```sh
+npm run check
+```
+
+This runs Oxlint, Oxfmt's formatting check, Vitest, and the production build.
+Individual commands are `npm run lint`, `npm run fmt`, `npm run fmt:check`,
+`npm test`, and `npm run test:watch`.
+
+Grunt currently builds JS/CSS assets only. For live asset editing, run `npm run watch`
+alongside `npm start`; use `npm run test:watch` separately for test feedback.
+
+Pull requests and deployments run the same checks in GitHub Actions. Updates to
+`main` deploy to GitHub Pages after those checks pass. In repository Settings →
+Pages, the publishing source must be **GitHub Actions**.
+
+### Tests and incremental modernization
+
+Vitest loads first-party source into isolated JavaScript contexts; unit tests do
+not depend on `dist`. The suite discovers `js/sort/sort.*.js` algorithms and checks
+sorting results, item preservation, frame counters, metadata, and serialized worker
+message handling. Worker tests use Node's VM, not a real browser. Deterministic
+random input cases make sorting regressions reproducible.
+
+One expected-failure test records an existing metadata bug: Quick advertises
+stability but reorders equal-valued items. Correcting that metadata and removing
+the exception is a follow-up to this tooling migration.
+
+Oxlint checks first-party JS, tests, and configuration, including the previously
+excluded heap sort. Two temporary exceptions in `.oxlintrc.json` preserve legacy
+code: `env`/`pluck` are unassigned in `A.Sort.js`, and `getMethod` is unused in
+`SortWorker.js`. Remove these exceptions when those files are modernized.
+
+Oxfmt currently formats tests, configuration, workflows, and documentation. Legacy
+JS/CSS and Liquid HTML are excluded from formatting to keep changes reviewable;
+remove their exclusions as each area is migrated. Vendored libraries and generated
+files are excluded from both tools.
+
+The next stages are Vite asset builds and untracking `dist`, an ES-module algorithm
+registry and worker API, and incremental UI/jQuery modernization.
 
 ## Audio Sort Links
 
