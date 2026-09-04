@@ -4,18 +4,35 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 [![Audio Sort][2]][1]
 
-[1]: http://projects.skratchdot.com/audio-sort/index.html
-[2]: http://projects.skratchdot.com/audio-sort/img/preview.jpg
+[1]: https://projects.skratchdot.com/audio-sort/index.html
+[2]: https://projects.skratchdot.com/audio-sort/img/preview.jpg
+
+## Development
+
+This site is built with [Eleventy](https://www.11ty.dev/) and requires Node.js 18 or newer.
+
+```sh
+npm install
+npm start
+```
+
+The production build is written to `_site`:
+
+```sh
+npm run build
+```
+
+Pull requests are built and tested by GitHub Actions. Updates to `main` are built and deployed to GitHub Pages automatically.
 
 ## Audio Sort Links
 
-- [Live Demo](http://projects.skratchdot.com/audio-sort/index.html)
+- [Live Demo](https://projects.skratchdot.com/audio-sort/index.html)
 
-- [Project Page / Comments](http://skratchdot.com/projects/audio-sort/)
+- [Project Page / Comments](https://skratchdot.com/projects/audio-sort/)
 
 - [Source Code](https://github.com/skratchdot/audio-sort/)
 
-- [TODO List](https://github.com/skratchdot/audio-sort/blob/gh-pages/TODO.md)
+- [TODO List](https://github.com/skratchdot/audio-sort/blob/main/TODO.md)
 
 ## Built With
 

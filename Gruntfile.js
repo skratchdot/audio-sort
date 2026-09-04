@@ -23,21 +23,6 @@ module.exports = function(grunt) {
 				src: ['test/**/*.js']
 			},
 		},
-		jekyll: {
-			server: {
-				src: './',
-				dest: './_site'
-			}
-		},
-		connect: {
-			server: {
-				options: {
-					port: 8080,
-					base: '_site',
-					keepalive: true
-				}
-			}
-		},
 		concat: {
 			styles: {
 				src: [
@@ -99,15 +84,11 @@ module.exports = function(grunt) {
 			},
 			lib: {
 				files: '<%= jshint.lib.src %>',
-				tasks: ['jshint:lib', 'concat', 'cssmin', 'nodeunit', 'jekyll']
-			},
-			html: {
-				files: ['*.html', '_includes/*.html'],
-				tasks: ['jekyll']
+				tasks: ['jshint:lib', 'concat', 'cssmin', 'nodeunit']
 			},
 			css: {
 				files: ['css/*.css'],
-				tasks: ['concat', 'cssmin', 'jekyll']
+				tasks: ['concat', 'cssmin']
 			},
 			test: {
 				files: '<%= jshint.test.src %>',
@@ -120,15 +101,12 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-nodeunit');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-concat');
-	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-jekyll');
 
 	// Default task.
 	grunt.registerTask('default', ['jshint', 'concat', 'cssmin', 'nodeunit']);
-	grunt.registerTask('build', ['jshint', 'concat', 'cssmin', 'uglify', 'nodeunit', 'jekyll']);
-	grunt.registerTask('server', ['connect']);
+	grunt.registerTask('build', ['jshint', 'concat', 'cssmin', 'uglify', 'nodeunit']);
 
 };
