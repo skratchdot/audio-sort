@@ -18,11 +18,3 @@
 
 - Fix the play intervalCallback() function. Shouldn't be looping so much in there. The
   program was running faster before I re-factored a bunch of stuff and added this stupid loop.
-
-- <del>Add "export to midi" button(s)</del>
-
-- <del>Allow data to be set by clicking on the svg node</del>
-
-- <del>Add audio controls: string synth vs sin vs saw vs tri, etc</del>
-
-- NO LONGER VALID: <del>Add "stats panel" toggle buttons</del>
