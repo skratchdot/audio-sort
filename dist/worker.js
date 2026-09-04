@@ -253,7 +253,20 @@
 (function (global) {
 	'use strict';
 
-	var getMethod;
+	var getFunctionBody,
+		getMethod;
+
+	getFunctionBody = function (fn) {
+		var source = fn.toString(),
+			bodyStart = source.indexOf('{'),
+			bodyEnd = source.lastIndexOf('}');
+
+		if (bodyStart === -1 || bodyEnd <= bodyStart) {
+			return source;
+		}
+
+		return source.slice(bodyStart + 1, bodyEnd);
+	};
 
 	getMethod = function (method) {
 		var defaultMethod = 'bubble';
@@ -268,7 +281,6 @@
 		var Fn = Function,
 			obj = {},
 			token = (new Date()).getTime(),
-			fnArray,
 			frames;
 
 		// ensure obj is valid
@@ -277,9 +289,7 @@
 		obj.arr = event.data.arr || [];
 
 		// convert our function
-		fnArray = obj.fn.split('\n');
-		obj.fn = fnArray.splice(1, fnArray.length - 2).join('\n');
-		obj.fn = new Fn(obj.fn);
+		obj.fn = new Fn(getFunctionBody(obj.fn));
 
 		// get result
 		AS.init(obj.arr, token);

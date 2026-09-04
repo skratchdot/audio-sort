@@ -1,6 +1,8 @@
 'use strict';
 
-var sort = require('../dist/sort.js'),
+var fs = require('fs'),
+	vm = require('vm'),
+	sort = require('../dist/sort.js'),
 	A = sort.A,
 	sizes = [5, 10],
 	sortedFive = [0, 1, 2, 3, 4],
@@ -50,6 +52,32 @@ exports['AudioSortTests'] = {
 		test.expect(2);
 		test.deepEqual(sort.fn.datagen.sorted(5), sortedFive, 'array is not sorted');
 		test.deepEqual(sort.fn.datagen.sorted(10), sortedTen, 'array is not sorted');
+		test.done();
+	},
+	'worker accepts pre- and post-ES2019 function serialization': function (test) {
+		var workerSource = fs.readFileSync('dist/worker.js', 'utf8'),
+			functionSources = [
+				'function () {\nAS.play(0);\n}',
+				'function anonymous(\n) {\nAS.play(0);\n}'
+			];
+
+		test.expect(functionSources.length * 2);
+		functionSources.forEach(function (functionSource) {
+			var message,
+				context = {
+					postMessage: function (value) {
+						message = value;
+					}
+				};
+
+			vm.runInNewContext(workerSource, context);
+			test.doesNotThrow(function () {
+				context.onmessage({
+					data: { key: 'test', fn: functionSource, arr: [1] }
+				});
+			});
+			test.ok(message && message.fn.indexOf('AS.play(0);') !== -1);
+		});
 		test.done();
 	},
 	'instruments length': function (test) {
