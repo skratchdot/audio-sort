@@ -1627,6 +1627,7 @@
 		buildSortOptions,
 		clickPlayButton,
 		doSort,
+		getFunctionBody,
 		generateData,
 		getScale,
 		getBaseDataAsFrames,
@@ -1653,6 +1654,18 @@
 		preloadSoundfonts,
 		setupPlayers,
 		updateDisplayCache;
+
+	getFunctionBody = function (fn) {
+		var source = $.trim(fn.toString()),
+			bodyStart = source.indexOf('{'),
+			bodyEnd = source.lastIndexOf('}');
+
+		if (bodyStart === -1 || bodyEnd <= bodyStart) {
+			return source;
+		}
+
+		return source.slice(bodyStart + 1, bodyEnd);
+	};
 
 	buildSortOptions = function (selector) {
 		var $container, $li, $a, sortKey, sortObject;
@@ -1979,7 +1992,6 @@
 	onSortModalClick = function () {
 		var $modal = $('#modal-sort'),
 			selectedSort = global.sort[selected.sort],
-			fnArray,
 			fnText;
 		$modal.find('.sort-name').text(selectedSort.display);
 		$modal.find('.nav-tabs a:first').tab('show');
@@ -1991,8 +2003,7 @@
 		$modal.find('#sort-info-memory').html(selectedSort.memory || '&nbsp;');
 		$modal.find('#sort-info-method').html(selectedSort.method || '&nbsp;');
 		addAceEditor('#sort-algorithm');
-		fnArray = $.trim(selectedSort.toString()).split('\n');
-		fnText = fnArray.splice(1, fnArray.length - 2).join('\n');
+		fnText = getFunctionBody(selectedSort);
 		fnText = js_beautify(fnText, {
 			indent_size: 1,
 			indent_char: '\t'
