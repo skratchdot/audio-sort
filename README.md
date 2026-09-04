@@ -30,7 +30,7 @@ npm run check
 ```
 
 This runs Oxlint, Oxfmt's formatting check, Vitest, and the production build.
-Individual commands are `npm run lint`, `npm run fmt`, `npm run fmt:check`,
+Individual commands are `npm run lint`, `npm run format`, `npm run format:check`,
 `npm test`, and `npm run test:watch`.
 
 Grunt currently builds JS/CSS assets only. For live asset editing, run `npm run watch`

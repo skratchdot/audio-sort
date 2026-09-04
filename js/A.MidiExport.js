@@ -8,57 +8,62 @@
  */
 /*global $, A */
 (function (global) {
-	'use strict';
+  "use strict";
 
-	var MidiExport = {};
+  var MidiExport = {};
 
-	MidiExport.populateChannels = function (selector) {
-		var i, $select = $(selector), $option, html = '', numChannels = 16;
+  MidiExport.populateChannels = function (selector) {
+    var i,
+      $select = $(selector),
+      $option,
+      html = "",
+      numChannels = 16;
 
-		// empty select
-		$select.empty();
+    // empty select
+    $select.empty();
 
-		// populate select
-		for (i = 0; i < numChannels; i++) {
-			$option = $('<option></option>')
-				.val(i)
-				.text(i);
-			if (i === 0) {
-				$option.attr('selected', 'selected');
-			}
-			html += $option.wrap('<div />').parent().html();
-		}
-		$select.append(html);
-	};
+    // populate select
+    for (i = 0; i < numChannels; i++) {
+      $option = $("<option></option>").val(i).text(i);
+      if (i === 0) {
+        $option.attr("selected", "selected");
+      }
+      html += $option.wrap("<div />").parent().html();
+    }
+    $select.append(html);
+  };
 
-	MidiExport.populateInstruments = function (selector) {
-		var i, instrument, group = '',
-			$select = $(selector), $optGroup, $option;
+  MidiExport.populateInstruments = function (selector) {
+    var i,
+      instrument,
+      group = "",
+      $select = $(selector),
+      $optGroup,
+      $option;
 
-		// empty select
-		$select.empty();
+    // empty select
+    $select.empty();
 
-		// populate select
-		for (i = 0; i < A.instruments.length; i++) {
-			instrument = A.instruments[i];
-			if (group !== instrument.group) {
-				group = instrument.group;
-				if ($optGroup) {
-					$select.append($optGroup);
-				}
-				$optGroup = $('<optgroup></optgroup>')
-					.attr('label', group);
-			}
-			$option = $('<option></option>')
-				.val(i)
-				.text(i + ': ' + instrument.name);
-			if (i === 0) {
-				$option.attr('selected', 'selected');
-			}
-			$optGroup.append($option);
-		}
-		$select.append($optGroup);
-	};
+    // populate select
+    for (i = 0; i < A.instruments.length; i++) {
+      instrument = A.instruments[i];
+      if (group !== instrument.group) {
+        group = instrument.group;
+        if ($optGroup) {
+          $select.append($optGroup);
+        }
+        $optGroup = $("<optgroup></optgroup>").attr("label", group);
+      }
+      $option = $("<option></option>")
+        .val(i)
+        .text(i + ": " + instrument.name);
+      if (i === 0) {
+        $option.attr("selected", "selected");
+      }
+      $optGroup.append($option);
+    }
+    $select.append($optGroup);
+  };
 
-	global.A.MidiExport = MidiExport;
-}(this));
+  global.A.MidiExport = MidiExport;
+})(this);

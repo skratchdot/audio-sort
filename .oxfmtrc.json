@@ -1,15 +1,13 @@
 {
-	"$schema": "./node_modules/oxfmt/configuration_schema.json",
-	"useTabs": true,
-	"sortPackageJson": false,
-	"ignorePatterns": [
-		"js/**",
-		"css/**",
-		"dist/**",
-		"_site/**",
-		"_ignore/**",
-		"_includes/**",
-		"*.html",
-		"package-lock.json"
-	]
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "ignorePatterns": [
+    "js/lib/**",
+    "css/**",
+    "dist/**",
+    "_site/**",
+    "_ignore/**",
+    "_includes/**",
+    "*.html",
+    "package-lock.json"
+  ]
 }

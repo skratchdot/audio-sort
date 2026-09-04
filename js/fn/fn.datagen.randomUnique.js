@@ -1,8 +1,7 @@
 (function (global) {
-	'use strict';
+  "use strict";
 
-	global.fn.datagen.randomUnique = function (size) {
-		return global.fn.shuffle(global.fn.datagen.sorted(size));
-	};
-
-}(this));
+  global.fn.datagen.randomUnique = function (size) {
+    return global.fn.shuffle(global.fn.datagen.sorted(size));
+  };
+})(this);

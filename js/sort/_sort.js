@@ -1,4 +1,4 @@
 (function (global) {
-	'use strict';
-	global.sort = global.sort || {};
-}(this));
+  "use strict";
+  global.sort = global.sort || {};
+})(this);

@@ -1,39 +1,41 @@
 {
-	"$schema": "./node_modules/oxlint/configuration_schema.json",
-	"plugins": ["eslint", "unicorn", "oxc", "vitest"],
-	"categories": { "correctness": "error" },
-	"env": { "node": true },
-	"ignorePatterns": ["js/lib/**", "dist/**", "_site/**", "_ignore/**"],
-	"rules": { "no-undef": "error" },
-	"overrides": [
-		{
-			"files": ["js/**/*.js"],
-			"env": { "node": false, "browser": true },
-			"globals": { "AS": "readonly" }
-		},
-		{
-			"files": ["js/A.*.js", "js/visualization/*.js"],
-			"globals": {
-				"$": "readonly",
-				"A": "readonly",
-				"sc": "readonly",
-				"ace": "readonly",
-				"d3": "readonly",
-				"js_beautify": "readonly",
-				"timbre": "readonly",
-				"saveAs": "readonly",
-				"Midi": "readonly"
-			}
-		},
-		{
-			"files": ["js/A.Sort.js"],
-			"rules": { "no-unassigned-vars": "off" }
-		},
-		{
-			"files": ["js/SortWorker.js"],
-			"env": { "browser": false, "worker": true },
-			"globals": { "sort": "readonly" },
-			"rules": { "no-unused-vars": ["error", { "varsIgnorePattern": "^getMethod$" }] }
-		}
-	]
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "unicorn", "oxc", "vitest"],
+  "categories": { "correctness": "error" },
+  "env": { "node": true },
+  "ignorePatterns": ["js/lib/**", "dist/**", "_site/**", "_ignore/**"],
+  "rules": { "no-undef": "error" },
+  "overrides": [
+    {
+      "files": ["js/**/*.js"],
+      "env": { "node": false, "browser": true },
+      "globals": { "AS": "readonly" }
+    },
+    {
+      "files": ["js/A.*.js", "js/visualization/*.js"],
+      "globals": {
+        "$": "readonly",
+        "A": "readonly",
+        "sc": "readonly",
+        "ace": "readonly",
+        "d3": "readonly",
+        "js_beautify": "readonly",
+        "timbre": "readonly",
+        "saveAs": "readonly",
+        "Midi": "readonly"
+      }
+    },
+    {
+      "files": ["js/A.Sort.js"],
+      "rules": { "no-unassigned-vars": "off" }
+    },
+    {
+      "files": ["js/SortWorker.js"],
+      "env": { "browser": false, "worker": true },
+      "globals": { "sort": "readonly" },
+      "rules": {
+        "no-unused-vars": ["error", { "varsIgnorePattern": "^getMethod$" }]
+      }
+    }
+  ]
 }
