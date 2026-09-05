@@ -18,29 +18,27 @@
     "url": "git://github.com/skratchdot/audio-sort.git"
   },
   "scripts": {
-    "build": "npm run build:assets && npm run build:site",
-    "build:assets": "grunt build",
-    "build:site": "npm run clean && eleventy",
+    "build": "npm run clean && eleventy",
     "clean": "node -e \"require('node:fs').rmSync('_site', { recursive: true, force: true })\"",
     "serve": "npm run clean && eleventy --serve",
-    "start": "npm run build:assets && npm run serve",
+    "start": "npm run serve",
+    "preview": "vite preview --outDir _site",
+    "test:browser": "playwright test",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "lint": "oxlint --deny-warnings",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "check": "npm run lint && npm run format:check && npm test && npm run build",
-    "watch": "grunt watch"
+    "watch": "npm run serve"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.1.6",
-    "grunt": "^1.5.3",
-    "grunt-contrib-concat": "^2.1.0",
-    "grunt-contrib-cssmin": "^4.0.0",
-    "grunt-contrib-uglify": "^5.2.2",
-    "grunt-contrib-watch": "^1.1.0",
+    "@11ty/eleventy-plugin-vite": "^8.0.0",
+    "@playwright/test": "^1.63.0",
     "oxfmt": "^0.66.0",
     "oxlint": "^1.81.0",
+    "vite": "^8.2.2",
     "vitest": "^5.0.0"
   },
   "engines": {

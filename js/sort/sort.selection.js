@@ -31,4 +31,4 @@
   global.sort.selection.worst = "n^2";
   global.sort.selection.memory = "1";
   global.sort.selection.method = "selection";
-})(this);
+})(globalThis);

@@ -15,4 +15,4 @@
     }
     return arr;
   };
-})(this);
+})(globalThis);

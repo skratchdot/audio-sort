@@ -59,4 +59,4 @@
       fn: obj.fn.toString(),
     });
   };
-})(this);
+})(globalThis);

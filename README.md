@@ -9,7 +9,8 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 ## Development
 
-This site is built with [Eleventy](https://www.11ty.dev/) and requires Node.js 24 or newer.
+This site is built with [Eleventy](https://www.11ty.dev/) and [Vite](https://vite.dev/)
+and requires Node.js 24 or newer.
 Use `nvm use` to select the Node 24 version also used in CI.
 
 ```sh
@@ -33,10 +34,25 @@ This runs Oxlint, Oxfmt's formatting check, Vitest, and the production build.
 Individual commands are `npm run lint`, `npm run format`, `npm run format:check`,
 `npm test`, and `npm run test:watch`.
 
-Grunt currently builds JS/CSS assets only. For live asset editing, run `npm run watch`
-alongside `npm start`; use `npm run test:watch` separately for test feedback.
+`npm start` serves the site with live JS/CSS and template updates; a separate asset
+watcher is no longer needed. `npm run watch` is an alias. Use `npm run preview` to
+serve the production build and `npm run test:watch` for unit-test feedback.
 
-Pull requests and deployments run the same checks in GitHub Actions. Updates to
+Run browser checks against a fresh production build:
+
+```sh
+npx playwright install chromium
+npm run build
+npm run test:browser
+```
+
+Playwright checks the pages at both `/` and `/audio-sort/`, including actual
+bundled workers executing every built-in algorithm and custom algorithm code.
+External analytics, sharing widgets, and soundfonts are stubbed in these tests;
+they do not verify audible output. To use an existing Chrome installation, set
+`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its executable path.
+
+Pull requests and deployments run these checks plus the browser suite in GitHub Actions. Updates to
 `main` deploy to GitHub Pages after those checks pass. In repository Settings →
 Pages, the publishing source must be **GitHub Actions**.
 
@@ -57,13 +73,32 @@ excluded heap sort. Two temporary exceptions in `.oxlintrc.json` preserve legacy
 code: `env`/`pluck` are unassigned in `A.Sort.js`, and `getMethod` is unused in
 `SortWorker.js`. Remove these exceptions when those files are modernized.
 
-Oxfmt currently formats tests, configuration, workflows, and documentation. Legacy
-JS/CSS and Liquid HTML are excluded from formatting to keep changes reviewable;
-remove their exclusions as each area is migrated. Vendored libraries and generated
+Oxfmt formats first-party JS, tests, configuration, workflows, and documentation.
+Legacy CSS and Liquid HTML remain excluded. Vendored libraries and generated
 files are excluded from both tools.
 
-The next stages are Vite asset builds and untracking `dist`, an ES-module algorithm
-registry and worker API, and incremental UI/jQuery modernization.
+### Asset builds and next steps
+
+Eleventy renders HTML; Vite bundles the `js/main.mjs`, `js/worker.mjs`, and
+`css/main.css` entries. Generated assets have content-hashed filenames and relative
+URLs for GitHub Pages. `_site`, `.11ty-vite`, and the obsolete `dist` directory are
+ignored: generated output is built in CI, not checked in.
+
+For now, `js/lib` and images are copied unchanged. CSS is bundled but not minified
+because Bootstrap 2 includes obsolete IE syntax rejected by the modern minifier.
+JavaScript and the worker are minified. First-party IIFEs use `globalThis` as a
+temporary bridge from ES-module entries to the existing global APIs.
+
+New `js/sort/sort.*.js` files are discovered automatically by Vite and the unit
+suite. Follow an existing algorithm's registration/metadata convention and keep
+algorithm functions self-contained: the worker still receives their serialized
+source, which may reference the global `AS` API but not imported closures.
+
+Next: replace global registrations with an explicit ES-module algorithm registry
+and worker messages for built-in algorithm IDs, while preserving the custom-code
+editor. Then modernize UI/jQuery incrementally. New algorithms can be added now,
+with the correctness tests guarding each addition. The known Quick stability
+metadata bug remains a separate small fix.
 
 ## Audio Sort Links
 

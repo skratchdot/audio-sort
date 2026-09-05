@@ -9,4 +9,4 @@
     }
     return ret;
   };
-})(this);
+})(globalThis);

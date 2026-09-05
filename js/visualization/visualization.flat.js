@@ -145,4 +145,4 @@
     _init(settings);
     return flat;
   };
-})(this);
+})(globalThis);

@@ -1,3 +1,7 @@
 /node_modules/
 /_ignore/
 /_site/
+/dist/
+/.11ty-vite/
+/test-results/
+/playwright-report/

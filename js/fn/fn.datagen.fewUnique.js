@@ -11,4 +11,4 @@
     }
     return global.fn.shuffle(ret);
   };
-})(this);
+})(globalThis);

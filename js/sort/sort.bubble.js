@@ -27,4 +27,4 @@
   global.sort.bubble.worst = "n^2";
   global.sort.bubble.memory = "1";
   global.sort.bubble.method = "exchanging";
-})(this);
+})(globalThis);

@@ -29,4 +29,4 @@
   global.sort.insertion.worst = "n^2";
   global.sort.insertion.memory = "1";
   global.sort.insertion.method = "insertion";
-})(this);
+})(globalThis);

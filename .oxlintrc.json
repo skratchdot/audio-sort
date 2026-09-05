@@ -3,11 +3,19 @@
   "plugins": ["eslint", "unicorn", "oxc", "vitest"],
   "categories": { "correctness": "error" },
   "env": { "node": true },
-  "ignorePatterns": ["js/lib/**", "dist/**", "_site/**", "_ignore/**"],
+  "ignorePatterns": [
+    "js/lib/**",
+    "dist/**",
+    "_site/**",
+    "_ignore/**",
+    ".11ty-vite/**",
+    "test-results/**",
+    "playwright-report/**"
+  ],
   "rules": { "no-undef": "error" },
   "overrides": [
     {
-      "files": ["js/**/*.js"],
+      "files": ["js/**/*.js", "js/**/*.mjs"],
       "env": { "node": false, "browser": true },
       "globals": { "AS": "readonly" }
     },

@@ -34,6 +34,12 @@ jobs:
       - name: Lint, format, test, and build
         run: npm run check
 
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Test the built site and worker
+        run: npm run test:browser
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 

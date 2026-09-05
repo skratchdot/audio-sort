@@ -66,4 +66,4 @@
   };
 
   global.A.MidiExport = MidiExport;
-})(this);
+})(globalThis);

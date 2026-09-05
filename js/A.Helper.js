@@ -57,4 +57,4 @@
 
   // add Helper to the global scope
   global.A.Helper = Helper;
-})(this);
+})(globalThis);

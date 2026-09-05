@@ -26,30 +26,25 @@
 	</footer>
 
 	<!-- include scripts -->
-	<script type="text/javascript" charset="utf-8" src="js/lib/jquery-2.0.3.min.js"></script>
-	<script type="text/javascript" charset="utf-8" src="js/lib/bootstrap.min.js"></script>
-	<script type="text/javascript" charset="utf-8" src="js/lib/bootstrap-slider.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/bootstrap.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/bootstrap-slider.min.js"></script>
 	<!--
-	<script type="text/javascript" charset="utf-8" src="js/lib/fastclick.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/fastclick.min.js"></script>
 	-->
-	<script type="text/javascript" charset="utf-8" src="js/lib/timbre.js"></script>
-	<script type="text/javascript" charset="utf-8" src="js/lib/audio-jsonp.js"></script>
-	<script type="text/javascript" charset="utf-8" src="js/lib/timbre.mp3_decode.min.js"></script>
-	<script type="text/javascript" charset="utf-8" src="js/lib/timbre.soundfont.min.js"></script>
-	<script type="text/javascript" charset="utf-8" src="js/lib/subcollider.min.js"></script>
-	<script type="text/javascript" charset="utf-8" src="js/lib/d3.v3.min.js"></script>
-	<script type="text/javascript" charset="utf-8" src="js/lib/js_beautify.min.js"></script>
-	<script type="text/javascript" charset="utf-8" src="js/lib/ace/ace.js"></script>
-	<script type="text/javascript" charset="utf-8" src="js/lib/jsmidgen.js"></script>
-	<script type="text/javascript" charset="utf-8" src="js/lib/Blob.js"></script>
-	<script type="text/javascript" charset="utf-8" src="js/lib/FileSaver.min.js"></script>
-	<script type="text/javascript" charset="utf-8" src="dist/sort.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/timbre.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/audio-jsonp.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/timbre.mp3_decode.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/timbre.soundfont.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/subcollider.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/d3.v3.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/js_beautify.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/ace/ace.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/jsmidgen.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/Blob.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/js/lib/FileSaver.min.js"></script>
 	{% if init_audio_sort == true %}
-	<script type="text/javascript" charset="utf-8">
-		$(document).ready(function () {
-			A.Sort.init('dist/worker.js');
-		});
-	</script>
+	<script type="module" src="/js/main.mjs"></script>
 	{% endif %}
 	<!-- Google Analytics -->
 	<script>

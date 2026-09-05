@@ -207,4 +207,4 @@
     _init(settings);
     return bar;
   };
-})(this);
+})(globalThis);

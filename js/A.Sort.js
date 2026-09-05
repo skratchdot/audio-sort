@@ -72,7 +72,7 @@
     // Web Workers
     worker = null,
     workerKey,
-    workerUrl = "dist/worker.min.js",
+    createWorker,
     workerOnMessage,
     workerOnError,
     // Functions
@@ -740,7 +740,7 @@
     }
 
     // perform sort in worker thread
-    worker = new Worker(workerUrl);
+    worker = createWorker();
     worker.addEventListener("message", workerOnMessage, false);
     worker.addEventListener("error", workerOnError, false);
     worker.postMessage({
@@ -762,10 +762,8 @@
     return "bpm" + (parseFloat(selected.tempo) || defaults.tempo) + " l16";
   };
 
-  Sort.init = function (webWorkerUrl) {
-    if (typeof webWorkerUrl === "string") {
-      workerUrl = webWorkerUrl;
-    }
+  Sort.init = function (workerFactory) {
+    createWorker = workerFactory;
     // when using a mobile device, decrease samplerate.
     // idea taken from: http://mohayonao.github.io/timbre.js/misc/js/common.js
     if (timbre.envmobile) {
@@ -886,4 +884,4 @@
   };
 
   global.A.Sort = Sort;
-})(this);
+})(globalThis);
