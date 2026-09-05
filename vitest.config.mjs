@@ -6,11 +6,7 @@ export default defineConfig({
     environment: "node",
     // VM-loaded files are outside Vite's import graph. Watch them explicitly
     // until the application is migrated to ES modules.
-    forceRerunTriggers: [
-      ...configDefaults.forceRerunTriggers,
-      "**/js/{_A,A.instruments}.js",
-      "**/js/fn/*.js",
-    ],
+    forceRerunTriggers: [...configDefaults.forceRerunTriggers, "**/js/fn/*.js"],
     clearMocks: true,
     restoreMocks: true,
   },

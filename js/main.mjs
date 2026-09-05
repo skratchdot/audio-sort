@@ -1,13 +1,7 @@
-// Initialize legacy namespaces before loading the registration modules.
+// Initialize the remaining legacy generator namespace before registration.
 import "./fn/_fn.js";
-import "./visualization/_visualization.js";
-import "./_A.js";
 import "./registrations.mjs";
-import "./A.Helper.js";
-import "./A.MidiExport.js";
-import "./A.Player.js";
-import "./A.Sort.js";
-import "./A.instruments.js";
+import { createSortController } from "./A.Sort.mjs";
 import { algorithms } from "./sort/registry.mjs";
 import { sources } from "./sort/sources.mjs";
 import { createSortRequest, getFunctionBody, runSortRequest } from "./sort/requests.mjs";
@@ -16,7 +10,9 @@ function createSortWorker() {
   return new Worker(new URL("./worker.mjs", import.meta.url), { type: "module" });
 }
 
-globalThis.A.Sort.init({
+// The remaining generator registry is injected at the application boundary.
+const controller = createSortController(globalThis.fn.datagen);
+controller.init({
   createWorker: createSortWorker,
   algorithms: { ...algorithms },
   createSortRequest,

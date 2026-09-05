@@ -1,16 +1,15 @@
+import { $, timbre, d3, Midi } from "./vendor.mjs";
+import { visualizations } from "./visualization/registry.mjs";
 /*!
  * Project: Audio Sort
- *    File: A.Player.js
+ *    File: A.Player.mjs
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot
  * Licensed under the MIT license.
  */
-/*global $, timbre, d3, A, Midi */
-(function (global) {
-  "use strict";
-  global.A.Player = {};
-  global.A.Player.create = function (containerSelector, options) {
+export function createPlayerFactory(settings, Helper) {
+  return function createPlayer(containerSelector, options) {
     var player = {},
       // Config Values
       canvasBackground = "rgba(255, 255, 255, 0)",
@@ -82,7 +81,7 @@
 
       // setup audio envelopes/generators and interval
       player.refreshWaveGenerator();
-      interval = timbre("interval", { interval: A.Sort.getTempoString() }, intervalCallback);
+      interval = timbre("interval", { interval: settings.getTempoString() }, intervalCallback);
 
       // listen for player button clicks
       $container.find(".player-buttons").on("click", ".btn", onPlayerButtonClick);
@@ -181,17 +180,17 @@
         // play if possible
         if (data.length > 0) {
           info = data[intervalIndex];
-          selectedAudioType = A.Sort.getSelected("audioType");
+          selectedAudioType = settings.getSelected("audioType");
           for (i = 0; i < info.arr.length; i++) {
             currentItem = info.arr[i];
             if (currentItem.play) {
-              midi = A.Helper.getMidiNumber(currentItem.value);
+              midi = Helper.getMidiNumber(currentItem.value);
               if (midi >= 0 && midi < 128) {
                 if (selectedAudioType === "waveform") {
                   waveGenerator.noteOn(midi, 64);
                 } else if (selectedAudioType === "soundfont") {
                   timbre.soundfont.play(midi, false, {
-                    mul: A.Sort.getSelected("volume") * 1.5,
+                    mul: settings.getSelected("volume") * 1.5,
                   });
                 }
               }
@@ -260,7 +259,7 @@
     player.setData = function (d) {
       var selector = containerSelector + " .position-container";
       data = d;
-      $slider = A.Helper.createSlider(
+      $slider = Helper.createSlider(
         selector,
         {
           value: 0,
@@ -276,7 +275,7 @@
     player.setVisualization = function (visualizationName, forceInit) {
       var shouldInit = false;
       if (
-        global.visualization.hasOwnProperty(visualizationName) &&
+        visualizations.hasOwnProperty(visualizationName) &&
         selectedVisualization !== visualizationName
       ) {
         selectedVisualization = visualizationName;
@@ -286,7 +285,7 @@
         $svg.empty();
       }
       if (shouldInit || forceInit) {
-        visualization = global.visualization[selectedVisualization]({
+        visualization = visualizations[selectedVisualization]({
           data: data,
           svg: svg,
           $svg: $svg,
@@ -320,7 +319,7 @@
         }
       }
       isReverse = reverse === true ? true : false;
-      if (A.Sort.getSelected("audioType") === "waveform") {
+      if (settings.getSelected("audioType") === "waveform") {
         waveGenerator.play();
       }
       interval.start();
@@ -375,7 +374,7 @@
         for (j = 0; j < info.arr.length; j++) {
           currentItem = info.arr[j];
           if (currentItem.play) {
-            midiNumber = A.Helper.getMidiNumber(currentItem.value);
+            midiNumber = Helper.getMidiNumber(currentItem.value);
             if (midiNumber >= 0 && midiNumber < 128) {
               play.push(midiNumber);
             }
@@ -408,7 +407,7 @@
     };
 
     player.refreshWaveGenerator = function () {
-      var waveInfo = A.Sort.getSelectedWaveformInfo();
+      var waveInfo = settings.getSelectedWaveformInfo();
       $.each([env, waveGenerator], function (index, obj) {
         $.each(["pause", "removeAllListeners"], function (index, key) {
           if (obj && typeof obj[key] === "function") {
@@ -425,7 +424,7 @@
       });
       waveGenerator = timbre(waveInfo.gen, {
         env: env,
-        mul: A.Sort.getSelected("volume") * waveInfo.mul,
+        mul: settings.getSelected("volume") * waveInfo.mul,
         poly: waveInfo.poly || 10,
       }).on("ended", function () {
         if (!isPlaying) {
@@ -433,9 +432,9 @@
         }
       });
       if (waveInfo.gen === "OscGen") {
-        waveGenerator.set("osc", timbre(A.Sort.getSelected("waveform")));
+        waveGenerator.set("osc", timbre(settings.getSelected("waveform")));
       }
-      if (isPlaying && A.Sort.getSelected("audioType") === "waveform") {
+      if (isPlaying && settings.getSelected("audioType") === "waveform") {
         waveGenerator.play();
       }
     };
@@ -471,4 +470,4 @@
 
     return player;
   };
-})(globalThis);
+}

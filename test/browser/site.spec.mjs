@@ -45,6 +45,11 @@ test("built UI loads and algorithm IDs execute in the bundled worker", async ({
   const workerURL = sortWorker.url();
   expect(await sortWorker.evaluate(() => Object.hasOwn(globalThis, "AS"))).toBe(false);
   expect(await page.evaluate(() => Object.hasOwn(globalThis, "AS"))).toBe(false);
+  expect(
+    await page.evaluate(() =>
+      ["A", "visualization"].filter((name) => Object.hasOwn(globalThis, name)),
+    ),
+  ).toEqual([]);
   expect(workerURL.startsWith(baseURL)).toBe(true);
   await expect(page.locator("#sort-options [data-sort]")).toHaveCount(algorithmNames.length);
   await expect(page.locator("#base-chart svg rect").first()).toBeVisible();
@@ -180,6 +185,52 @@ for (const fallback of [false, true]) {
       });
   });
 }
+
+test("module UI connects data, visualization, playback navigation, sliders, and MIDI export", async ({
+  page,
+}) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("index.html");
+  await page.locator('#base-buttons [data-action="reverse"]').click();
+  await expect
+    .poll(async () => Number(await page.locator("#sort-player .position-max").textContent()))
+    .toBeGreaterThan(0);
+  await page.locator('[data-visualization="flat"]').click();
+  await expect(page.locator("#sort-chart svg path.line").first()).toBeVisible();
+  await page.locator('[data-visualization="bar"]').click();
+  await expect(page.locator("#sort-chart svg rect").first()).toBeVisible();
+  await page.locator('#sort-player [data-action="goToLast"]').click();
+  await expect(page.locator("#sort-player .position-current")).toHaveText(
+    await page.locator("#sort-player .position-max").textContent(),
+  );
+  await page.locator('#sort-player [data-action="goToFirst"]').click();
+  await expect(page.locator("#sort-player .position-current")).toHaveText("1");
+  await page.locator('#sort-player [data-action="play"]').click();
+  await expect
+    .poll(async () => Number(await page.locator("#sort-player .position-current").textContent()))
+    .toBeGreaterThan(1);
+  await page.locator('#sort-player [data-action="stop"]').click();
+  const originalVolume = await page.locator("#volume-display").textContent();
+  const slider = page.locator("#volume-container .slider");
+  const bounds = await slider.boundingBox();
+  await slider.click({ position: { x: bounds.width * 0.6, y: bounds.height / 2 } });
+  await expect(page.locator("#volume-display")).not.toHaveText(originalVolume);
+  await page.locator('[data-midi-export="sort"]').click();
+  await expect(page.locator("#midi-export-channel option")).toHaveCount(16);
+  await expect(page.locator("#midi-export-instrument option")).toHaveCount(128);
+  await page.locator("#midi-export-name").fill("module-smoke");
+  const downloadReady = page.waitForEvent("download");
+  await page.locator("#midi-export-btn").click();
+  const download = await downloadReady;
+  expect(download.suggestedFilename()).toBe("module-smoke.mid");
+  const chunks = [];
+  for await (const chunk of await download.createReadStream()) chunks.push(chunk);
+  const bytes = Buffer.concat(chunks);
+  expect(bytes.subarray(0, 4).toString()).toBe("MThd");
+  expect(bytes.includes(Buffer.from("MTrk"))).toBe(true);
+  expect(errors).toEqual([]);
+});
 
 for (const filename of ["about.html", "api.html"]) {
   test(`${filename} and its local assets load`, async ({ page, baseURL }) => {

@@ -76,9 +76,9 @@ stability but reorders equal-valued items. Correcting that metadata and removing
 the exception is a follow-up to this tooling migration.
 
 Oxlint checks first-party JS, tests, and configuration, including the previously
-excluded heap sort. One temporary exception in `.oxlintrc.json` preserves the
-unassigned legacy `env`/`pluck` variables in `A.Sort.js`. The old worker and its
-unused-function exception have been removed.
+excluded heap sort. The old global declarations and temporary legacy rule
+exceptions have been removed. Unused controller `env`/`pluck` options were removed
+after verifying the player never consumed them.
 
 Oxfmt formats first-party JS, tests, configuration, workflows, and documentation.
 Legacy CSS and Liquid HTML remain excluded. Vendored libraries and generated
@@ -93,8 +93,25 @@ ignored: generated output is built in CI, not checked in.
 
 For now, `js/lib` and images are copied unchanged. CSS is bundled but not minified
 because Bootstrap 2 includes obsolete IE syntax rejected by the modern minifier.
-JavaScript and the worker are minified. First-party IIFEs use `globalThis` as a
-temporary bridge from ES-module entries to the existing global APIs.
+JavaScript and the worker are minified. Only the data generators/utilities still
+use first-party IIFEs; `main.mjs` injects their registry into the UI controller.
+
+### UI modules
+
+The controller, player, helpers, MIDI export, instrument data, and visualizations
+are ES modules. `main.mjs` creates the controller; it supplies its settings API to
+helper/player factories, avoiding circular imports. Visualization implementations
+are imported explicitly by `js/visualization/registry.mjs`.
+
+There is no global `A` or `visualization`. `js/vendor.mjs` is the explicit bridge to
+classic libraries loaded by the footer before the module entry executes. jQuery
+and its plugins, timbre, D3, Ace, and MIDI libraries are intentionally unchanged.
+The factories are not a multi-mount component system: the controller still targets
+the existing page IDs and does not yet provide listener/worker/audio teardown.
+
+Browser checks cover editor round trips, visualization switching, playback
+progress/navigation, sliders, and a MIDI download with valid header/chunk markers.
+See [MODERNIZATION.md](MODERNIZATION.md) for a compact handoff and re-planning notes.
 
 ### Algorithms and worker protocol
 
@@ -135,7 +152,8 @@ To add an algorithm:
 4. Run `npm run check` and `npm run test:browser`. The test suites discover the new
    module and exercise correctness, metadata, worker execution, and editor round trips.
 
-Next: modernize the remaining UI modules and replace jQuery incrementally.
+Next: choose between more algorithms, generator modules, and incremental jQuery
+removal using the handoff notes above.
 New sorting algorithms can be added independently with these tests guarding each
 addition. The known Quick stability metadata bug remains a separate small fix.
 
