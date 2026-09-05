@@ -1,14 +1,13 @@
 /*!
  * Project: Audio Sort
- *    File: AS.js
+ *    File: AS.mjs
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot
  * Licensed under the MIT license.
  */
-(function (global) {
-  "use strict";
-
+// Each instance owns its arrays, frames, markers, and counters.
+export function createSortEngine() {
   var AS = {},
     // internal arrays
     _array = [],
@@ -147,6 +146,8 @@
     _token = token;
     compareCount = 0;
     swapCount = 0;
+    // Reusing an instance must not carry marker IDs into the next data set.
+    for (const type of Object.keys(recent)) recent[type] = [];
     for (i = 0; i < inputArray.length; i++) {
       _array.push(copyObject(inputArray[i]));
     }
@@ -247,5 +248,5 @@
     _frames[_frames.length - 1].swapCount = swapCount;
   };
 
-  global.AS = AS;
-})(globalThis);
+  return AS;
+}

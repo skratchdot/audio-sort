@@ -58,14 +58,18 @@ Pages, the publishing source must be **GitHub Actions**.
 
 ### Tests and incremental modernization
 
-Vitest imports algorithm modules directly and creates isolated JavaScript contexts
-for the remaining legacy engine/generators. Tests do not depend on generated output.
+Vitest imports engine and algorithm modules directly and creates isolated JavaScript
+contexts for the remaining legacy generators. Algorithm correctness checks invoke
+the imported code through a time-limited VM to guard against infinite loops.
+Tests do not depend on generated output.
 The suite discovers `js/sort/sort.*.mjs` files, checks registry/source coverage,
 sorting results, item preservation, frame counters, metadata, and the worker request
 handler. It also verifies built-ins never compile source and readable editor code
 still executes after saving. Deterministic random cases keep regressions reproducible.
 Playwright additionally exercises real bundled workers, editor saves, new custom
 algorithms, and the no-Worker fallback in the production site.
+Engine tests cover independent instances, repeated initialization, marker resets,
+and isolation after custom code modifies its own engine API.
 
 One expected-failure test records an existing metadata bug: Quick advertises
 stability but reorders equal-valued items. Correcting that metadata and removing
@@ -105,6 +109,15 @@ is the editor's function body. Only custom code uses `Function("AS", source)`.
 Replies contain `{ key, frames }` or `{ key, error }`. The no-Worker fallback uses
 the same request handler. Custom code is arbitrary JavaScript, not a security sandbox.
 
+The engine is exported as `createSortEngine()` from `js/AS.mjs`; importing it has
+no global side effects. Each default request creates a fresh engine, so frames,
+counters, markers, and custom changes to engine methods cannot leak to the next
+request. Advanced callers can pass an engine as the second argument to
+`runSortRequest(request, engine)`. Calling `engine.init()` resets its recording
+state, including pending markers, but does not undo changes to its methods.
+The worker and browser no longer expose `globalThis.AS`; algorithm bodies still
+use `AS` unchanged because it is supplied as a function argument.
+
 `js/sort/sources.mjs` imports original source as text for the editor, separately from
 the executable registry. This avoids showing minified variable names and excludes
 readable source strings from the worker bundle. Saving a built-in creates a custom
@@ -122,7 +135,7 @@ To add an algorithm:
 4. Run `npm run check` and `npm run test:browser`. The test suites discover the new
    module and exercise correctness, metadata, worker execution, and editor round trips.
 
-Next: modernize the remaining engine/UI modules and replace jQuery incrementally.
+Next: modernize the remaining UI modules and replace jQuery incrementally.
 New sorting algorithms can be added independently with these tests guarding each
 addition. The known Quick stability metadata bug remains a separate small fix.
 

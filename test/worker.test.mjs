@@ -1,12 +1,31 @@
+import { createSortEngine } from "../js/AS.mjs";
 import { describe, expect, test, vi } from "vitest";
 import { algorithms } from "../js/sort/registry.mjs";
 import { sources } from "../js/sort/sources.mjs";
 import { createSortRequest, getFunctionBody, runSortRequest } from "../js/sort/requests.mjs";
-import { algorithmNames, loadLegacy, seededValues } from "./helpers/legacy.mjs";
+import { algorithmNames, seededValues } from "./helpers/legacy.mjs";
 
 function run(request) {
-  return runSortRequest(request, loadLegacy(["js/AS.js"]).AS);
+  return runSortRequest(request);
 }
+
+test("default requests get fresh engines even after custom code mutates its API", () => {
+  const request = {
+    key: 1,
+    type: "custom",
+    source: "AS.swap = () => { throw new Error('leaked API'); }; AS.highlight(0);",
+    arr: [
+      { id: "a", value: 2 },
+      { id: "b", value: 1 },
+    ],
+  };
+  const first = runSortRequest(request);
+  const snapshot = structuredClone(first);
+  const second = runSortRequest({ key: 2, type: "builtin", id: "bubble", arr: request.arr });
+  expect(second.frames.at(-1).arr.map((item) => item.value)).toEqual([1, 2]);
+  expect(second.frames.flatMap((frame) => frame.arr).some((item) => item.highlight)).toBe(false);
+  expect(first).toEqual(snapshot);
+});
 
 test("registry and editor sources cover every algorithm module", () => {
   expect(Object.keys(algorithms).sort()).toEqual(algorithmNames);
@@ -20,7 +39,7 @@ describe.each(algorithmNames)("%s worker request", (id) => {
     const original = [...values];
     const request = createSortRequest(0, id, algorithms[id], values);
     expect(request).toEqual({ key: 0, type: "builtin", id, arr: values });
-    const engine = loadLegacy(["js/AS.js"]).AS;
+    const engine = createSortEngine();
     const compile = vi.spyOn(globalThis, "Function").mockImplementation(() => {
       throw new Error("Built-ins must not compile source");
     });
@@ -79,7 +98,7 @@ test.each([
 });
 
 test("a failed request does not poison the next run", () => {
-  const engine = loadLegacy(["js/AS.js"]).AS;
+  const engine = createSortEngine();
   expect(() =>
     runSortRequest({ type: "custom", source: "throw new Error('failure')", arr: [4, 2] }, engine),
   ).toThrow("failure");

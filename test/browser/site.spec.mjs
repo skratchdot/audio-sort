@@ -41,7 +41,10 @@ test("built UI loads and algorithm IDs execute in the bundled worker", async ({
     predicate: (worker) => /\/assets\/worker-/.test(worker.url()),
   });
   await page.goto("index.html");
-  const workerURL = (await workerReady).url();
+  const sortWorker = await workerReady;
+  const workerURL = sortWorker.url();
+  expect(await sortWorker.evaluate(() => Object.hasOwn(globalThis, "AS"))).toBe(false);
+  expect(await page.evaluate(() => Object.hasOwn(globalThis, "AS"))).toBe(false);
   expect(workerURL.startsWith(baseURL)).toBe(true);
   await expect(page.locator("#sort-options [data-sort]")).toHaveCount(algorithmNames.length);
   await expect(page.locator("#base-chart svg rect").first()).toBeVisible();
@@ -61,15 +64,23 @@ test("built UI loads and algorithm IDs execute in the bundled worker", async ({
       const worker = new globalThis.Worker(workerURL, { type: "module" });
       const results = [];
       try {
-        for (const name of [...names, "invalid", "failure", "custom"]) {
+        for (const name of [...names, "invalid", "failure", "mutate", "custom"]) {
           const response = new Promise((resolve, reject) => {
             worker.onmessage = (event) => resolve(event.data);
             worker.onerror = (event) => reject(new Error(event.message));
           });
           worker.postMessage({
             key: name,
-            ...(name === "custom" || name === "failure"
-              ? { type: "custom", source: name === "failure" ? "throw null;" : "AS.swap(0, 1);" }
+            ...(name === "custom" || name === "failure" || name === "mutate"
+              ? {
+                  type: "custom",
+                  source:
+                    name === "failure"
+                      ? "throw null;"
+                      : name === "mutate"
+                        ? "AS.swap = () => { throw new Error('leaked API'); };"
+                        : "AS.swap(0, 1);",
+                }
               : { type: "builtin", id: name }),
             arr: (name === "custom" ? [2, 1] : [5, 1, 3, 1, 2]).map((value, id) => ({ value, id })),
           });
@@ -94,6 +105,7 @@ test("built UI loads and algorithm IDs execute in the bundled worker", async ({
     ...algorithmNames.map((key) => ({ key, values: [1, 1, 2, 3, 5] })),
     { key: "invalid", error: "Unknown algorithm ID" },
     { key: "failure", error: "null" },
+    { key: "mutate", values: [5, 1, 3, 1, 2] },
     { key: "custom", values: [1, 2] },
   ]);
   expect(errors).toEqual([]);
@@ -147,6 +159,7 @@ for (const fallback of [false, true]) {
         globalThis.Worker = undefined;
       });
     await page.goto("index.html");
+    expect(await page.evaluate(() => Object.hasOwn(globalThis, "AS"))).toBe(false);
     await expect
       .poll(async () => Number(await page.locator("#sort-player .position-max").textContent()))
       .toBeGreaterThan(0);

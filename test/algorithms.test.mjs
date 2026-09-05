@@ -1,5 +1,6 @@
+import { algorithms } from "../js/sort/registry.mjs";
 import { describe, expect, test } from "vitest";
-import { algorithmNames, loadAlgorithms, runAlgorithm, seededValues } from "./helpers/legacy.mjs";
+import { algorithmNames, runAlgorithm, seededValues } from "./helpers/legacy.mjs";
 
 const cases = [
   { name: "empty", values: [] },
@@ -17,7 +18,7 @@ const cases = [
 
 test("discovers the built-in algorithm registry", () => {
   expect(algorithmNames.length).toBeGreaterThan(0);
-  expect(Object.keys(loadAlgorithms().sort).sort()).toEqual(algorithmNames);
+  expect(Object.keys(algorithms).sort()).toEqual(algorithmNames);
 });
 
 describe.each(algorithmNames)("%s", (name) => {
@@ -47,7 +48,7 @@ describe.each(algorithmNames)("%s", (name) => {
   });
 
   test("provides metadata used by the algorithm chooser", () => {
-    const algorithm = loadAlgorithms().sort[name];
+    const algorithm = algorithms[name];
     for (const field of ["display", "best", "average", "worst", "memory", "method"]) {
       expect(typeof algorithm[field]).toBe("string");
       expect(algorithm[field].length).toBeGreaterThan(0);
@@ -58,7 +59,7 @@ describe.each(algorithmNames)("%s", (name) => {
 
 describe("stable algorithms", () => {
   for (const name of algorithmNames) {
-    if (!loadAlgorithms().sort[name].stable) continue;
+    if (!algorithms[name].stable) continue;
 
     // Quick currently advertises stability but exchanges equal-valued items.
     // Keep this executable regression visible until its metadata is corrected.

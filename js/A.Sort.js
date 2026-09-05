@@ -721,7 +721,7 @@
     // browsers that don't support Web Workers will behave slowly
     if (typeof Worker === "undefined") {
       try {
-        workerOnMessage({ data: runSortRequest(request, global.AS) });
+        workerOnMessage({ data: runSortRequest(request) });
       } catch (error) {
         workerOnMessage({ data: { key: workerKey, error: String(error?.message ?? error) } });
       }
