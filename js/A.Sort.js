@@ -73,6 +73,10 @@
     worker = null,
     workerKey,
     createWorker,
+    algorithms,
+    createSortRequest,
+    runSortRequest,
+    getSource,
     workerOnMessage,
     workerOnError,
     // Functions
@@ -88,7 +92,6 @@
     buildSortOptions,
     clickPlayButton,
     doSort,
-    getFunctionBody,
     generateData,
     getScale,
     getBaseDataAsFrames,
@@ -116,26 +119,14 @@
     setupPlayers,
     updateDisplayCache;
 
-  getFunctionBody = function (fn) {
-    var source = $.trim(fn.toString()),
-      bodyStart = source.indexOf("{"),
-      bodyEnd = source.lastIndexOf("}");
-
-    if (bodyStart === -1 || bodyEnd <= bodyStart) {
-      return source;
-    }
-
-    return source.slice(bodyStart + 1, bodyEnd);
-  };
-
   buildSortOptions = function (selector) {
     var $container, $li, $a, sortKey, sortObject;
-    if (global.hasOwnProperty("sort")) {
+    if (algorithms) {
       $container = $(selector);
       $container.empty();
-      for (sortKey in global.sort) {
-        if (global.sort.hasOwnProperty(sortKey)) {
-          sortObject = global.sort[sortKey];
+      for (sortKey in algorithms) {
+        if (algorithms.hasOwnProperty(sortKey)) {
+          sortObject = algorithms[sortKey];
           $li = $("<li></li>");
           $a = $('<a href="javascript:void(0);"></a>');
           $a.attr("data-sort", sortKey);
@@ -459,7 +450,7 @@
 
   onSortModalClick = function () {
     var $modal = $("#modal-sort"),
-      selectedSort = global.sort[selected.sort],
+      selectedSort = algorithms[selected.sort],
       fnText;
     $modal.find(".sort-name").text(selectedSort.display);
     $modal.find(".nav-tabs a:first").tab("show");
@@ -471,7 +462,7 @@
     $modal.find("#sort-info-memory").html(selectedSort.memory || "&nbsp;");
     $modal.find("#sort-info-method").html(selectedSort.method || "&nbsp;");
     addAceEditor("#sort-algorithm");
-    fnText = getFunctionBody(selectedSort);
+    fnText = getSource(selected.sort, selectedSort);
     fnText = js_beautify(fnText, {
       indent_size: 1,
       indent_char: "\t",
@@ -488,7 +479,10 @@
   };
 
   onSaveAlgorithmEdit = function () {
-    global.sort[selected.sort] = new Fn(aceEditor.getValue());
+    algorithms[selected.sort] = Object.assign(
+      new Fn("AS", aceEditor.getValue()),
+      algorithms[selected.sort],
+    );
     $("#modal-sort").modal("hide");
   };
 
@@ -497,14 +491,14 @@
       nameSafe = name.replace(/[^a-zA-Z]/gi, ""),
       id = nameSafe + "_id_" + new Date().getTime();
     if ($.trim(name).length) {
-      global.sort[id] = new Fn(aceEditor.getValue());
-      global.sort[id].display = name;
-      global.sort[id].stable = true;
-      global.sort[id].best = "";
-      global.sort[id].average = "";
-      global.sort[id].worst = "";
-      global.sort[id].memory = "";
-      global.sort[id].method = "";
+      algorithms[id] = new Fn("AS", aceEditor.getValue());
+      algorithms[id].display = name;
+      algorithms[id].stable = true;
+      algorithms[id].best = "";
+      algorithms[id].average = "";
+      algorithms[id].worst = "";
+      algorithms[id].memory = "";
+      algorithms[id].method = "";
     }
     $("#modal-add-algorithm").modal("hide");
     buildSortOptions("#sort-options");
@@ -701,13 +695,17 @@
   };
 
   workerOnMessage = function (event) {
+    if (event.data.key !== workerKey) return;
     var isSortPlaying = players.sort.isPlaying();
-    if (event.data.key === workerKey) {
-      players.sort.setData(event.data.frames || []);
-      players.sort.goToFirst();
-      if (isSortPlaying || triggerAutoPlay) {
-        clickPlayButton();
-      }
+    if (Object.hasOwn(event.data, "error")) {
+      workerOnError(event.data.error);
+      triggerAutoPlay = false;
+      return;
+    }
+    players.sort.setData(event.data.frames || []);
+    players.sort.goToFirst();
+    if (isSortPlaying || triggerAutoPlay) {
+      clickPlayButton();
     }
     triggerAutoPlay = false;
   };
@@ -717,18 +715,16 @@
   };
 
   doSort = function () {
-    workerKey = new Date().getTime();
+    workerKey = (workerKey || 0) + 1;
+    var request = createSortRequest(workerKey, selected.sort, algorithms[selected.sort], baseData);
 
     // browsers that don't support Web Workers will behave slowly
     if (typeof Worker === "undefined") {
-      AS.init(baseData, workerKey);
-      global.sort[selected.sort]();
-      workerOnMessage({
-        data: {
-          key: workerKey,
-          frames: AS.end(workerKey),
-        },
-      });
+      try {
+        workerOnMessage({ data: runSortRequest(request, global.AS) });
+      } catch (error) {
+        workerOnMessage({ data: { key: workerKey, error: String(error?.message ?? error) } });
+      }
       return;
     }
 
@@ -743,11 +739,7 @@
     worker = createWorker();
     worker.addEventListener("message", workerOnMessage, false);
     worker.addEventListener("error", workerOnError, false);
-    worker.postMessage({
-      key: workerKey,
-      fn: global.sort[selected.sort].toString(),
-      arr: baseData,
-    });
+    worker.postMessage(request);
   };
 
   Sort.getSelected = function (key, defaultValue) {
@@ -762,8 +754,12 @@
     return "bpm" + (parseFloat(selected.tempo) || defaults.tempo) + " l16";
   };
 
-  Sort.init = function (workerFactory) {
-    createWorker = workerFactory;
+  Sort.init = function (options) {
+    createWorker = options.createWorker;
+    algorithms = options.algorithms;
+    createSortRequest = options.createSortRequest;
+    runSortRequest = options.runSortRequest;
+    getSource = options.getSource;
     // when using a mobile device, decrease samplerate.
     // idea taken from: http://mohayonao.github.io/timbre.js/misc/js/common.js
     if (timbre.envmobile) {

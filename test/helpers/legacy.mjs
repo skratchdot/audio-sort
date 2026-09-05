@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { createContext, runInContext } from "node:vm";
+import { algorithms } from "../../js/sort/registry.mjs";
 
 const root = new URL("../../", import.meta.url);
 
@@ -8,10 +9,10 @@ export function source(path) {
 }
 
 export const algorithmFiles = readdirSync(new URL("js/sort/", root))
-  .filter((file) => /^sort\..+\.js$/.test(file))
+  .filter((file) => /^sort\..+\.mjs$/.test(file))
   .sort();
 
-export const algorithmNames = algorithmFiles.map((file) => file.slice(5, -3));
+export const algorithmNames = algorithmFiles.map((file) => file.slice(5, -4));
 
 // A fresh realm supplies the globals expected by the legacy IIFEs, without
 // leaking state between tests or requiring checked-in/generated bundles.
@@ -24,18 +25,14 @@ export function loadLegacy(paths, globals = {}) {
 }
 
 export function loadAlgorithms() {
-  return loadLegacy([
-    "js/AS.js",
-    "js/sort/_sort.js",
-    ...algorithmFiles.map((file) => `js/sort/${file}`),
-  ]);
+  return loadLegacy(["js/AS.js"], { sort: algorithms });
 }
 
 export function runAlgorithm(name, values) {
   const context = loadAlgorithms();
   context.input = values;
   context.algorithmName = name;
-  return runInContext("AS.init(input, 'test'); sort[algorithmName](); AS.end('test');", context, {
+  return runInContext("AS.init(input, 'test'); sort[algorithmName](AS); AS.end('test');", context, {
     timeout: 1000,
   });
 }

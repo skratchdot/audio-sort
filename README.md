@@ -58,20 +58,23 @@ Pages, the publishing source must be **GitHub Actions**.
 
 ### Tests and incremental modernization
 
-Vitest loads first-party source into isolated JavaScript contexts; unit tests do
-not depend on `dist`. The suite discovers `js/sort/sort.*.js` algorithms and checks
-sorting results, item preservation, frame counters, metadata, and serialized worker
-message handling. Worker tests use Node's VM, not a real browser. Deterministic
-random input cases make sorting regressions reproducible.
+Vitest imports algorithm modules directly and creates isolated JavaScript contexts
+for the remaining legacy engine/generators. Tests do not depend on generated output.
+The suite discovers `js/sort/sort.*.mjs` files, checks registry/source coverage,
+sorting results, item preservation, frame counters, metadata, and the worker request
+handler. It also verifies built-ins never compile source and readable editor code
+still executes after saving. Deterministic random cases keep regressions reproducible.
+Playwright additionally exercises real bundled workers, editor saves, new custom
+algorithms, and the no-Worker fallback in the production site.
 
 One expected-failure test records an existing metadata bug: Quick advertises
 stability but reorders equal-valued items. Correcting that metadata and removing
 the exception is a follow-up to this tooling migration.
 
 Oxlint checks first-party JS, tests, and configuration, including the previously
-excluded heap sort. Two temporary exceptions in `.oxlintrc.json` preserve legacy
-code: `env`/`pluck` are unassigned in `A.Sort.js`, and `getMethod` is unused in
-`SortWorker.js`. Remove these exceptions when those files are modernized.
+excluded heap sort. One temporary exception in `.oxlintrc.json` preserves the
+unassigned legacy `env`/`pluck` variables in `A.Sort.js`. The old worker and its
+unused-function exception have been removed.
 
 Oxfmt formats first-party JS, tests, configuration, workflows, and documentation.
 Legacy CSS and Liquid HTML remain excluded. Vendored libraries and generated
@@ -89,16 +92,39 @@ because Bootstrap 2 includes obsolete IE syntax rejected by the modern minifier.
 JavaScript and the worker are minified. First-party IIFEs use `globalThis` as a
 temporary bridge from ES-module entries to the existing global APIs.
 
-New `js/sort/sort.*.js` files are discovered automatically by Vite and the unit
-suite. Follow an existing algorithm's registration/metadata convention and keep
-algorithm functions self-contained: the worker still receives their serialized
-source, which may reference the global `AS` API but not imported closures.
+### Algorithms and worker protocol
 
-Next: replace global registrations with an explicit ES-module algorithm registry
-and worker messages for built-in algorithm IDs, while preserving the custom-code
-editor. Then modernize UI/jQuery incrementally. New algorithms can be added now,
-with the correctness tests guarding each addition. The known Quick stability
-metadata bug remains a separate small fix.
+Built-in algorithms are ES modules with a default function taking the `AS` engine
+as its argument. `js/sort/registry.mjs` is the shared, immutable registry; the UI
+receives its own mutable catalog for edits and additions, without `globalThis.sort`.
+
+Untouched built-ins send `{ key, type: "builtin", id, arr }` to the worker and run
+the imported function directly—no serialization or dynamic compilation. Edited
+and new custom algorithms send `{ key, type: "custom", source, arr }`, where `source`
+is the editor's function body. Only custom code uses `Function("AS", source)`.
+Replies contain `{ key, frames }` or `{ key, error }`. The no-Worker fallback uses
+the same request handler. Custom code is arbitrary JavaScript, not a security sandbox.
+
+`js/sort/sources.mjs` imports original source as text for the editor, separately from
+the executable registry. This avoids showing minified variable names and excludes
+readable source strings from the worker bundle. Saving a built-in creates a custom
+override and preserves its display metadata; it never modifies the shared registry.
+
+To add an algorithm:
+
+1. Add `js/sort/sort.<id>.mjs`, following an existing default-function and metadata
+   convention. Use the passed `AS` API for frame/operation recording.
+2. Import/register it under a stable ID in `registry.mjs` and add its raw source to
+   `sources.mjs`. Tests detect missing registrations. Runtime discovery is now explicit.
+3. Keep the editable function body self-contained, using `AS` and standard JavaScript;
+   imported helpers are supported by module execution but aren't available when the
+   body is copied into the custom editor.
+4. Run `npm run check` and `npm run test:browser`. The test suites discover the new
+   module and exercise correctness, metadata, worker execution, and editor round trips.
+
+Next: modernize the remaining engine/UI modules and replace jQuery incrementally.
+New sorting algorithms can be added independently with these tests guarding each
+addition. The known Quick stability metadata bug remains a separate small fix.
 
 ## Audio Sort Links
 
