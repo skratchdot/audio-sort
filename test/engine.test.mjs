@@ -1,8 +1,75 @@
 import { expect, test } from "vitest";
-import { loadLegacy } from "./helpers/legacy.mjs";
+import { createSortEngine } from "../js/AS.mjs";
+
+test("importing and creating engines does not install a global AS", () => {
+  expect(Object.hasOwn(globalThis, "AS")).toBe(false);
+  createSortEngine();
+  expect(Object.hasOwn(globalThis, "AS")).toBe(false);
+});
+
+test("interleaved engines have independent arrays, frames, counters, and tokens", () => {
+  const first = createSortEngine();
+  const second = createSortEngine();
+  first.init(
+    [
+      { id: "a", value: 2 },
+      { id: "b", value: 1 },
+    ],
+    "first",
+  );
+  first.highlight(0);
+  first.gt(0, 1);
+  second.init(
+    [
+      { id: "a", value: 4 },
+      { id: "b", value: 3 },
+    ],
+    "second",
+  );
+  second.play(0);
+  first.swap(0, 1);
+  const firstFrames = first.end("first");
+  const secondFrames = second.end("second");
+  expect(firstFrames.at(-1).arr.map((item) => item.value)).toEqual([1, 2]);
+  expect(secondFrames.at(-1).arr.map((item) => item.value)).toEqual([4, 3]);
+  expect(firstFrames.at(-1)).toMatchObject({ compareCount: 1, swapCount: 1 });
+  expect(secondFrames.at(-1)).toMatchObject({ compareCount: 0, swapCount: 0 });
+  expect(secondFrames.flatMap((frame) => frame.arr).some((item) => item.highlight)).toBe(false);
+  second.init([], "next");
+  expect(first.getFrames()).toBe(firstFrames);
+  expect(first.length()).toBe(2);
+  expect(second.getFrames()).not.toBe(secondFrames);
+});
+
+test("init clears all pending markers even when IDs are reused after an unfinished run", () => {
+  const AS = createSortEngine();
+  const input = [
+    { id: "a", value: 2 },
+    { id: "b", value: 1 },
+  ];
+  AS.init(input, "first");
+  AS.highlight(0);
+  AS.play(0);
+  AS.mark(0);
+  AS.gt(0, 1);
+  AS.swap(0, 1);
+  const oldFrames = structuredClone(AS.getFrames());
+  const oldReference = AS.getFrames();
+  AS.init(input, "second");
+  const frames = AS.end("second");
+  expect(oldReference).toEqual(oldFrames);
+  for (const frame of frames) {
+    expect(frame).toMatchObject({ compareCount: 0, swapCount: 0 });
+    for (const item of frame.arr) {
+      for (const marker of ["play", "mark", "swap", "justSwapped", "compare", "highlight"]) {
+        expect(item[marker]).toBeFalsy();
+      }
+    }
+  }
+});
 
 test("records comparisons and swaps while preserving earlier frames", () => {
-  const { AS } = loadLegacy(["js/AS.js"]);
+  const AS = createSortEngine();
   AS.init([2, 1], "sort");
   expect(AS.gt(0, 1)).toBe(true);
   AS.swap(0, 1);
@@ -15,7 +82,7 @@ test("records comparisons and swaps while preserving earlier frames", () => {
 });
 
 test("tracks an item by identity after its index changes", () => {
-  const { AS } = loadLegacy(["js/AS.js"]);
+  const AS = createSortEngine();
   AS.init(
     [
       { id: "first", value: 2 },
@@ -32,14 +99,14 @@ test("tracks an item by identity after its index changes", () => {
 });
 
 test("requires the matching token to finish a sort", () => {
-  const { AS } = loadLegacy(["js/AS.js"]);
+  const AS = createSortEngine();
   AS.init([1], "current");
   expect(AS.end("old")).toHaveLength(0);
   expect(AS.end("current").at(-1).arr[0].value).toBe(1);
 });
 
 test("resets frames and counters when initialized for a new sort", () => {
-  const { AS } = loadLegacy(["js/AS.js"]);
+  const AS = createSortEngine();
   AS.init([2, 1], "first");
   AS.gt(0, 1);
   AS.swap(0, 1);

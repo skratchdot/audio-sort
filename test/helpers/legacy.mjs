@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { createContext, runInContext } from "node:vm";
 import { algorithms } from "../../js/sort/registry.mjs";
+import { createSortEngine } from "../../js/AS.mjs";
 
 const root = new URL("../../", import.meta.url);
 
@@ -24,14 +25,15 @@ export function loadLegacy(paths, globals = {}) {
   return context;
 }
 
-export function loadAlgorithms() {
-  return loadLegacy(["js/AS.js"], { sort: algorithms });
-}
-
 export function runAlgorithm(name, values) {
-  const context = loadAlgorithms();
-  context.input = values;
-  context.algorithmName = name;
+  // Imported implementations and engine; the VM only enforces a time limit
+  // so a future algorithm regression cannot hang the entire test process.
+  const context = createContext({
+    AS: createSortEngine(),
+    sort: algorithms,
+    input: values,
+    algorithmName: name,
+  });
   return runInContext("AS.init(input, 'test'); sort[algorithmName](AS); AS.end('test');", context, {
     timeout: 1000,
   });

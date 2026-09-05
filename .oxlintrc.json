@@ -16,8 +16,7 @@
   "overrides": [
     {
       "files": ["js/**/*.js", "js/**/*.mjs"],
-      "env": { "node": false, "browser": true },
-      "globals": { "AS": "readonly" }
+      "env": { "node": false, "browser": true }
     },
     {
       "files": ["js/A.*.js", "js/visualization/*.js"],

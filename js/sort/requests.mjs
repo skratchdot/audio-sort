@@ -1,4 +1,5 @@
 import { algorithms } from "./registry.mjs";
+import { createSortEngine } from "../AS.mjs";
 
 export function getFunctionBody(fn) {
   const source = String(fn).trim();
@@ -16,7 +17,7 @@ export function createSortRequest(key, id, algorithm, arr) {
 
 // Shared by the real worker and the no-Worker fallback. Only editor code needs
 // dynamic compilation; built-ins execute their imported implementation directly.
-export function runSortRequest(request, engine) {
+export function runSortRequest(request, engine = createSortEngine()) {
   if (!request || !Array.isArray(request.arr)) throw new TypeError("Expected a sort array");
   let algorithm;
   if (request.type === "builtin") {

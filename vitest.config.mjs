@@ -8,7 +8,7 @@ export default defineConfig({
     // until the application is migrated to ES modules.
     forceRerunTriggers: [
       ...configDefaults.forceRerunTriggers,
-      "**/js/{AS,_A,A.instruments}.js",
+      "**/js/{_A,A.instruments}.js",
       "**/js/fn/*.js",
     ],
     clearMocks: true,
