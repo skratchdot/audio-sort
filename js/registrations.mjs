@@ -1,5 +1,5 @@
 // Bootstraps are loaded by main.mjs before this module's dependencies execute.
-// Keep the legacy glob discovery until the explicit algorithm registry migration.
-import.meta.glob(["./fn/fn.*.js", "./sort/sort.*.js", "./visualization/visualization.*.js"], {
+// Algorithms use an explicit module registry; other registrations remain legacy.
+import.meta.glob(["./fn/fn.*.js", "./visualization/visualization.*.js"], {
   eager: true,
 });

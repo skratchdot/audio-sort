@@ -38,12 +38,8 @@
       "rules": { "no-unassigned-vars": "off" }
     },
     {
-      "files": ["js/SortWorker.js"],
-      "env": { "browser": false, "worker": true },
-      "globals": { "sort": "readonly" },
-      "rules": {
-        "no-unused-vars": ["error", { "varsIgnorePattern": "^getMethod$" }]
-      }
+      "files": ["js/worker.mjs"],
+      "env": { "browser": false, "worker": true }
     }
   ]
 }
