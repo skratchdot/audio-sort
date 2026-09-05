@@ -86,4 +86,4 @@
   global.sort.quick.worst = "n^2";
   global.sort.quick.memory = "1";
   global.sort.quick.method = "exchanging";
-})(this);
+})(globalThis);

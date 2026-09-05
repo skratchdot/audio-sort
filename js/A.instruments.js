@@ -139,4 +139,4 @@
     { val: 126, name: "Applause", group: "Sound effects" },
     { val: 127, name: "Gunshot", group: "Sound effects" },
   ];
-})(this);
+})(globalThis);

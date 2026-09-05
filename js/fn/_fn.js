@@ -3,4 +3,4 @@
   global.fn = global.fn || {
     datagen: {},
   };
-})(this);
+})(globalThis);

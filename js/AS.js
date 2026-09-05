@@ -248,4 +248,4 @@
   };
 
   global.AS = AS;
-})(this);
+})(globalThis);

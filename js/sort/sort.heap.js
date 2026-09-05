@@ -88,4 +88,4 @@
   global.sort.heap.average = "nlogn";
   global.sort.heap.memory = "1";
   global.sort.heap.method = "heap";
-})(this);
+})(globalThis);

@@ -471,4 +471,4 @@
 
     return player;
   };
-})(this);
+})(globalThis);
