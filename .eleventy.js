@@ -6,12 +6,13 @@ module.exports = async function (eleventyConfig) {
 
   // Vite copies these unchanged from its public directory into the final site.
   eleventyConfig.addPassthroughCopy({
-    "js/lib": "public/js/lib",
-    img: "public/img",
-    ".nojekyll": "public/.nojekyll",
+    "src/js/lib": "public/js/lib",
+    "src/img": "public/img",
+    "src/.nojekyll": "public/.nojekyll",
   });
   eleventyConfig.setServerPassthroughCopyBehavior("copy");
   eleventyConfig.addPlugin(EleventyVitePlugin, {
+    tempFolderName: "src/.11ty-vite",
     viteOptions: {
       // Relative generated URLs work at both / and the /audio-sort/ Pages path.
       base: "./",
@@ -19,8 +20,8 @@ module.exports = async function (eleventyConfig) {
       build: { cssMinify: false },
       resolve: {
         alias: {
-          "/js": resolve("js"),
-          "/css": resolve("css"),
+          "/js": resolve("src/js"),
+          "/css": resolve("src/css"),
         },
       },
     },
@@ -28,7 +29,7 @@ module.exports = async function (eleventyConfig) {
 
   return {
     dir: {
-      input: ".",
+      input: "src",
       includes: "_includes",
       output: "_site",
     },

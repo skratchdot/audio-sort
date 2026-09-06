@@ -1,8 +1,8 @@
-import { createSortEngine } from "../js/AS.mjs";
+import { createSortEngine } from "../src/js/AS.mjs";
 import { describe, expect, test, vi } from "vitest";
-import { algorithms } from "../js/sort/registry.mjs";
-import { sources } from "../js/sort/sources.mjs";
-import { createSortRequest, getFunctionBody, runSortRequest } from "../js/sort/requests.mjs";
+import { algorithms } from "../src/js/sort/registry.mjs";
+import { sources } from "../src/js/sort/sources.mjs";
+import { createSortRequest, getFunctionBody, runSortRequest } from "../src/js/sort/requests.mjs";
 import { algorithmNames, seededValues } from "./helpers/legacy.mjs";
 
 function run(request) {

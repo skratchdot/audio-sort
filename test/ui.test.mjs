@@ -1,8 +1,8 @@
 import { expect, test } from "vitest";
-import { createSortController } from "../js/A.Sort.mjs";
-import { createHelpers } from "../js/A.Helper.mjs";
-import { createPlayerFactory } from "../js/A.Player.mjs";
-import { visualizations } from "../js/visualization/registry.mjs";
+import { createSortController } from "../src/js/A.Sort.mjs";
+import { createHelpers } from "../src/js/A.Helper.mjs";
+import { createPlayerFactory } from "../src/js/A.Player.mjs";
+import { visualizations } from "../src/js/visualization/registry.mjs";
 
 test("UI modules import without DOM initialization or first-party globals", () => {
   for (const name of ["A", "visualization"]) expect(Object.hasOwn(globalThis, name)).toBe(false);

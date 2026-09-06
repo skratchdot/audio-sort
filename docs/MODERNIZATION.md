@@ -10,18 +10,21 @@
 - The engine is an isolated ES-module factory, fresh per default request.
 - UI controller, player, helper, MIDI export, instruments, and visualizations are
   modules. Global `A`, `sort`, `AS`, and `visualization` are gone.
+- Site files live in `src/`, with ignored output in root-level `_site/` and temporary
+  staging in `src/.11ty-vite/`. Planning documents live in `docs/`; tool configuration
+  and tests remain at the repository root. Public URLs are unchanged.
 
 ## Important boundaries
 
-- `js/main.mjs` composes the app; the remaining `globalThis.fn.datagen` registry
+- `src/js/main.mjs` composes the app; the remaining `globalThis.fn.datagen` registry
   is injected into `createSortController`.
-- `js/vendor.mjs` captures globals from unchanged classic vendor scripts. Keep
+- `src/js/vendor.mjs` captures globals from unchanged classic vendor scripts. Keep
   those scripts loaded before the module entry. This is not a jQuery replacement.
 - Controller settings are passed to helper/player factories; do not introduce
   controller/player/helper circular imports.
 - UI still uses fixed DOM IDs, jQuery events/plugins, legacy timbre audio, D3 v3,
   and Ace. There is no multi-mount or teardown lifecycle yet.
-- Worker messages and algorithm registration steps are documented in README.
+- Worker messages and algorithm registration steps are documented in [README](../README.md).
 - Editable algorithm bodies must stay self-contained. Custom code is arbitrary
   JavaScript, not sandboxed. Registry metadata remains separate from custom edits.
 - Bootstrap 2 CSS remains unminified because of legacy IE syntax.

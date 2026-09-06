@@ -1,5 +1,22 @@
 import { expect, test } from "@playwright/test";
+import { readdirSync } from "node:fs";
 import { algorithmNames } from "../helpers/legacy.mjs";
+
+test("production output contains only public pages and assets", () => {
+  const output = new URL("../../_site/", import.meta.url);
+  expect(readdirSync(output).sort()).toEqual([
+    ".nojekyll",
+    "about.html",
+    "api.html",
+    "assets",
+    "img",
+    "index.html",
+    "js",
+  ]);
+  // Only public pages should be rendered, with no source-directory nesting.
+  const pages = readdirSync(output, { recursive: true }).filter((file) => file.endsWith(".html"));
+  expect(pages.sort()).toEqual(["about.html", "api.html", "index.html"]);
+});
 
 test.beforeEach(async ({ page, baseURL }) => {
   // Analytics, sharing widgets, and remote soundfonts are not build dependencies.

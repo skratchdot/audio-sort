@@ -1,16 +1,16 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   "ignorePatterns": [
-    "js/lib/**",
-    "css/**",
+    "src/js/lib/**",
+    "src/css/**",
     "dist/**",
     "_site/**",
-    ".11ty-vite/**",
+    "src/.11ty-vite/**",
     "test-results/**",
     "playwright-report/**",
     "_ignore/**",
-    "_includes/**",
-    "*.html",
+    "src/_includes/**",
+    "src/*.html",
     "package-lock.json"
   ]
 }

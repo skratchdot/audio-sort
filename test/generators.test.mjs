@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { loadGenerators } from "./helpers/legacy.mjs";
-import { instruments } from "../js/A.instruments.mjs";
+import { instruments } from "../src/js/A.instruments.mjs";
 
 const names = ["sorted", "reverse", "randomUnique", "randomDupes", "almostSorted", "fewUnique"];
 
