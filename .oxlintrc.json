@@ -4,22 +4,22 @@
   "categories": { "correctness": "error" },
   "env": { "node": true },
   "ignorePatterns": [
-    "js/lib/**",
+    "src/js/lib/**",
     "dist/**",
     "_site/**",
     "_ignore/**",
-    ".11ty-vite/**",
+    "src/.11ty-vite/**",
     "test-results/**",
     "playwright-report/**"
   ],
   "rules": { "no-undef": "error" },
   "overrides": [
     {
-      "files": ["js/**/*.js", "js/**/*.mjs"],
+      "files": ["src/js/**/*.js", "src/js/**/*.mjs"],
       "env": { "node": false, "browser": true }
     },
     {
-      "files": ["js/worker.mjs"],
+      "files": ["src/js/worker.mjs"],
       "env": { "browser": false, "worker": true }
     }
   ]

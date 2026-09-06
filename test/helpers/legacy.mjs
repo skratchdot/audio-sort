@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { createContext, runInContext } from "node:vm";
-import { algorithms } from "../../js/sort/registry.mjs";
-import { createSortEngine } from "../../js/AS.mjs";
+import { algorithms } from "../../src/js/sort/registry.mjs";
+import { createSortEngine } from "../../src/js/AS.mjs";
 
 const root = new URL("../../", import.meta.url);
 
@@ -9,7 +9,7 @@ export function source(path) {
   return readFileSync(new URL(path, root), "utf8");
 }
 
-export const algorithmFiles = readdirSync(new URL("js/sort/", root))
+export const algorithmFiles = readdirSync(new URL("src/js/sort/", root))
   .filter((file) => /^sort\..+\.mjs$/.test(file))
   .sort();
 
@@ -40,13 +40,13 @@ export function runAlgorithm(name, values) {
 }
 
 export function loadGenerators() {
-  const files = readdirSync(new URL("js/fn/", root)).filter((file) => file.endsWith(".js"));
+  const files = readdirSync(new URL("src/js/fn/", root)).filter((file) => file.endsWith(".js"));
   return loadLegacy([
-    "js/fn/_fn.js",
+    "src/js/fn/_fn.js",
     ...files
       .filter((file) => file !== "_fn.js")
       .sort()
-      .map((file) => `js/fn/${file}`),
+      .map((file) => `src/js/fn/${file}`),
   ]).fn;
 }
 

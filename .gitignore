@@ -2,6 +2,6 @@
 /_ignore/
 /_site/
 /dist/
-/.11ty-vite/
+/src/.11ty-vite/
 /test-results/
 /playwright-report/
