@@ -10,7 +10,8 @@ factories. Visualizations are registered in
 [`vendor.mjs`](../src/js/vendor.mjs) captures globals from the classic scripts in
 the footer, which must load before the module entry. The UI uses jQuery plugins,
 timbre, D3 v3, and Ace. It targets fixed DOM IDs and has no multi-mount or teardown
-lifecycle. Data generators and utilities still use a global `fn` registry.
+lifecycle. Data generators and utilities are modules with explicit imports;
+[`fn/registry.mjs`](../src/js/fn/registry.mjs) supplies the controller's generator catalog.
 
 ## Engine and workers
 

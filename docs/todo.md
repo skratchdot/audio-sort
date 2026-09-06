@@ -27,8 +27,6 @@
 
 These are options, not a prioritized plan.
 
-- Convert data generators and utilities to modules; remove their global registry
-  and VM source loaders.
 - Replace jQuery incrementally, starting with chooser/filter events and rendering.
 - Assess playback and remote soundfonts before deciding whether to retain, wrap,
   or replace timbre.

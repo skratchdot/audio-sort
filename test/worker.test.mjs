@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from "vitest";
 import { algorithms } from "../src/js/sort/registry.mjs";
 import { sources } from "../src/js/sort/sources.mjs";
 import { createSortRequest, getFunctionBody, runSortRequest } from "../src/js/sort/requests.mjs";
-import { algorithmNames, seededValues } from "./helpers/legacy.mjs";
+import { algorithmNames, seededValues } from "./helpers/algorithms.mjs";
 
 function run(request) {
   return runSortRequest(request);

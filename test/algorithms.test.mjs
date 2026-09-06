@@ -1,6 +1,6 @@
 import { algorithms } from "../src/js/sort/registry.mjs";
 import { describe, expect, test } from "vitest";
-import { algorithmNames, runAlgorithm, seededValues } from "./helpers/legacy.mjs";
+import { algorithmNames, runAlgorithm, seededValues } from "./helpers/algorithms.mjs";
 
 const cases = [
   { name: "empty", values: [] },

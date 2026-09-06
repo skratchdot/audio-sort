@@ -1,6 +1,44 @@
 import { expect, test } from "@playwright/test";
 import { readdirSync } from "node:fs";
-import { algorithmNames } from "../helpers/legacy.mjs";
+import { algorithmNames } from "../helpers/algorithms.mjs";
+import { generators } from "../../src/js/fn/registry.mjs";
+
+test("every data generator feeds valid input to the worker", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("index.html");
+  await expect.poll(() => page.evaluate(() => globalThis.sortReplies.length)).toBeGreaterThan(0);
+  for (const name of Object.keys(generators)) {
+    const previousKey = await page.evaluate(() => globalThis.sortRequests.at(-1).key);
+    await page.locator(`#base-buttons [data-action="${name}"]`).click();
+    await expect
+      .poll(() => page.evaluate(() => globalThis.sortRequests.at(-1).key))
+      .not.toBe(previousKey);
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const key = globalThis.sortRequests.at(-1).key;
+          return globalThis.sortReplies.some((reply) => reply.key === key);
+        }),
+      )
+      .toBe(true);
+    const { request, reply } = await page.evaluate(() => {
+      const request = globalThis.sortRequests.at(-1);
+      return { request, reply: globalThis.sortReplies.find((item) => item.key === request.key) };
+    });
+    const values = request.arr;
+    expect(values).toHaveLength(12);
+    expect(values.every((value) => Number.isInteger(value) && value >= 0 && value < 12)).toBe(true);
+    if (name === "sorted") expect(values).toEqual(Array.from({ length: 12 }, (_, i) => i));
+    if (name === "reverse") expect(values).toEqual(Array.from({ length: 12 }, (_, i) => 11 - i));
+    expect(reply.error).toBeUndefined();
+    expect(reply.frames.at(-1).arr.map((item) => item.value)).toEqual(
+      [...values].sort((a, b) => a - b),
+    );
+  }
+  expect(await page.evaluate(() => Object.hasOwn(globalThis, "fn"))).toBe(false);
+  expect(errors).toEqual([]);
+});
 
 test("production output contains only public pages and assets", () => {
   const output = new URL("../../_site/", import.meta.url);
@@ -64,7 +102,7 @@ test("built UI loads and algorithm IDs execute in the bundled worker", async ({
   expect(await page.evaluate(() => Object.hasOwn(globalThis, "AS"))).toBe(false);
   expect(
     await page.evaluate(() =>
-      ["A", "visualization"].filter((name) => Object.hasOwn(globalThis, name)),
+      ["A", "visualization", "fn"].filter((name) => Object.hasOwn(globalThis, name)),
     ),
   ).toEqual([]);
   expect(workerURL.startsWith(baseURL)).toBe(true);
