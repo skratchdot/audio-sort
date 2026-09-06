@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { loadGenerators, loadLegacy } from "./helpers/legacy.mjs";
+import { loadGenerators } from "./helpers/legacy.mjs";
+import { instruments } from "../js/A.instruments.mjs";
 
 const names = ["sorted", "reverse", "randomUnique", "randomDupes", "almostSorted", "fewUnique"];
 
@@ -37,6 +38,5 @@ test.each([0, 1, 5, 10, 48])("fewUnique emits at most four distinct values at si
 });
 
 test("includes all 128 General MIDI instruments", () => {
-  const { A } = loadLegacy(["js/_A.js", "js/A.instruments.js"]);
-  expect(A.instruments).toHaveLength(128);
+  expect(instruments).toHaveLength(128);
 });

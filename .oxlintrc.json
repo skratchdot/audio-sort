@@ -19,24 +19,6 @@
       "env": { "node": false, "browser": true }
     },
     {
-      "files": ["js/A.*.js", "js/visualization/*.js"],
-      "globals": {
-        "$": "readonly",
-        "A": "readonly",
-        "sc": "readonly",
-        "ace": "readonly",
-        "d3": "readonly",
-        "js_beautify": "readonly",
-        "timbre": "readonly",
-        "saveAs": "readonly",
-        "Midi": "readonly"
-      }
-    },
-    {
-      "files": ["js/A.Sort.js"],
-      "rules": { "no-unassigned-vars": "off" }
-    },
-    {
       "files": ["js/worker.mjs"],
       "env": { "browser": false, "worker": true }
     }

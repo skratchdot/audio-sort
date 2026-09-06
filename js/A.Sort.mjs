@@ -1,16 +1,20 @@
+import { $, sc, ace, d3, js_beautify, timbre, saveAs } from "./vendor.mjs";
+import { createHelpers } from "./A.Helper.mjs";
+import { createPlayerFactory } from "./A.Player.mjs";
+import { MidiExport } from "./A.MidiExport.mjs";
+import { instruments } from "./A.instruments.mjs";
 /*!
  * Project: Audio Sort
- *    File: A.Sort.js
+ *    File: A.Sort.mjs
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot
  * Licensed under the MIT license.
  */
-/*global $, sc, ace, d3, js_beautify, timbre, A, Worker, Blob, Uint8Array, saveAs */
-(function (global) {
-  "use strict";
-
+export function createSortController(generators) {
   var Sort = {},
+    Helper = createHelpers(Sort),
+    createPlayer = createPlayerFactory(Sort, Helper),
     // Pass jshint
     Fn = Function,
     // Default Settings
@@ -54,9 +58,6 @@
       base: null,
       sort: null,
     },
-    // Audio Variables
-    env,
-    pluck,
     // Ace Editor
     aceEditor,
     // AutoPlay
@@ -300,7 +301,7 @@
 
   onAudioDataButton = function () {
     var action = $(this).data("action");
-    if (global.fn.datagen.hasOwnProperty(action)) {
+    if (generators.hasOwnProperty(action)) {
       generateData(true, action);
       doSort();
     }
@@ -344,9 +345,9 @@
   generateData = function (regenerateMaxData, action) {
     var i, scale, slice;
     if (regenerateMaxData) {
-      if (global.fn.datagen.hasOwnProperty(action)) {
-        baseData = global.fn.datagen[action](selected.dataSize);
-        maxData = global.fn.datagen[action](defaults.dataSize.max);
+      if (generators.hasOwnProperty(action)) {
+        baseData = generators[action](selected.dataSize);
+        maxData = generators[action](defaults.dataSize.max);
         slice = maxData.slice(0, selected.dataSize);
         scale = getScale(0, baseData.length - 1, d3.min(slice), d3.max(slice));
         // we always want our current "baseData" when re-sizing
@@ -402,10 +403,10 @@
       .val("");
 
     // populate channels
-    A.MidiExport.populateChannels("#midi-export-channel");
+    MidiExport.populateChannels("#midi-export-channel");
 
     // populate instruments
-    A.MidiExport.populateInstruments("#midi-export-instrument");
+    MidiExport.populateInstruments("#midi-export-instrument");
 
     // store the source of our data so onMidiSave() can use it
     $("#midi-export-btn").attr("data-midi-export", $(this).data("midiExport"));
@@ -518,9 +519,7 @@
   };
 
   setupPlayers = function () {
-    players.base = A.Player.create("#base-section", {
-      env: env,
-      pluck: pluck,
+    players.base = createPlayer("#base-section", {
       isLooping: true,
       hasMarkers: false,
       allowHover: true,
@@ -536,9 +535,7 @@
         playerButtonCallback(players.sort, e.action);
       },
     });
-    players.sort = A.Player.create("#sort-section", {
-      env: env,
-      pluck: pluck,
+    players.sort = createPlayer("#sort-section", {
       isLooping: true,
       hasMarkers: true,
       onPlayerButtonClickCallback: function (e) {
@@ -618,8 +615,8 @@
       $ul = $(selector),
       $li,
       htmlString = "";
-    for (i = 0; i < A.instruments.length; i++) {
-      instrument = A.instruments[i];
+    for (i = 0; i < instruments.length; i++) {
+      instrument = instruments[i];
       // output group
       if (group !== instrument.group) {
         group = instrument.group;
@@ -658,7 +655,7 @@
       midi;
     if (selected.audioType === "soundfont") {
       for (i = 0; i < baseData.length; i++) {
-        midi = A.Helper.getMidiNumber(baseData[i]);
+        midi = Helper.getMidiNumber(baseData[i]);
         if (midiNotes.indexOf(midi) === -1 && midi >= 0 && midi < 128) {
           midiNotes.push(midi);
         }
@@ -798,12 +795,12 @@
         $("#soundfont-options li").show();
       });
     // create some of our sliders
-    A.Helper.createSlider("#volume-container", defaults.volume, onSliderVolume);
-    A.Helper.createSlider("#tempo-container", defaults.tempo, onSliderTempo);
-    A.Helper.createSlider("#center-note-container", defaults.centerNote, onSliderCenterNote);
-    A.Helper.createSlider("#data-size-container", defaults.dataSize, onSliderDataSize);
+    Helper.createSlider("#volume-container", defaults.volume, onSliderVolume);
+    Helper.createSlider("#tempo-container", defaults.tempo, onSliderTempo);
+    Helper.createSlider("#center-note-container", defaults.centerNote, onSliderCenterNote);
+    Helper.createSlider("#data-size-container", defaults.dataSize, onSliderDataSize);
     // create our waveform sliders
-    waveformSliders.a = A.Helper.createSlider(
+    waveformSliders.a = Helper.createSlider(
       "#waveform-adshr-attack-container",
       {
         value: waveform[selected.waveform].a,
@@ -813,7 +810,7 @@
       },
       onSliderWaveform,
     );
-    waveformSliders.d = A.Helper.createSlider(
+    waveformSliders.d = Helper.createSlider(
       "#waveform-adshr-decay-container",
       {
         value: waveform[selected.waveform].d,
@@ -823,7 +820,7 @@
       },
       onSliderWaveform,
     );
-    waveformSliders.s = A.Helper.createSlider(
+    waveformSliders.s = Helper.createSlider(
       "#waveform-adshr-sustain-container",
       {
         value: waveform[selected.waveform].s,
@@ -833,7 +830,7 @@
       },
       onSliderWaveform,
     );
-    waveformSliders.h = A.Helper.createSlider(
+    waveformSliders.h = Helper.createSlider(
       "#waveform-adshr-hold-container",
       {
         value: waveform[selected.waveform].h,
@@ -843,7 +840,7 @@
       },
       onSliderWaveform,
     );
-    waveformSliders.r = A.Helper.createSlider(
+    waveformSliders.r = Helper.createSlider(
       "#waveform-adshr-release-container",
       {
         value: waveform[selected.waveform].r,
@@ -879,5 +876,5 @@
     updateDisplayCache("#data-size-display", selected.dataSize);
   };
 
-  global.A.Sort = Sort;
-})(globalThis);
+  return Sort;
+}

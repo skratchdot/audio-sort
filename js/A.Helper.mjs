@@ -1,14 +1,14 @@
+import { $, sc } from "./vendor.mjs";
 /*!
  * Project: Audio Sort
- *    File: A.Helper.js
+ *    File: A.Helper.mjs
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot
  * Licensed under the MIT license.
  */
-/*global A, $, sc */
-(function (global) {
-  "use strict";
+export function createHelpers(settings, dependencies = { $, sc }) {
+  const { $, sc } = dependencies;
 
   var Helper = {},
     // functions
@@ -22,16 +22,16 @@
     var scale, octaveSize, degrees, degreeSize, centerValue, playMidi, centerMidi;
 
     // get some info from our current scale
-    scale = sc.ScaleInfo.at(A.Sort.getSelected("scale"));
+    scale = sc.ScaleInfo.at(settings.getSelected("scale"));
     octaveSize = scale.pitchesPerOctave();
     degrees = scale.degrees();
     degreeSize = degrees.length;
-    centerValue = Math.floor(A.Sort.getSelected("dataSize") / 2);
+    centerValue = Math.floor(settings.getSelected("dataSize") / 2);
 
     playMidi = getMidiNumberHelper(degrees, degreeSize, octaveSize, playValue);
     centerMidi = getMidiNumberHelper(degrees, degreeSize, octaveSize, centerValue);
 
-    return playMidi + A.Sort.getSelected("centerNote") - centerMidi;
+    return playMidi + settings.getSelected("centerNote") - centerMidi;
   };
 
   Helper.createSlider = function (selector, obj, onChange) {
@@ -55,6 +55,5 @@
     return $slider;
   };
 
-  // add Helper to the global scope
-  global.A.Helper = Helper;
-})(globalThis);
+  return Helper;
+}
