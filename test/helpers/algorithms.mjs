@@ -1,29 +1,15 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { createContext, runInContext } from "node:vm";
 import { algorithms } from "../../src/js/sort/registry.mjs";
 import { createSortEngine } from "../../src/js/AS.mjs";
 
 const root = new URL("../../", import.meta.url);
 
-export function source(path) {
-  return readFileSync(new URL(path, root), "utf8");
-}
-
 export const algorithmFiles = readdirSync(new URL("src/js/sort/", root))
   .filter((file) => /^sort\..+\.mjs$/.test(file))
   .sort();
 
 export const algorithmNames = algorithmFiles.map((file) => file.slice(5, -4));
-
-// A fresh realm supplies the globals expected by the legacy IIFEs, without
-// leaking state between tests or requiring checked-in/generated bundles.
-export function loadLegacy(paths, globals = {}) {
-  const context = createContext(globals);
-  for (const path of paths) {
-    runInContext(source(path), context, { filename: path, timeout: 1000 });
-  }
-  return context;
-}
 
 export function runAlgorithm(name, values) {
   // Imported implementations and engine; the VM only enforces a time limit
@@ -37,17 +23,6 @@ export function runAlgorithm(name, values) {
   return runInContext("AS.init(input, 'test'); sort[algorithmName](AS); AS.end('test');", context, {
     timeout: 1000,
   });
-}
-
-export function loadGenerators() {
-  const files = readdirSync(new URL("src/js/fn/", root)).filter((file) => file.endsWith(".js"));
-  return loadLegacy([
-    "src/js/fn/_fn.js",
-    ...files
-      .filter((file) => file !== "_fn.js")
-      .sort()
-      .map((file) => `src/js/fn/${file}`),
-  ]).fn;
 }
 
 export function seededValues(size, seed) {

@@ -1,12 +1,39 @@
-import { describe, expect, test } from "vitest";
-import { loadGenerators } from "./helpers/legacy.mjs";
+import { describe, expect, test, vi } from "vitest";
+import { readdirSync } from "node:fs";
+import { generators } from "../src/js/fn/registry.mjs";
 import { instruments } from "../src/js/A.instruments.mjs";
 
 const names = ["sorted", "reverse", "randomUnique", "randomDupes", "almostSorted", "fewUnique"];
 
+test("registry covers every generator without creating a global namespace", () => {
+  const files = readdirSync(new URL("../src/js/fn/", import.meta.url))
+    .filter((file) => file.startsWith("fn.datagen."))
+    .map((file) => file.slice("fn.datagen.".length, -4));
+  expect(Object.keys(generators).sort()).toEqual([...names].sort());
+  expect(files.sort()).toEqual([...names].sort());
+  expect(Object.isFrozen(generators)).toBe(true);
+  expect(Object.hasOwn(globalThis, "fn")).toBe(false);
+});
+
+test.each(names)("%s returns independent arrays", (name) => {
+  const first = generators[name](5);
+  const second = generators[name](5);
+  expect(first).not.toBe(second);
+  first.fill(-1);
+  expect(second).not.toContain(-1);
+});
+
+test("random generators preserve their deterministic behavior", () => {
+  vi.spyOn(Math, "random").mockReturnValue(0);
+  expect(generators.randomUnique(5)).toEqual([1, 2, 3, 4, 0]);
+  expect(generators.randomDupes(5)).toEqual([0, 0, 0, 0, 0]);
+  expect(generators.almostSorted(5)).toEqual([0, 1, 2, 3, 4]);
+  expect(generators.fewUnique(8)).toEqual([5, 3, 1, 7, 5, 3, 1, 7]);
+});
+
 describe.each(names)("%s generator", (name) => {
   test.each([0, 1, 5, 10, 48])("produces %i valid values", (size) => {
-    const values = Array.from(loadGenerators().datagen[name](size));
+    const values = Array.from(generators[name](size));
     expect(values).toHaveLength(size);
     for (const value of values) {
       expect(Number.isInteger(value)).toBe(true);
@@ -19,22 +46,21 @@ describe.each(names)("%s generator", (name) => {
 test.each([0, 1, 5, 10, 48])(
   "ordered generators produce the expected sequence at size %i",
   (size) => {
-    const { datagen } = loadGenerators();
     const ordered = Array.from({ length: size }, (_, i) => i);
-    expect(Array.from(datagen.sorted(size))).toEqual(ordered);
-    expect(Array.from(datagen.reverse(size))).toEqual([...ordered].reverse());
+    expect(Array.from(generators.sorted(size))).toEqual(ordered);
+    expect(Array.from(generators.reverse(size))).toEqual([...ordered].reverse());
   },
 );
 
 describe.each(["randomUnique", "almostSorted"])("%s permutation", (name) => {
   test.each([0, 1, 5, 10, 48])("preserves every value at size %i", (size) => {
-    const values = Array.from(loadGenerators().datagen[name](size));
+    const values = Array.from(generators[name](size));
     expect(values.sort((a, b) => a - b)).toEqual(Array.from({ length: size }, (_, i) => i));
   });
 });
 
 test.each([0, 1, 5, 10, 48])("fewUnique emits at most four distinct values at size %i", (size) => {
-  expect(new Set(loadGenerators().datagen.fewUnique(size)).size).toBeLessThanOrEqual(4);
+  expect(new Set(generators.fewUnique(size)).size).toBeLessThanOrEqual(4);
 });
 
 test("includes all 128 General MIDI instruments", () => {
