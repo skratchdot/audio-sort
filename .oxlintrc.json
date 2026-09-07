@@ -4,12 +4,12 @@
   "categories": { "correctness": "error" },
   "env": { "node": true },
   "ignorePatterns": [
-    "public/**",
-    "dist/**",
     "_ignore/**",
+    "dist/**",
+    "playwright-report/**",
+    "public/**",
     "src/.11ty-vite/**",
-    "test-results/**",
-    "playwright-report/**"
+    "test-results/**"
   ],
   "rules": { "no-undef": "error" },
   "overrides": [

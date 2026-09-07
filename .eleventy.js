@@ -11,8 +11,6 @@ module.exports = async function (eleventyConfig) {
     viteOptions: {
       // Relative generated URLs work at both / and the /audio-sort/ Pages path.
       base: "./",
-      // Preserve Bootstrap 2's legacy CSS until the UI migration removes its IE hacks.
-      build: { cssMinify: false },
       resolve: {
         alias: {
           "/js": resolve("src/js"),
