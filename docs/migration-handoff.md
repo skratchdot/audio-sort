@@ -45,7 +45,7 @@ The existing workspace, runtime, and visual design are retained.
 - Public routes are `/audio-sort/`, `/audio-sort/about`, and `/audio-sort/api`. Per the user's updated preference,
   no `.html` compatibility routes or rewrites are included. Internal links use
   TanStack navigation; static hosting may append a directory trailing slash.
-- `vite.config.mjs` emits directory index HTML and client assets to `dist/audio-sort/`, and build-time
+- `vite.config.ts` emits directory index HTML and client assets to `dist/audio-sort/`, and build-time
   server files to ignored `.tanstack/server/`. No server is deployed.
 - Development, production, preview, and browser tests share `/audio-sort/`.
   There is one build and one browser suite. Preview serves `dist/` using `sirv-cli`,

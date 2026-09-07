@@ -1,6 +1,7 @@
-{
-  "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": [
+import { defineConfig } from "oxfmt";
+
+export default defineConfig({
+  ignorePatterns: [
     "_ignore/**",
     "dist/**",
     ".tanstack/**",
@@ -10,6 +11,6 @@
     "public/**",
     "src/route-tree.gen.ts",
     "src/.11ty-vite/**",
-    "test-results/**"
-  ]
-}
+    "test-results/**",
+  ],
+});

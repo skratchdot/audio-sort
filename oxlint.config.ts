@@ -1,0 +1,35 @@
+import { defineConfig } from "oxlint";
+
+export default defineConfig({
+  plugins: ["eslint", "unicorn", "oxc", "vitest", "typescript"],
+  categories: { correctness: "error" },
+  env: { node: true },
+  ignorePatterns: [
+    "_ignore/**",
+    "dist/**",
+    ".tanstack/**",
+    ".test-pages/**",
+    "playwright-report/**",
+    "public/**",
+    "src/route-tree.gen.ts",
+    "src/.11ty-vite/**",
+    "test-results/**",
+  ],
+  rules: {
+    "typescript/consistent-type-definitions": ["error", "type"],
+    "no-undef": "error",
+    "no-var": "error",
+    "prefer-const": "error",
+    "one-var": ["error", "never"],
+  },
+  overrides: [
+    {
+      files: ["src/**/*.js", "src/**/*.mjs", "src/**/*.ts", "src/**/*.tsx"],
+      env: { node: false, browser: true },
+    },
+    {
+      files: ["src/js/worker.mjs"],
+      env: { browser: false, worker: true },
+    },
+  ],
+});
