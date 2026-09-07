@@ -1,11 +1,11 @@
-import { $, sc, ace, d3, js_beautify, timbre, saveAs } from "./vendor.mjs";
-import { createHelpers } from "./A.Helper.mjs";
-import { createPlayerFactory } from "./A.Player.mjs";
-import { MidiExport } from "./A.MidiExport.mjs";
-import { instruments } from "./A.instruments.mjs";
+import { $, sc, ace, d3, js_beautify, timbre, saveAs } from "../vendor.mjs";
+import { createHelpers } from "./create-helpers.mjs";
+import { createPlayerFactory } from "./create-player-factory.mjs";
+import { MidiExport } from "../midi/midi-export.mjs";
+import { instruments } from "../midi/instruments.mjs";
 /*!
  * Project: Audio Sort
- *    File: A.Sort.mjs
+ *    File: create-sort-controller.mjs
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot

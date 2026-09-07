@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { createSortEngine } from "../src/js/AS.mjs";
+import { createSortEngine } from "../src/js/sorting/create-sort-engine.mjs";
 
 test("importing and creating engines does not install a global AS", () => {
   expect(Object.hasOwn(globalThis, "AS")).toBe(false);

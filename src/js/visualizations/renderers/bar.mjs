@@ -1,4 +1,4 @@
-import { $ } from "../vendor.mjs";
+import { $ } from "../../vendor.mjs";
 
 var hoverIndex = -1,
   hoverValue = -1,

@@ -1,7 +1,7 @@
-import { $, sc } from "./vendor.mjs";
+import { $, sc } from "../vendor.mjs";
 /*!
  * Project: Audio Sort
- *    File: A.Helper.mjs
+ *    File: create-helpers.mjs
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot

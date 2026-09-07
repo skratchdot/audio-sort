@@ -1,15 +1,15 @@
 import { readdirSync } from "node:fs";
 import { createContext, runInContext } from "node:vm";
-import { algorithms } from "../../src/js/sort/registry.mjs";
-import { createSortEngine } from "../../src/js/AS.mjs";
+import { algorithms } from "../../src/js/sorting/algorithm-registry.mjs";
+import { createSortEngine } from "../../src/js/sorting/create-sort-engine.mjs";
 
 const root = new URL("../../", import.meta.url);
 
-export const algorithmFiles = readdirSync(new URL("src/js/sort/", root))
-  .filter((file) => /^sort\..+\.mjs$/.test(file))
+export const algorithmFiles = readdirSync(new URL("src/js/sorting/algorithms/", root))
+  .filter((file) => file.endsWith(".mjs"))
   .sort();
 
-export const algorithmNames = algorithmFiles.map((file) => file.slice(5, -4));
+export const algorithmNames = algorithmFiles.map((file) => file.slice(0, -4));
 
 export function runAlgorithm(name, values) {
   // Imported implementations and engine; the VM only enforces a time limit

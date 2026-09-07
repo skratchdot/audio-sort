@@ -1,4 +1,4 @@
-import { runSortRequest } from "./sort/requests.mjs";
+import { runSortRequest } from "./sorting/sort-requests.mjs";
 
 globalThis.onmessage = ({ data }) => {
   try {

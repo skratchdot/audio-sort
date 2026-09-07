@@ -1,4 +1,4 @@
-import swap from "./fn.swap.mjs";
+import swap from "./swap.mjs";
 
 // shuffle function is the fisherYates algorithm adapted from:
 // http://sedition.com/perl/javascript-fy.html

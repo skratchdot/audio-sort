@@ -1,4 +1,4 @@
-import { d3 } from "../vendor.mjs";
+import { d3 } from "../../vendor.mjs";
 
 export default function flat(settings) {
   var flat = {},

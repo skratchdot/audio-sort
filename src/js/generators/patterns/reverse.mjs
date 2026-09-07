@@ -1,4 +1,4 @@
-import sorted from "./fn.datagen.sorted.mjs";
+import sorted from "./sorted.mjs";
 
 export default function reverse(size) {
   return sorted(size).reverse();

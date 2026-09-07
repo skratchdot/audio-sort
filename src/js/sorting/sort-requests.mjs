@@ -1,5 +1,5 @@
-import { algorithms } from "./registry.mjs";
-import { createSortEngine } from "../AS.mjs";
+import { algorithms } from "./algorithm-registry.mjs";
+import { createSortEngine } from "./create-sort-engine.mjs";
 
 export function getFunctionBody(fn) {
   const source = String(fn).trim();

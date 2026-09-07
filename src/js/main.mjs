@@ -1,8 +1,8 @@
-import { generators } from "./fn/registry.mjs";
-import { createSortController } from "./A.Sort.mjs";
-import { algorithms } from "./sort/registry.mjs";
-import { sources } from "./sort/sources.mjs";
-import { createSortRequest, getFunctionBody, runSortRequest } from "./sort/requests.mjs";
+import { generators } from "./generators/generator-registry.mjs";
+import { createSortController } from "./ui/create-sort-controller.mjs";
+import { algorithms } from "./sorting/algorithm-registry.mjs";
+import { sources } from "./sorting/algorithm-sources.mjs";
+import { createSortRequest, getFunctionBody, runSortRequest } from "./sorting/sort-requests.mjs";
 
 function createSortWorker() {
   return new Worker(new URL("./worker.mjs", import.meta.url), { type: "module" });
