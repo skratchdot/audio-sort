@@ -3,7 +3,7 @@ import { createStore } from "jotai/vanilla";
 import { waveformDefaults, selectedWaveformAtom } from "../src/js/state/waveforms.ts";
 import { envelopeDefaults, envelopeAtom, updateEnvelopeAtom } from "../src/js/state/envelope.ts";
 import { updateSettingAtom } from "../src/js/state/settings.ts";
-import { createSortController } from "../src/js/ui/create-sort-controller.mjs";
+import { createWorkspace } from "../src/js/ui/create-workspace.mjs";
 import { getEnvelopePoints, formatEnvelopeValue } from "../src/js/ui/envelope-diagram.ts";
 
 test("all eight generators use the shared defaults, including string", () => {
@@ -66,7 +66,7 @@ test.each([
 
 test("controller getters combine the current generator with the shared envelope", () => {
   const store = createStore();
-  const controller = createSortController({}, store);
+  const controller = createWorkspace(store).settings;
   store.set(updateEnvelopeAtom, { key: "a", value: 100 });
   store.set(updateSettingAtom, { key: "waveform", value: "sin" });
   expect(controller.getSelectedWaveformInfo()).toMatchObject({ gen: "OscGen", a: 100 });

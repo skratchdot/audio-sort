@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
+    "jsx": "react-jsx",
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
@@ -12,5 +13,5 @@
     "lib": ["ES2022", "DOM"],
     "types": []
   },
-  "include": ["src/js/**/*.ts"]
+  "include": ["src/js/**/*.ts", "src/js/**/*.tsx"]
 }

@@ -43,14 +43,21 @@
     "file-saver": "2.0.5",
     "jotai": "2.20.3",
     "jsmidgen": "0.1.8",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "timbre": "14.11.25"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.1.6",
     "@11ty/eleventy-plugin-vite": "^8.0.0",
     "@playwright/test": "^1.63.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
     "oxfmt": "^0.66.0",
     "oxlint": "^1.81.0",
+    "tailwindcss": "^4.3.3",
     "typescript": "7.0.2",
     "vite": "^8.2.2",
     "vitest": "^5.0.0"

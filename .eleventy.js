@@ -2,6 +2,8 @@
 
 module.exports = async function (eleventyConfig) {
   const { default: EleventyVitePlugin } = await import("@11ty/eleventy-plugin-vite");
+  const { default: react } = await import("@vitejs/plugin-react");
+  const { default: tailwindcss } = await import("@tailwindcss/vite");
   const { resolve } = require("node:path");
 
   // The plugin stages root-level public/ for Vite to copy unchanged to dist/.
@@ -11,6 +13,7 @@ module.exports = async function (eleventyConfig) {
     viteOptions: {
       // Relative generated URLs work at both / and the /audio-sort/ Pages path.
       base: "./",
+      plugins: [react(), tailwindcss()],
       // Timbre's browser CommonJS entry publishes through `global.timbre`.
       define: { global: "globalThis" },
       resolve: {

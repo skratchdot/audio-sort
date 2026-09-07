@@ -1,5 +1,3 @@
-import { $ } from "../../vendor.mjs";
-
 export default function bar(settings) {
   let hoverIndex = -1;
   let hoverValue = -1;
@@ -9,7 +7,6 @@ export default function bar(settings) {
   const bar = {};
   // settings
   let data;
-  let $svg;
   let svg;
   let hasMarkers;
   let onClick;
@@ -21,9 +18,7 @@ export default function bar(settings) {
   const _init = function (settings) {
     data = settings.data;
     svg = settings.svg;
-    $svg = settings.$svg;
-    $svg.removeAttr("preserveAspectRatio");
-    $svg.removeAttr("viewBox");
+    svg.attr("preserveAspectRatio", null).attr("viewBox", null);
     hasMarkers = settings.hasMarkers;
     onClick = settings.onClick;
   };
@@ -59,28 +54,15 @@ export default function bar(settings) {
   };
 
   const getIndexAndValueFromMouse = function (e) {
-    const $this = $(e.currentTarget);
-    const $parent = $this.parent();
-
     let n = 0;
     let min = 0;
 
     // set relative positions
-    const parentOffset = $parent.offset();
-    let relX = e.pageX - parentOffset.left;
-    let relY = e.pageY - parentOffset.top;
-
-    // account for border/margin/padding
-    relX = relX - parseInt($parent.css("border-left-width"), 10);
-    relX = relX - parseInt($parent.css("margin-left"), 10);
-    relX = relX - parseInt($parent.css("padding-left"), 10);
-    relY = relY - parseInt($parent.css("border-top-width"), 10);
-    relY = relY - parseInt($parent.css("margin-top"), 10);
-    relY = relY - parseInt($parent.css("padding-top"), 10);
-
-    // store widths and heights
-    const w = $this.parent().width();
-    const h = $this.parent().height();
+    const bounds = svg.node().getBoundingClientRect();
+    const relX = e.clientX - bounds.left;
+    const relY = e.clientY - bounds.top;
+    const w = bounds.width;
+    const h = bounds.height;
 
     // get datasize
     if (data.length > 0) {
@@ -97,8 +79,8 @@ export default function bar(settings) {
     value = isFinite(value) ? value : 0;
 
     // handle offset errors
-    index = Math.min(min, index);
-    value = Math.min(min, value);
+    index = Math.max(0, Math.min(min, index));
+    value = Math.max(0, Math.min(min, value));
     value = min - value;
 
     return {
@@ -112,9 +94,7 @@ export default function bar(settings) {
 
     if (hoverIndex !== result.index) {
       hoverIndex = result.index;
-      const $rect = $svg.find("rect");
-      $rect.attr("opacity", 1);
-      $rect.eq(hoverIndex).attr("opacity", 0.5);
+      svg.selectAll("rect").attr("opacity", (_d, i) => (i === hoverIndex ? 0.5 : 1));
     }
     hoverValue = result.value;
     if (isClicking && (hoverIndex !== clickIndex || hoverValue !== clickValue)) {
@@ -126,7 +106,7 @@ export default function bar(settings) {
 
   bar.onMouseOut = function () {
     hoverIndex = -1;
-    $svg.find("rect").attr("opacity", 1);
+    svg.selectAll("rect").attr("opacity", 1);
   };
 
   bar.onMouseDown = function (e) {

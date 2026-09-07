@@ -1,5 +1,2 @@
-@import "./bootstrap.css";
-@import "./bootstrap-responsive.css";
-@import "./slider.css";
-@import "./audio-sort.css";
-@import "./audio-sort-responsive.css";
+@import "./tailwind.css";
+@import "./site.css";

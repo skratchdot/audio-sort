@@ -1,13 +1,13 @@
 # Architecture
 
 Modules in `src/js/` use lowercase, hyphen-separated filenames. `ui/` contains
-controller/player factories, `sorting/` the engine and request handling, and
+React components and runtime/player modules, `sorting/` the engine and request handling, and
 `sorting/algorithms/` only algorithm implementations. Generators, utilities,
 MIDI support, and visualizations each have their own directory. The app entry,
 worker entry, and vendor bridge stay at the top level.
 
 TypeScript is introduced incrementally alongside `.mjs` modules. Vite handles
-bundling; `pnpm run typecheck` checks `.ts` application modules separately.
+bundling; `pnpm run typecheck` checks `.ts` and `.tsx` application modules separately.
 Built-in algorithm source and the Ace editor remain JavaScript for now.
 
 Generator implementations live in `generators/patterns/`; visualization
@@ -16,85 +16,48 @@ one level above, separate from the implementations they register.
 
 ## UI
 
-[`main.mjs`](../src/js/main.mjs) creates the sort controller and supplies the data
-generator registry. The controller passes its settings API to helper and player
-factories. Visualizations are registered in
-[`visualization-registry.mjs`](../src/js/visualizations/visualization-registry.mjs).
+[`main.mjs`](../src/js/main.mjs) mounts one React workspace with an application-scoped
+vanilla Jotai store. React owns settings, tabs, transport controls, counters, native
+range inputs, and dialogs. Components are split into settings, waveform, playback,
+and dialog modules under `ui/`. Tailwind Preflight/utilities and first-party
+`site.css` preserve the two-section design; no Bootstrap or jQuery is shipped.
 
-Selected settings live in [`state/settings.ts`](../src/js/state/settings.ts), using
-`jotai/vanilla` without React. Each controller owns a separate store unless one
-is supplied. UI handlers write through `updateSettingAtom`; helpers and players
-read fresh values through the existing controller getters. There is no mirrored
-settings object. Snapshots and defaults are immutable. One shared envelope lives
-in [`state/envelope.ts`](../src/js/state/envelope.ts); changing waveform only
-selects a generator from [`state/waveforms.ts`](../src/js/state/waveforms.ts).
-All waveforms, including string, start with attack 50 ms, decay 300 ms, sustain
-50%, hold 200 ms, and release 300 ms. Sustain edits retain two-decimal rounding.
+[`create-workspace.mjs`](../src/js/ui/create-workspace.mjs) coordinates workers,
+data generation, settings subscriptions, soundfont preloading, and player lifetime.
+React reads its playback snapshots through `useSyncExternalStore`. Settings and
+custom algorithms are read directly from Jotai; there is no mirrored settings cache.
+Audio clocks and nodes remain outside React and Jotai.
 
-Timbre's bundled `adshr` implementation holds **at sustain level after decay**,
-not at the peak before decay (see `register("adshr")` in
-the pinned `timbre/timbre.dev.js` package entry). The native envelope controls and
-[`envelope-diagram.ts`](../src/js/ui/envelope-diagram.ts) use that same ordering.
-The diagram shows amplitude against proportional elapsed time; it is an envelope
-preview, not the resulting oscillator or plucked-string signal.
+[`create-workspace-player.mjs`](../src/js/ui/create-workspace-player.mjs) owns
+the contents of its D3 SVG and delegates transport and synthesis to
+`audio/create-transport.ts` and `audio/create-timbre-audio.mjs`.
+React renders the surrounding controls and an empty SVG host, never chart children.
+The waveform preview canvas has the same explicit imperative ownership.
+Pointer capture supports dragging input values across data updates.
 
-[`connect-playback-settings.ts`](../src/js/ui/connect-playback-settings.ts) connects
-volume, tempo, AutoPlay, and loop preferences to UI/audio effects. It applies
-current values immediately, observes relevant changes, and returns a disconnect
-function. The controller replaces its old connections before reconnecting.
-[`connect-audio-settings.ts`](../src/js/ui/connect-audio-settings.ts) shares that
-lifecycle and synchronizes audio type, waveform/envelopes, center note, scale,
-and instrument. It sets the instrument before soundfont preloading and avoids
-rebuilding generators for unrelated settings.
-Envelope labels now populate on initial connection.
-[`connect-sort-settings.ts`](../src/js/ui/connect-sort-settings.ts) renders the
-catalog/selection and data size, resizes data before sorting, and reruns the
-selected algorithm when its implementation changes. Adding or editing an
-unselected algorithm updates the catalog without unnecessary sorting.
-AutoPlay and each player's
-loop preference live in `state/playback-preferences.ts`; their handlers render
-button state from the store instead of reading CSS classes. AutoPlay no longer
-uses Bootstrap's button toggle. Playing/stopped state, direction, position,
-timers, and audio nodes remain outside the store. The player delegates position,
-direction, looping, and clock lifetime to `audio/create-transport.ts`, and synthesis
-and note dispatch to `audio/create-timbre-audio.mjs`. These modules do not own DOM
-elements. See the [audio boundary and dependency audit](audio-dependencies.md).
+Each waveform uses one shared envelope from `state/envelope.ts`. Defaults remain
+attack 50 ms, decay 300 ms, sustain 50%, hold 200 ms, and release 300 ms.
+Timbre's `adshr` holds at sustain level after decay; the envelope diagram uses that
+ordering. The string preview is illustrative, not a sampled live waveform.
 
-Controllers are single-use: `init()` rejects repeated initialization; `destroy()`
-is idempotent. Destruction disconnects subscriptions, cancels the sort worker and
-click debounce, invalidates pending editor loads and audio-resume callbacks,
-destroys the Ace editor/session, releases player audio nodes, and removes owned
-sliders and namespaced events. Slider disposal also removes active document drag
-handlers without disturbing unrelated handlers. Bar pointer state is per renderer
-and survives data updates during a drag.
+Native `dialog` elements provide modal focus containment and Escape handling.
+Closing restores focus to the trigger. Ace loads on demand from its pnpm package;
+closing a dialog invalidates pending initialization and destroys the editor/session.
+The editor remains JavaScript with two-space soft tabs. Invalid edits leave the
+catalog unchanged and show an error. MIDI export uses native selects, `jsmidgen`,
+`file-saver`, and Blob.
 
-Cached-page `pagehide` suspends playback and subscriptions, cancels pending sorts,
-and closes dialogs while keeping data/settings. Cached `pageshow` reconnects and
-re-sorts without automatically resuming audio. Non-cached exits and Vite disposal
-destroy the controller. A new controller can mount the existing markup and store;
-simultaneous controllers sharing the same fixed DOM IDs are not supported.
-Soundfont caches are controller-owned: suspension pauses samples, while destruction
-aborts pending requests and releases sample nodes. The first-party loader fetches
-the existing MP3 samples and uses native decoding instead of JSONP. Global vendor
-libraries remain library-owned; teardown does not shut down the shared AudioContext.
+Cached-page suspension disconnects runtime effects, pauses audio, cancels workers
+and pending resumes, and closes dialogs. Returning reconnects effects without
+automatically playing. React continues to represent the same Jotai store.
+Non-cached exits and Vite disposal unmount React, dispose owned resources, and
+release native pointer listeners. Fresh runtime instances can reuse the store.
+The shared AudioContext stays library-owned.
 
-[`vendor.mjs`](../src/js/vendor.mjs) captures globals from the classic scripts in
-the footer, which must load before the module entry. The UI uses jQuery plugins,
-timbre. Visualizations use named imports from pinned `d3-selection`, `d3-array`,
-`d3-scale`, `d3-color`, and `d3-shape` packages, with explicit data joins and no D3 global.
-MIDI export and downloads import pinned `jsmidgen` and
-`file-saver` packages and use the browser's native Blob implementation.
-Ace is imported from the pinned `ace-builds` npm package, with its
-JavaScript mode, Monokai theme, and diagnostics worker bundled by Vite. The editor uses
-two-space soft tabs and preserves source text without a separate beautifier.
-It targets fixed DOM IDs and is destroyed with its owning controller.
-Data generators and utilities are modules with explicit imports;
-[`generator-registry.ts`](../src/js/generators/generator-registry.ts) supplies the controller's generator catalog.
-
-Musical scales are immutable local data in `src/js/midi/scales.ts`, extracted
-from the former subcollider.js bundle with its MIT notice. Scale grouping and
-note mapping retain the original behavior, including 24- and 43-pitch octave
-groups; no subcollider global or prototype extensions are loaded.
+All third-party JavaScript uses package imports. `vendor.mjs` only re-exports the
+pinned Timbre browser entry; there are no classic script tags or `public/js` files.
+D3 imports remain scoped. Sample audio is fetched and decoded by first-party
+modules; see [the audio boundary](audio-dependencies.md).
 
 ## Engine and workers
 

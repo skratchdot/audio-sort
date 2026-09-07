@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Audio Sort · UI layout study</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      :root {
+        color-scheme: light;
+        font-family: system-ui, sans-serif;
+        color: #203238;
+        background: #f3f5f4;
+        accent-color: #146c62;
+      }
+      body {
+        margin: 0;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+      button,
+      select {
+        border: 1px solid #c5cecb;
+        border-radius: 6px;
+        background: white;
+        padding: 6px 9px;
+        color: inherit;
+      }
+      button:disabled {
+        color: #56645f;
+        background: #f3f5f4;
+        cursor: not-allowed;
+      }
+      :focus-visible {
+        outline: 3px solid #b46520;
+        outline-offset: 3px;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1 {
+        font-size: 23px;
+        letter-spacing: -1px;
+      }
+      h2 {
+        font-size: 16px;
+      }
+      h3 {
+        font-size: 14px;
+      }
+      small,
+      .muted {
+        color: #596962;
+        font-size: 12px;
+      }
+      .study {
+        background: #e2ebe7;
+        padding: 10px 24px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 24px;
+        align-items: center;
+        font-size: 13px;
+      }
+      .study label {
+        display: inline-flex;
+        gap: 5px;
+        align-items: center;
+      }
+      .study strong {
+        color: #146c62;
+      }
+      header {
+        padding: 18px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .shell {
+        max-width: 1320px;
+        margin: auto;
+        padding: 0 24px 24px;
+      }
+      .brand {
+        display: flex;
+        gap: 12px;
+        align-items: baseline;
+      }
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 285px;
+        gap: 18px;
+        align-items: start;
+      }
+      .stages {
+        display: grid;
+        gap: 16px;
+        min-width: 0;
+      }
+      .card {
+        border: 1px solid #cfd8d3;
+        border-radius: 10px;
+        background: white;
+        overflow: hidden;
+      }
+      .card-head {
+        padding: 12px 16px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border-bottom: 1px solid #e3e9e5;
+      }
+      .step {
+        color: #146c62;
+        margin-right: 8px;
+        font-size: 12px;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+      }
+      .body {
+        padding: 14px 16px;
+      }
+      .configuration {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: end;
+        margin-bottom: 10px;
+      }
+      .configuration label {
+        display: grid;
+        gap: 4px;
+        font-size: 12px;
+      }
+      .configuration input[type="number"] {
+        width: 65px;
+        padding: 6px;
+        border: 1px solid #c5cecb;
+        border-radius: 6px;
+      }
+      .chart {
+        height: 110px;
+        display: flex;
+        align-items: end;
+        gap: 4px;
+        border-bottom: 1px solid #cfd8d3;
+        padding: 8px 0 0;
+      }
+      .chart span {
+        flex: 1;
+        background: #69a399;
+        min-width: 0;
+        border-radius: 3px 3px 0 0;
+      }
+      .sort-chart {
+        height: 190px;
+      }
+      .sort-chart span {
+        background: #558193;
+      }
+      .sort-chart span:nth-child(7),
+      .sort-chart span:nth-child(8) {
+        background: #bd7a2d;
+      }
+      .transport {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+        font-size: 12px;
+      }
+      .transport .play {
+        color: white;
+        background: #146c62;
+        border-color: #146c62;
+      }
+      .scrubber {
+        width: 100%;
+        margin: 10px 0 0;
+      }
+      .stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        padding: 9px 16px;
+        background: #f4f7f5;
+        font-size: 12px;
+      }
+      .stats strong {
+        font-variant-numeric: tabular-nums;
+      }
+      .inspector {
+        max-height: calc(100vh - 130px);
+        overflow-y: auto;
+      }
+      summary {
+        cursor: pointer;
+        font-weight: 650;
+        padding: 13px 16px;
+      }
+      .inspector > summary {
+        border-bottom: 1px solid #e3e9e5;
+      }
+      .inspector .body {
+        display: grid;
+        gap: 14px;
+      }
+      .field {
+        display: grid;
+        gap: 6px;
+        font-size: 12px;
+      }
+      .field > span {
+        display: flex;
+        justify-content: space-between;
+      }
+      .field select,
+      .field input {
+        width: 100%;
+        min-width: 0;
+      }
+      output {
+        font-variant-numeric: tabular-nums;
+      }
+      .envelope {
+        border-top: 1px solid #e3e9e5;
+      }
+      .envelope summary {
+        padding: 12px 0;
+        font-size: 13px;
+      }
+      .envelope svg {
+        width: 100%;
+        height: 65px;
+        background: #f4f7f5;
+        border-radius: 5px;
+      }
+      .envelope-fields {
+        display: grid;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .envelope-fields label {
+        display: grid;
+        grid-template-columns: 48px 1fr 45px;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+      }
+      .envelope-fields input {
+        width: 100%;
+        min-width: 0;
+      }
+      .envelope-fields output {
+        text-align: right;
+      }
+      #input-toggle {
+        display: none;
+      }
+      body[data-layout="focused"] #input-toggle {
+        display: inline-block;
+      }
+      body[data-layout="focused"] .sort-chart {
+        height: 290px;
+      }
+      body[data-layout="focused"] .input-body {
+        display: none;
+      }
+      body[data-layout="focused"] .input-card.expanded .input-body {
+        display: block;
+      }
+      .note {
+        margin-top: 16px;
+        font-size: 12px;
+        color: #596962;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      @media (max-width: 899px) {
+        .shell {
+          padding: 0 12px 18px;
+        }
+        .study {
+          padding: 10px 12px;
+        }
+        .workspace {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .inspector {
+          max-height: none;
+          overflow: visible;
+        }
+        .brand {
+          display: block;
+        }
+        .sort-chart,
+        body[data-layout="focused"] .sort-chart {
+          height: 190px;
+        }
+      }
+    </style>
+  </head>
+  <body data-layout="tiers">
+    <div class="study">
+      <strong>Layout study · no audio</strong>
+      <label><input type="radio" name="layout" value="tiers" checked /> Two-tier</label>
+      <label><input type="radio" name="layout" value="focused" /> Sort-focused</label>
+      <span>Playback, editing, and export are placeholders.</span>
+    </div>
+    <div class="shell">
+      <header>
+        <div class="brand">
+          <h1>Audio Sort</h1>
+          <small>See the pattern. Hear the process.</small>
+        </div>
+        <small>Workspace concept</small>
+      </header>
+      <main class="workspace">
+        <div class="stages">
+          <section class="card input-card" aria-labelledby="input-title">
+            <div class="card-head">
+              <h2 id="input-title"><span class="step">01</span>Input data</h2>
+              <div class="row">
+                <button id="input-toggle" aria-expanded="false" aria-controls="input-body">
+                  Show input</button
+                ><button disabled>Export MIDI</button>
+              </div>
+            </div>
+            <div class="body input-body" id="input-body">
+              <div class="configuration">
+                <label
+                  >Pattern<select>
+                    <option>Random · unique</option>
+                    <option>Random · duplicates</option>
+                    <option>Almost sorted</option>
+                    <option>Few unique</option>
+                    <option>Sorted</option>
+                    <option>Reverse</option>
+                  </select></label
+                ><label>Items<input type="number" value="24" min="2" max="48" /></label
+                ><button disabled>Generate</button
+                ><small>Drag bars to adjust values in the finished app.</small>
+              </div>
+              <div
+                class="chart input-chart"
+                role="img"
+                aria-label="Illustrative unsorted input data"
+              ></div>
+              <div class="transport">
+                <div class="row">
+                  <button disabled aria-label="First input note">|←</button
+                  ><button disabled>Reverse</button><button disabled class="play">Play input</button
+                  ><button disabled>Stop</button
+                  ><button disabled aria-label="Last input note">→|</button
+                  ><label><input type="checkbox" /> Loop</label>
+                </div>
+                <span>1 / 24</span>
+              </div>
+              <input
+                class="scrubber"
+                type="range"
+                min="1"
+                max="24"
+                value="1"
+                aria-label="Input position (layout only)"
+              />
+            </div>
+          </section>
+          <section class="card" aria-labelledby="sort-title">
+            <div class="card-head">
+              <h2 id="sort-title"><span class="step">02</span>Sorting</h2>
+              <button disabled>Export MIDI</button>
+            </div>
+            <div class="body">
+              <div class="configuration">
+                <label
+                  >Algorithm<select>
+                    <option>Bubble sort</option>
+                    <option>Quick sort</option>
+                    <option>Heap sort</option>
+                    <option>Insertion sort</option>
+                  </select></label
+                ><button disabled>Info / Edit code</button><button disabled>Add algorithm</button
+                ><label
+                  >View<select>
+                    <option>Bars</option>
+                    <option>Flat</option>
+                  </select></label
+                >
+              </div>
+              <div
+                class="chart sort-chart"
+                role="img"
+                aria-label="Illustrative intermediate sort frame; amber bars are compared"
+              ></div>
+              <div class="transport">
+                <div class="row">
+                  <button disabled aria-label="First sort frame">|←</button
+                  ><button disabled>Reverse</button><button disabled class="play">Play sort</button
+                  ><button disabled>Stop</button
+                  ><button disabled aria-label="Last sort frame">→|</button
+                  ><label><input type="checkbox" /> Loop</label>
+                </div>
+                <label><input type="checkbox" /> AutoPlay</label>
+              </div>
+              <input
+                class="scrubber"
+                type="range"
+                min="1"
+                max="276"
+                value="48"
+                aria-label="Sort position (layout only)"
+              />
+            </div>
+            <div class="stats">
+              <span>Sample frame <strong>48 / 276</strong></span
+              ><span>Comparisons <strong>32</strong></span
+              ><span>Swaps <strong>16</strong></span
+              ><span>Amber: comparing</span>
+            </div>
+          </section>
+        </div>
+        <details class="card inspector" open>
+          <summary>Sound settings <small>· shared</small></summary>
+          <div class="body">
+            <label class="field"
+              ><span>Volume<output>25%</output></span
+              ><input type="range" value="25" min="0" max="100" data-unit="%"
+            /></label>
+            <label class="field"
+              ><span>Tempo<output>90 BPM</output></span
+              ><input type="range" value="90" min="30" max="240" data-unit=" BPM"
+            /></label>
+            <label class="field"
+              >Center note<select>
+                <option>C4 · MIDI 60</option>
+                <option>C3 · MIDI 48</option>
+                <option>C5 · MIDI 72</option>
+              </select></label
+            >
+            <label class="field"
+              >Scale<select>
+                <option>Major</option>
+                <option>Minor</option>
+                <option>Chromatic</option>
+                <option>Pentatonic</option>
+              </select></label
+            >
+            <label class="field"
+              >Sound source<select id="sound-source">
+                <option value="waveform">Waveform</option>
+                <option value="instrument">Sample instrument</option>
+              </select></label
+            >
+            <div id="waveform-settings">
+              <label class="field"
+                >Waveform<select>
+                  <option>String</option>
+                  <option>Sine</option>
+                  <option>Cosine</option>
+                  <option>Pulse</option>
+                  <option>Triangle</option>
+                  <option>Saw</option>
+                  <option>Fami</option>
+                  <option>Konami</option>
+                </select></label
+              >
+              <details class="envelope" open>
+                <summary>Amplitude envelope</summary>
+                <svg viewBox="0 0 250 70" role="img" aria-label="Illustrative amplitude envelope">
+                  <path
+                    d="M 5 64 L 20 6 L 95 35 L 160 35 L 245 64"
+                    fill="none"
+                    stroke="#146c62"
+                    stroke-width="2"
+                  />
+                </svg>
+                <div class="envelope-fields">
+                  <label
+                    >Attack<input
+                      type="range"
+                      min="10"
+                      max="500"
+                      step="5"
+                      value="50"
+                      data-unit=" ms"
+                    /><output>50 ms</output></label
+                  >
+                  <label
+                    >Decay<input
+                      type="range"
+                      min="10"
+                      max="2000"
+                      step="5"
+                      value="300"
+                      data-unit=" ms"
+                    /><output>300 ms</output></label
+                  >
+                  <label
+                    >Sustain<input type="range" min="0" max="100" value="50" data-unit="%" /><output
+                      >50%</output
+                    ></label
+                  >
+                  <label
+                    >Hold<input
+                      type="range"
+                      min="10"
+                      max="3000"
+                      step="5"
+                      value="200"
+                      data-unit=" ms"
+                    /><output>200 ms</output></label
+                  >
+                  <label
+                    >Release<input
+                      type="range"
+                      min="10"
+                      max="3000"
+                      step="5"
+                      value="300"
+                      data-unit=" ms"
+                    /><output>300 ms</output></label
+                  >
+                </div>
+              </details>
+            </div>
+            <label id="instrument-settings" class="field" hidden
+              >Instrument<select>
+                <option>Acoustic grand piano</option>
+                <option>Cello</option>
+                <option>Marimba</option>
+              </select></label
+            >
+          </div>
+        </details>
+      </main>
+      <p class="note">
+        Design prototype only. Values are not saved; charts do not represent a running algorithm.
+        Compare layouts at desktop and mobile widths.
+      </p>
+    </div>
+    <script>
+      const values = [
+        42, 85, 24, 61, 95, 36, 72, 18, 54, 79, 31, 67, 48, 91, 14, 58, 76, 27, 64, 39, 88, 51, 21,
+        99,
+      ];
+      document.querySelectorAll(".chart").forEach((chart, index) => {
+        const data = index
+          ? [...values.slice(0, 8).sort((a, b) => a - b), ...values.slice(8)]
+          : values;
+        for (const value of data) {
+          const bar = document.createElement("span");
+          bar.style.height = `${value}%`;
+          chart.append(bar);
+        }
+      });
+      document.querySelectorAll('[name="layout"]').forEach((radio) =>
+        radio.addEventListener("change", () => {
+          document.body.dataset.layout = radio.value;
+        }),
+      );
+      document.querySelector("#input-toggle").addEventListener("click", (event) => {
+        const expanded = document.querySelector(".input-card").classList.toggle("expanded");
+        event.currentTarget.setAttribute("aria-expanded", String(expanded));
+        event.currentTarget.textContent = expanded ? "Hide input" : "Show input";
+      });
+      document.querySelector("#sound-source").addEventListener("change", (event) => {
+        const waveform = event.target.value === "waveform";
+        document.querySelector("#waveform-settings").hidden = !waveform;
+        document.querySelector("#instrument-settings").hidden = waveform;
+      });
+      document.querySelectorAll("input[data-unit]").forEach((input) =>
+        input.addEventListener("input", () => {
+          input.closest("label").querySelector("output").textContent =
+            input.value + input.dataset.unit;
+        }),
+      );
+    </script>
+  </body>
+</html>
