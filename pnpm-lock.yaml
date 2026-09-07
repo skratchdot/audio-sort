@@ -130,6 +130,9 @@ importers:
       file-saver:
         specifier: 2.0.5
         version: 2.0.5
+      jotai:
+        specifier: 2.20.3
+        version: 2.20.3
       jsmidgen:
         specifier: 0.1.8
         version: 0.1.8
@@ -1026,6 +1029,24 @@ packages:
   iso-639-1@3.1.6:
     resolution: {integrity: sha512-ZFar/L4ngX7wZh2QX+Fiftmuf0igWJsrJtfizrovWifF1gAWkfmRa5Z1m0LQZbm0hKCHRDYhLRSLFrSqNe4EJA==}
     engines: {node: '>=6.0'}
+
+  jotai@2.20.3:
+    resolution: {integrity: sha512-N8L9FUbeGDP+0qNJw1FebOxt+5hk+jTOwUA2LlRE4C081jUcY6F1T/FSETp4DT2/INMtiSRZyNm2D+yZdzrSgA==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@babel/core': '>=7.0.0'
+      '@babel/template': '>=7.0.0'
+      '@types/react': '>=17.0.0'
+      react: '>=17.0.0'
+    peerDependenciesMeta:
+      '@babel/core':
+        optional: true
+      '@babel/template':
+        optional: true
+      '@types/react':
+        optional: true
+      react:
+        optional: true
 
   js-yaml@3.15.2:
     resolution: {integrity: sha512-6EuL879VkRA+1Cz578mKMiKvjPNEuk6+r1JaFzoSWejZmtf7xWbIyw1e3KkxlkzTIt9Taw6JBhEppG7utc1P+w==}
@@ -2158,6 +2179,8 @@ snapshots:
   is-number@7.0.0: {}
 
   iso-639-1@3.1.6: {}
+
+  jotai@2.20.3: {}
 
   js-yaml@3.15.2:
     dependencies:

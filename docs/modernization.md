@@ -59,6 +59,9 @@ TypeScript checks cover scales, instruments, all array utilities, generators,
 the generator registry, sort recorder, and request/response handling.
 Remaining `.mjs` modules and browser-entered algorithms are not type-checked yet.
 
-Next: introduce the Jotai settings store behind the existing UI. The algorithm
-function/metadata format and editor remain unchanged; do not add parser/build
+Jotai now owns the nine selected settings behind the existing UI, with an isolated
+vanilla store per controller. No React dependency or audio lifecycle changes.
+Next: move waveform envelopes, custom algorithm overrides, and playback toggles
+into state, then add explicit UI/audio synchronization before multiple UI owners.
+The algorithm function/metadata format and editor remain unchanged; do not add parser/build
 machinery solely to reorganize metadata.

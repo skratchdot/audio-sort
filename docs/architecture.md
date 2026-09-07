@@ -21,6 +21,17 @@ generator registry. The controller passes its settings API to helper and player
 factories. Visualizations are registered in
 [`visualization-registry.mjs`](../src/js/visualizations/visualization-registry.mjs).
 
+Selected settings live in [`state/settings.ts`](../src/js/state/settings.ts), using
+`jotai/vanilla` without React. Each controller owns a separate store unless one
+is supplied. UI handlers write through `updateSettingAtom`; helpers and players
+read fresh values through the existing controller getters. There is no mirrored
+settings object. Snapshots and defaults are immutable.
+
+This is a state-storage migration, not a reactive UI rewrite: existing handlers
+still update DOM controls and audio resources. Writing directly to an injected
+store does not yet synchronize those side effects. Waveform envelopes, custom
+algorithm overrides, and player-local toggles remain for subsequent steps.
+
 [`vendor.mjs`](../src/js/vendor.mjs) captures globals from the classic scripts in
 the footer, which must load before the module entry. The UI uses jQuery plugins,
 timbre. Visualizations use named imports from pinned `d3-selection`, `d3-array`,
