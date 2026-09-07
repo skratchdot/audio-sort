@@ -87,7 +87,7 @@ function WaveformControls({ store }: { store: Store }) {
               type="button"
               data-waveform={id}
               aria-pressed={id === waveform}
-              className="tw:border tw:border-solid tw:border-[#ccc] tw:bg-[#f5f5f5] tw:px-1 tw:py-0 tw:text-[11px] tw:leading-5 tw:text-[#333] tw:aria-pressed:bg-[#ddd] tw:focus-visible:outline-2! tw:focus-visible:outline-[#087ca7]! tw:focus-visible:outline-offset-2"
+              className="tw:border tw:border-solid tw:border-[#ccc] tw:bg-[#f5f5f5] tw:px-1 tw:py-0 tw:text-[11px]! tw:leading-5 tw:text-[#333] tw:aria-pressed:bg-[#ddd] tw:focus-visible:outline-2! tw:focus-visible:outline-[#087ca7]! tw:focus-visible:outline-offset-2"
               onClick={() => updateSetting({ key: "waveform", value: id })}
             >
               {id}
@@ -100,7 +100,7 @@ function WaveformControls({ store }: { store: Store }) {
           <Fragment key={control.key}>
             <label
               htmlFor={`envelope-${control.name}`}
-              className="tw:m-0! tw:text-[12px] tw:font-bold"
+              className="tw:m-0! tw:text-[12px]! tw:font-bold!"
             >
               {control.label}
               <output

@@ -864,11 +864,18 @@ test("charts use extra laptop height without enlarging short or narrow layouts",
 
 test("envelope controls preserve the compact settings panel", async ({ page }) => {
   await page.goto("index.html");
+  // Exercise fallback font metrics even on Macs with Helvetica installed.
+  // Bootstrap must not override the React panel's compact typography.
+  await page.addStyleTag({
+    content: "body, input, button { font-family: Arial, sans-serif !important; }",
+  });
   for (const width of [1280, 1024, 768, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.locator('#settings a[href="#audio"]').click();
     const before = await page.locator("#sort-section").boundingBox();
     await page.locator('#settings a[href="#waveform"]').click();
+    await expect(page.locator("#envelope-controls label").first()).toHaveCSS("font-size", "12px");
+    await expect(page.locator("#waveform button").first()).toHaveCSS("font-size", "11px");
     const after = await page.locator("#sort-section").boundingBox();
     expect(Math.abs(after.y - before.y)).toBeLessThanOrEqual(2);
     const panel = await page.locator("#settings-content").boundingBox();
