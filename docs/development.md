@@ -17,8 +17,8 @@ images in `public/img/`, and the `.nojekyll` marker. Files are copied unchanged
 to `dist/` without a `public/` URL prefix. Use `/img/...` in source CSS; Vite
 adjusts these URLs for the deployment path. Application modules and CSS stay in `src/`.
 
-CSS is bundled but not minified because Bootstrap 2's legacy IE syntax is incompatible with the
-minifier.
+CSS is bundled and minified by Vite. Bootstrap 2's obsolete star-prefixed IE declarations have
+been removed so its styles work with the CSS minifier.
 
 ## Checks
 
