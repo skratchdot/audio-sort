@@ -2,14 +2,15 @@ import { $, timbre } from "../vendor.mjs";
 import { select } from "d3-selection";
 import { createMidiBytes } from "../midi/create-midi-bytes.mjs";
 import { visualizations } from "../visualizations/visualization-registry.mjs";
+import { playbackPreferencesAtom, toggleLoopAtom } from "../state/playback-preferences.ts";
 
-export function createPlayerFactory(settings, Helper) {
+export function createPlayerFactory(settings, Helper, settingsStore) {
   return function createPlayer(containerSelector, options) {
     const player = {};
     // Config Values
     const canvasBackground = "rgba(255, 255, 255, 0)";
     // State Variables
-    let isLooping;
+    const isLooping = () => settingsStore.get(playbackPreferencesAtom).loop[options.id];
     let isPlaying;
     let isReverse;
     let intervalIndex;
@@ -41,7 +42,6 @@ export function createPlayerFactory(settings, Helper) {
       options = options || {};
 
       // setup some more variables
-      isLooping = options.isLooping || false;
       isPlaying = options.isPlaying || false;
       isReverse = options.isReverse || false;
       hasMarkers = options.hasMarkers || false;
@@ -53,6 +53,10 @@ export function createPlayerFactory(settings, Helper) {
       }
       intervalIndex = 0;
       const $container = $(containerSelector || null);
+      $container
+        .find('[data-action="loop"]')
+        .toggleClass("active", isLooping())
+        .attr("aria-pressed", String(isLooping()));
       $compareCurrent = $container.find(".compare-current");
       $compareMax = $container.find(".compare-max");
       $swapCurrent = $container.find(".swap-current");
@@ -185,14 +189,14 @@ export function createPlayerFactory(settings, Helper) {
         intervalIndex = isReverse ? intervalIndex - 1 : intervalIndex + 1;
 
         // we can stop if we are not looping
-        if (!isLooping && (intervalIndex < 0 || intervalIndex >= data.length)) {
+        if (!isLooping() && (intervalIndex < 0 || intervalIndex >= data.length)) {
           player.stop();
         }
 
         // we need to loop
-        if (isLooping && intervalIndex < 0) {
+        if (isLooping() && intervalIndex < 0) {
           intervalIndex = data.length - 1;
-        } else if (isLooping && intervalIndex >= data.length) {
+        } else if (isLooping() && intervalIndex >= data.length) {
           intervalIndex = 0;
         }
       } else {
@@ -215,12 +219,8 @@ export function createPlayerFactory(settings, Helper) {
         } else if (action === "goToLast") {
           player.goToLast();
         } else if (action === "loop") {
-          isLooping = !$item.hasClass("active");
-          if (isLooping) {
-            $item.addClass("active");
-          } else {
-            $item.removeClass("active");
-          }
+          settingsStore.set(toggleLoopAtom, options.id);
+          $item.toggleClass("active", isLooping()).attr("aria-pressed", String(isLooping()));
         }
         refreshSliderPosition();
         if (typeof onPlayerButtonClickCallback === "function") {

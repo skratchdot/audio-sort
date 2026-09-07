@@ -31,8 +31,11 @@ generator presets stay fixed, and sustain edits retain two-decimal rounding.
 
 This is a state-storage migration, not a reactive UI rewrite: existing handlers
 still update DOM controls and audio resources. Writing directly to an injected
-store does not yet synchronize those side effects. Player-local toggles remain
-for subsequent steps.
+store does not yet synchronize those side effects. AutoPlay and each player's
+loop preference live in `state/playback-preferences.ts`; their handlers render
+button state from the store instead of reading CSS classes. AutoPlay no longer
+uses Bootstrap's button toggle. Playing/stopped state, direction, position,
+timers, and audio nodes remain owned by the player.
 
 [`vendor.mjs`](../src/js/vendor.mjs) captures globals from the classic scripts in
 the footer, which must load before the module entry. The UI uses jQuery plugins,

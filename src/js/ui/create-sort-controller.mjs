@@ -10,6 +10,7 @@ import { instruments } from "../midi/instruments.ts";
 import { createStore } from "jotai/vanilla";
 import { defaults, settingsAtom, updateSettingAtom } from "../state/settings.ts";
 import { waveformDefaults, waveformsAtom, updateEnvelopeAtom } from "../state/waveforms.ts";
+import { playbackPreferencesAtom, toggleAutoPlayAtom } from "../state/playback-preferences.ts";
 import {
   algorithmCatalogAtom,
   editAlgorithmAtom,
@@ -19,7 +20,7 @@ import {
 export function createSortController(generators, settingsStore = createStore()) {
   const Sort = {};
   const Helper = createHelpers(Sort);
-  const createPlayer = createPlayerFactory(Sort, Helper);
+  const createPlayer = createPlayerFactory(Sort, Helper, settingsStore);
   // Read the current atom value on demand; do not keep a second settings cache.
   const getSelected = () => settingsStore.get(settingsAtom);
   const setSelected = (key, value) => settingsStore.set(updateSettingAtom, { key, value });
@@ -33,7 +34,6 @@ export function createSortController(generators, settingsStore = createStore()) 
   // Ace Editor
   let aceEditor;
   // AutoPlay
-  let $sortAutoPlay;
   let triggerAutoPlay = false;
   // Helper Variables
   const displayCache = {};
@@ -252,7 +252,7 @@ export function createSortController(generators, settingsStore = createStore()) 
     $item.addClass("active");
     updateDisplayCache("#sort-display", $item.text());
     setSelected("sort", $item.find("a").data("sort"));
-    if ($sortAutoPlay.hasClass("active")) {
+    if (settingsStore.get(playbackPreferencesAtom).autoPlay) {
       triggerAutoPlay = true;
     }
     doSort();
@@ -449,7 +449,7 @@ export function createSortController(generators, settingsStore = createStore()) 
 
   const setupPlayers = function () {
     players.base = createPlayer("#base-section", {
-      isLooping: true,
+      id: "base",
       hasMarkers: false,
       allowHover: true,
       allowClick: true,
@@ -465,7 +465,7 @@ export function createSortController(generators, settingsStore = createStore()) 
       },
     });
     players.sort = createPlayer("#sort-section", {
-      isLooping: true,
+      id: "sort",
       hasMarkers: true,
       onPlayerButtonClickCallback: function (e) {
         playerButtonCallback(players.base, e.action);
@@ -776,7 +776,16 @@ export function createSortController(generators, settingsStore = createStore()) 
       onSliderWaveform,
     );
     // cache a few items
-    $sortAutoPlay = $("#sort-autoplay");
+    const $sortAutoPlay = $("#sort-autoplay");
+    const renderAutoPlay = () => {
+      const active = settingsStore.get(playbackPreferencesAtom).autoPlay;
+      $sortAutoPlay.toggleClass("active", active).attr("aria-pressed", String(active));
+    };
+    renderAutoPlay();
+    $sortAutoPlay.on("click", () => {
+      settingsStore.set(toggleAutoPlayAtom);
+      renderAutoPlay();
+    });
     $("#modal-sort, #modal-add-algorithm").on("hide", function () {
       if (activeEditorModal !== "#" + this.id) return;
       editorRequest++;
