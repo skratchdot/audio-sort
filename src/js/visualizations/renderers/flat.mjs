@@ -2,26 +2,21 @@ import { rgb } from "d3-color";
 import { line as createLine } from "d3-shape";
 
 export default function flat(settings) {
-  var flat = {},
-    // settings
-    data = [],
-    $svg,
-    svg,
-    flattenedLines = [],
-    numFlattenedLines = 0,
-    frameLength = 0,
-    dataColor = "steelblue",
-    playColor = "#c80000",
-    lines,
-    // functions
-    _init,
-    drawFlattenedLines,
-    initFlattenedLines;
+  const flat = {};
+  // settings
+  let data = [];
+  let svg;
+  let flattenedLines = [];
+  let numFlattenedLines = 0;
+  let frameLength = 0;
+  const dataColor = "steelblue";
+  const playColor = "#c80000";
+  let lines;
 
-  _init = function (settings) {
+  const _init = function (settings) {
     data = settings.data;
     svg = settings.svg;
-    $svg = settings.$svg;
+    const $svg = settings.$svg;
     // setup lengths
     if (data.length) {
       numFlattenedLines = data[0].arr.length;
@@ -40,23 +35,16 @@ export default function flat(settings) {
     drawFlattenedLines();
   };
 
-  initFlattenedLines = function () {
-    var i,
-      j,
-      id,
-      currentArray,
-      item,
-      index,
-      lastFrameArray,
-      ids = [],
-      half;
+  const initFlattenedLines = function () {
+    const ids = [];
+
     flattenedLines = [];
     if (data.length) {
-      lastFrameArray = data[data.length - 1].arr;
-      half = Math.floor(numFlattenedLines / 2);
+      const lastFrameArray = data[data.length - 1].arr;
+      const half = Math.floor(numFlattenedLines / 2);
       // build base arrays
-      for (i = 0; i < numFlattenedLines; i++) {
-        id = lastFrameArray[i].id;
+      for (let i = 0; i < numFlattenedLines; i++) {
+        const id = lastFrameArray[i].id;
         ids.push(id);
         flattenedLines[i] = {
           id: id,
@@ -71,11 +59,11 @@ export default function flat(settings) {
         };
       }
       // build line data
-      for (i = 0; i < frameLength; i++) {
-        currentArray = data[i].arr;
-        for (j = 0; j < currentArray.length; j++) {
-          item = currentArray[j];
-          index = ids.indexOf(item.id);
+      for (let i = 0; i < frameLength; i++) {
+        const currentArray = data[i].arr;
+        for (let j = 0; j < currentArray.length; j++) {
+          const item = currentArray[j];
+          const index = ids.indexOf(item.id);
           flattenedLines[index].lineData.push({
             x: i,
             y: j + 0.5,
@@ -90,11 +78,9 @@ export default function flat(settings) {
     }
   };
 
-  drawFlattenedLines = function (index) {
-    var line;
-
+  const drawFlattenedLines = function (index) {
     // create our line function
-    line = createLine()
+    const line = createLine()
       .x(function (d) {
         return d.x;
       })

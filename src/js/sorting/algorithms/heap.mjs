@@ -6,7 +6,7 @@ export default function heap(AS) {
     buildHeap();
     AS.clearHighlight();
 
-    for (var size = AS.length(); size > 1; size--) {
+    for (let size = AS.length(); size > 1; size--) {
       AS.mark(0);
       AS.play(0);
       AS.swap(0, size - 1); // First element is the maximum, stick it at the end
@@ -19,8 +19,8 @@ export default function heap(AS) {
 
   // Build a max-heap of the whole array (pg 157 in book)
   function buildHeap() {
-    var size = AS.length();
-    for (var i = parent(size - 1); i >= 0; i--) {
+    const size = AS.length();
+    for (let i = parent(size - 1); i >= 0; i--) {
       AS.highlight(i);
       heapify(i, size); // heapify over every element above the leaf nodes
     }
@@ -30,9 +30,9 @@ export default function heap(AS) {
   // i is the root of the subtree
   // size is the end of the heap
   function heapify(i, size) {
-    var l = left(i),
-      r = right(i),
-      largest = i;
+    const l = left(i);
+    const r = right(i);
+    let largest = i;
 
     AS.play(i);
     AS.mark(i);

@@ -11,7 +11,12 @@
     "src/.11ty-vite/**",
     "test-results/**"
   ],
-  "rules": { "no-undef": "error" },
+  "rules": {
+    "no-undef": "error",
+    "no-var": "error",
+    "prefer-const": "error",
+    "one-var": ["error", "never"]
+  },
   "overrides": [
     {
       "files": ["src/js/**/*.js", "src/js/**/*.mjs"],

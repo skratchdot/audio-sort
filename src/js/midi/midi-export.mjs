@@ -12,18 +12,17 @@ import { instruments } from "./instruments.mjs";
 export const MidiExport = {};
 
 MidiExport.populateChannels = function (selector) {
-  var i,
-    $select = $(selector),
-    $option,
-    html = "",
-    numChannels = 16;
+  const $select = $(selector);
+
+  let html = "";
+  const numChannels = 16;
 
   // empty select
   $select.empty();
 
   // populate select
-  for (i = 0; i < numChannels; i++) {
-    $option = $("<option></option>").val(i).text(i);
+  for (let i = 0; i < numChannels; i++) {
+    const $option = $("<option></option>").val(i).text(i);
     if (i === 0) {
       $option.attr("selected", "selected");
     }
@@ -33,19 +32,16 @@ MidiExport.populateChannels = function (selector) {
 };
 
 MidiExport.populateInstruments = function (selector) {
-  var i,
-    instrument,
-    group = "",
-    $select = $(selector),
-    $optGroup,
-    $option;
+  let group = "";
+  const $select = $(selector);
+  let $optGroup;
 
   // empty select
   $select.empty();
 
   // populate select
-  for (i = 0; i < instruments.length; i++) {
-    instrument = instruments[i];
+  for (let i = 0; i < instruments.length; i++) {
+    const instrument = instruments[i];
     if (group !== instrument.group) {
       group = instrument.group;
       if ($optGroup) {
@@ -53,7 +49,7 @@ MidiExport.populateInstruments = function (selector) {
       }
       $optGroup = $("<optgroup></optgroup>").attr("label", group);
     }
-    $option = $("<option></option>")
+    const $option = $("<option></option>")
       .val(i)
       .text(i + ": " + instrument.name);
     if (i === 0) {

@@ -1,25 +1,21 @@
 import { $ } from "../../vendor.mjs";
 
-var hoverIndex = -1,
-  hoverValue = -1,
-  clickIndex = -1,
-  clickValue = -1,
-  isClicking = false;
+let hoverIndex = -1;
+let hoverValue = -1;
+let clickIndex = -1;
+let clickValue = -1;
+let isClicking = false;
 
 export default function bar(settings) {
-  var bar = {},
-    // settings
-    data,
-    $svg,
-    svg,
-    hasMarkers,
-    onClick,
-    // function
-    _init,
-    drawMarkers,
-    getIndexAndValueFromMouse;
+  const bar = {};
+  // settings
+  let data;
+  let $svg;
+  let svg;
+  let hasMarkers;
+  let onClick;
 
-  _init = function (settings) {
+  const _init = function (settings) {
     data = settings.data;
     svg = settings.svg;
     $svg = settings.$svg;
@@ -29,25 +25,24 @@ export default function bar(settings) {
     onClick = settings.onClick;
   };
 
-  drawMarkers = function (info, level, property) {
-    var circle, len, radius, cy;
+  const drawMarkers = function (info, level, property) {
     if (hasMarkers) {
       // select some items
-      circle = svg
+      const circle = svg
         .selectAll("circle." + property)
         .data(info.arr)
         .join("circle");
-      len = info.arr.length;
+      const len = info.arr.length;
 
       // determine our radius and our y position
-      radius = 100 / (Math.max(len, 20) * 4);
-      cy = 100 - level * 10 + "%";
+      const radius = 100 / (Math.max(len, 20) * 4);
+      const cy = 100 - level * 10 + "%";
 
       // update
       circle
         .attr("cy", cy)
         .attr("cx", function (d, i) {
-          var width = 100 / (len * 2);
+          const width = 100 / (len * 2);
           return (i / len) * 100 + width + "%";
         })
         .attr("r", function () {
@@ -60,23 +55,17 @@ export default function bar(settings) {
     }
   };
 
-  getIndexAndValueFromMouse = function (e) {
-    var index,
-      value,
-      $this = $(e.currentTarget),
-      $parent = $this.parent(),
-      parentOffset,
-      relX,
-      relY,
-      w,
-      h,
-      n = 0,
-      min = 0;
+  const getIndexAndValueFromMouse = function (e) {
+    const $this = $(e.currentTarget);
+    const $parent = $this.parent();
+
+    let n = 0;
+    let min = 0;
 
     // set relative positions
-    parentOffset = $parent.offset();
-    relX = e.pageX - parentOffset.left;
-    relY = e.pageY - parentOffset.top;
+    const parentOffset = $parent.offset();
+    let relX = e.pageX - parentOffset.left;
+    let relY = e.pageY - parentOffset.top;
 
     // account for border/margin/padding
     relX = relX - parseInt($parent.css("border-left-width"), 10);
@@ -87,8 +76,8 @@ export default function bar(settings) {
     relY = relY - parseInt($parent.css("padding-top"), 10);
 
     // store widths and heights
-    w = $this.parent().width();
-    h = $this.parent().height();
+    const w = $this.parent().width();
+    const h = $this.parent().height();
 
     // get datasize
     if (data.length > 0) {
@@ -97,8 +86,8 @@ export default function bar(settings) {
     }
 
     // set index/value
-    index = Math.floor((relX / w) * n);
-    value = Math.floor((relY / h) * n);
+    let index = Math.floor((relX / w) * n);
+    let value = Math.floor((relY / h) * n);
 
     // account for div/0
     index = isFinite(index) ? index : 0;
@@ -116,11 +105,11 @@ export default function bar(settings) {
   };
 
   bar.onMouseMove = function (e) {
-    var result = getIndexAndValueFromMouse(e),
-      $rect;
+    const result = getIndexAndValueFromMouse(e);
+
     if (hoverIndex !== result.index) {
       hoverIndex = result.index;
-      $rect = $svg.find("rect");
+      const $rect = $svg.find("rect");
       $rect.attr("opacity", 1);
       $rect.eq(hoverIndex).attr("opacity", 0.5);
     }
@@ -138,7 +127,7 @@ export default function bar(settings) {
   };
 
   bar.onMouseDown = function (e) {
-    var result = getIndexAndValueFromMouse(e);
+    const result = getIndexAndValueFromMouse(e);
     e.preventDefault();
     isClicking = true;
     clickIndex = result.index;
@@ -153,15 +142,15 @@ export default function bar(settings) {
   };
 
   bar.draw = function (index) {
-    var info, rect, len;
+    let info;
 
     // draw it
     if (data.length > 0) {
       info = data[index];
 
       // select some items
-      rect = svg.selectAll("rect").data(info.arr).join("rect");
-      len = info.arr.length;
+      const rect = svg.selectAll("rect").data(info.arr).join("rect");
+      const len = info.arr.length;
 
       // update
       rect

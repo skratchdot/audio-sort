@@ -12,50 +12,39 @@ import { visualizations } from "../visualizations/visualization-registry.mjs";
  */
 export function createPlayerFactory(settings, Helper) {
   return function createPlayer(containerSelector, options) {
-    var player = {},
-      // Config Values
-      canvasBackground = "rgba(255, 255, 255, 0)",
-      // State Variables
-      isLooping,
-      isPlaying,
-      isReverse,
-      intervalIndex,
-      hasMarkers,
-      allowHover,
-      allowClick,
-      onClick,
-      // Cached jQuery items
-      $container,
-      $svg,
-      $slider,
-      $compareCurrent,
-      $compareMax,
-      $swapCurrent,
-      $swapMax,
-      $positionCurrent,
-      $positionMax,
-      // Cached d3 items
-      svg,
-      // Data
-      data,
-      interval,
-      env,
-      waveGenerator,
-      visualization,
-      selectedVisualization = "bar",
-      // Functions
-      _init,
-      clearCanvas,
-      drawSvg,
-      ensureIntervalIndex,
-      intervalCallback,
-      refreshSliderPosition,
-      // Event Listeners
-      onPlayerButtonClick,
-      onPlayerButtonClickCallback,
-      onSliderPositionChange;
+    const player = {};
+    // Config Values
+    const canvasBackground = "rgba(255, 255, 255, 0)";
+    // State Variables
+    let isLooping;
+    let isPlaying;
+    let isReverse;
+    let intervalIndex;
+    let hasMarkers;
+    let onClick;
+    // Cached jQuery items
+    let $svg;
+    let $slider;
+    let $compareCurrent;
+    let $compareMax;
+    let $swapCurrent;
+    let $swapMax;
+    let $positionCurrent;
+    let $positionMax;
+    // Cached d3 items
+    let svg;
+    // Data
+    let data;
+    let interval;
+    let env;
+    let waveGenerator;
+    let visualization;
+    let selectedVisualization = "bar";
 
-    _init = function () {
+    // Event Listeners
+    let onPlayerButtonClickCallback;
+
+    const _init = function () {
       options = options || {};
 
       // setup some more variables
@@ -63,14 +52,14 @@ export function createPlayerFactory(settings, Helper) {
       isPlaying = options.isPlaying || false;
       isReverse = options.isReverse || false;
       hasMarkers = options.hasMarkers || false;
-      allowHover = options.allowHover || false;
-      allowClick = options.allowClick || false;
+      const allowHover = options.allowHover || false;
+      const allowClick = options.allowClick || false;
       onClick = options.onClick;
       if (typeof onClick !== "function") {
         onClick = $.noop;
       }
       intervalIndex = 0;
-      $container = $(containerSelector || null);
+      const $container = $(containerSelector || null);
       $compareCurrent = $container.find(".compare-current");
       $compareMax = $container.find(".compare-max");
       $swapCurrent = $container.find(".swap-current");
@@ -117,21 +106,20 @@ export function createPlayerFactory(settings, Helper) {
       }
     };
 
-    clearCanvas = function (canvas) {
-      var context = canvas.getContext("2d");
+    const clearCanvas = function (canvas) {
+      const context = canvas.getContext("2d");
       context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     };
 
-    drawSvg = function () {
-      var info,
-        len = data.length,
-        last = len - 1;
+    const drawSvg = function () {
+      const len = data.length;
+      const last = len - 1;
 
       // make sure we have a valid index
       ensureIntervalIndex();
 
       // draw our visualization
-      info = visualization.draw(intervalIndex);
+      const info = visualization.draw(intervalIndex);
 
       if (info) {
         // compare: current
@@ -161,32 +149,31 @@ export function createPlayerFactory(settings, Helper) {
       }
     };
 
-    refreshSliderPosition = function () {
+    const refreshSliderPosition = function () {
       if ($slider.length) {
         $slider.slider("setValue", intervalIndex);
       }
     };
 
-    ensureIntervalIndex = function () {
+    const ensureIntervalIndex = function () {
       // ensure current index is safe
       intervalIndex = Math.min(intervalIndex, data.length - 1);
       intervalIndex = Math.max(intervalIndex, 0);
     };
 
-    intervalCallback = function () {
-      var midi, info, i, currentItem, selectedAudioType;
+    const intervalCallback = function () {
       if (isPlaying) {
         ensureIntervalIndex();
         refreshSliderPosition();
 
         // play if possible
         if (data.length > 0) {
-          info = data[intervalIndex];
-          selectedAudioType = settings.getSelected("audioType");
-          for (i = 0; i < info.arr.length; i++) {
-            currentItem = info.arr[i];
+          const info = data[intervalIndex];
+          const selectedAudioType = settings.getSelected("audioType");
+          for (let i = 0; i < info.arr.length; i++) {
+            const currentItem = info.arr[i];
             if (currentItem.play) {
-              midi = Helper.getMidiNumber(currentItem.value);
+              const midi = Helper.getMidiNumber(currentItem.value);
               if (midi >= 0 && midi < 128) {
                 if (selectedAudioType === "waveform") {
                   waveGenerator.noteOn(midi, 64);
@@ -220,9 +207,9 @@ export function createPlayerFactory(settings, Helper) {
       }
     };
 
-    onPlayerButtonClick = function () {
-      var $item = $(this),
-        action = $item.data("action");
+    const onPlayerButtonClick = function () {
+      const $item = $(this);
+      const action = $item.data("action");
       timbre.fn._audioContext.resume().then(function () {
         if (action === "stop") {
           player.stop();
@@ -252,14 +239,14 @@ export function createPlayerFactory(settings, Helper) {
       });
     };
 
-    onSliderPositionChange = function (e) {
+    const onSliderPositionChange = function (e) {
       intervalIndex = parseInt(e.value, 10);
       ensureIntervalIndex();
       drawSvg();
     };
 
     player.setData = function (d) {
-      var selector = containerSelector + " .position-container";
+      const selector = containerSelector + " .position-container";
       data = d;
       $slider = Helper.createSlider(
         selector,
@@ -275,7 +262,7 @@ export function createPlayerFactory(settings, Helper) {
     };
 
     player.setVisualization = function (visualizationName, forceInit) {
-      var shouldInit = false;
+      let shouldInit = false;
       if (
         visualizations.hasOwnProperty(visualizationName) &&
         selectedVisualization !== visualizationName
@@ -353,7 +340,7 @@ export function createPlayerFactory(settings, Helper) {
     };
 
     player.refreshWaveGenerator = function () {
-      var waveInfo = settings.getSelectedWaveformInfo();
+      const waveInfo = settings.getSelectedWaveformInfo();
       $.each([env, waveGenerator], function (index, obj) {
         $.each(["pause", "removeAllListeners"], function (index, key) {
           if (obj && typeof obj[key] === "function") {
@@ -386,7 +373,7 @@ export function createPlayerFactory(settings, Helper) {
     };
 
     player.drawEnvelopeCanvas = function () {
-      var canvas = $("#waveform-adshr-canvas").get(0);
+      const canvas = $("#waveform-adshr-canvas").get(0);
       // ADSHR
       clearCanvas(canvas);
       if (env && typeof env.plot === "function") {
@@ -398,7 +385,7 @@ export function createPlayerFactory(settings, Helper) {
     };
 
     player.drawWaveformCanvases = function () {
-      var canvas = $("#waveform-canvas").get(0);
+      const canvas = $("#waveform-canvas").get(0);
       // ADSHR
       player.drawEnvelopeCanvas();
       // Waveform

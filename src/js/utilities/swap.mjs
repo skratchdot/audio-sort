@@ -1,12 +1,11 @@
 export default function swap(arr, one, two) {
-  var len = arr.length,
-    tempOne,
-    tempTwo;
+  const len = arr.length;
+
   one = parseInt(one, 10) || 0;
   two = parseInt(two, 10) || 0;
   if (one !== two && one >= 0 && two >= 0 && one < len && two < len) {
-    tempOne = arr[one];
-    tempTwo = arr[two];
+    const tempOne = arr[one];
+    const tempTwo = arr[two];
     arr[one] = tempTwo;
     arr[two] = tempOne;
   }

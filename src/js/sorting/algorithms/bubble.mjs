@@ -1,7 +1,7 @@
 export default function bubble(AS) {
-  var i,
-    swapped,
-    endIndex = AS.length();
+  let i;
+  let swapped;
+  let endIndex = AS.length();
   do {
     swapped = false;
     for (i = 0; i < endIndex - 1; i++) {
