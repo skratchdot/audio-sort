@@ -1,11 +1,15 @@
 <div class="tab-pane" id="waveform">
   <div class="waveform-section">
+    <svg
+      id="envelope-diagram"
+      role="img"
+      viewBox="35 25 350 135"
+      aria-label="Amplitude envelope"
+      preserveAspectRatio="none"
+    ></svg>
     <canvas id="waveform-canvas"></canvas>
     <div class="btn-group"></div>
   </div>
-  <h4>Amplitude envelope</h4>
-  <svg id="envelope-diagram" role="img" viewBox="0 0 400 230" aria-label="Amplitude envelope"></svg>
-  <p id="envelope-help">Shared by all waveforms. Hold keeps the sustain level before release.</p>
   <div id="envelope-controls">
     <label for="envelope-attack"
       >Attack <output id="waveform-adshr-attack-display" for="envelope-attack"></output
@@ -32,11 +36,12 @@
       value="300"
     />
     <label for="envelope-sustain"
-      >Sustain level <output id="waveform-adshr-sustain-display" for="envelope-sustain"></output
+      >Sustain <output id="waveform-adshr-sustain-display" for="envelope-sustain"></output
     ></label>
     <input
       type="range"
       id="envelope-sustain"
+      aria-label="Sustain level"
       data-envelope="s"
       min="0"
       max="1"
@@ -44,17 +49,17 @@
       value="0.5"
     />
     <label for="envelope-hold"
-      >Sustain hold <output id="waveform-adshr-hold-display" for="envelope-hold"></output
+      >Hold <output id="waveform-adshr-hold-display" for="envelope-hold"></output
     ></label>
     <input
       type="range"
       id="envelope-hold"
+      aria-label="Sustain hold"
       data-envelope="h"
       min="10"
       max="3000"
       step="5"
       value="200"
-      aria-describedby="envelope-help"
     />
     <label for="envelope-release"
       >Release <output id="waveform-adshr-release-display" for="envelope-release"></output

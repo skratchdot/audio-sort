@@ -47,7 +47,21 @@ svg,
 }
 
 #waveform .waveform-section {
-  width: 100%;
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+}
+
+#waveform.active {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+#envelope-controls {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
 }
 
 #waveform .btn-group {
@@ -56,14 +70,14 @@ svg,
 }
 
 #waveform .btn-group .btn {
-  width: 25%;
+  width: 50%;
   margin: 0;
   border-radius: 0px;
 }
 
 #waveform canvas {
   width: 100%;
-  height: 55px;
+  height: 40px;
   margin-bottom: 5px;
   background-position: -20px 27px;
 }
@@ -75,10 +89,16 @@ svg,
 #envelope-diagram {
   display: block;
   width: 100%;
-  height: auto;
+  height: 55px;
+  margin-bottom: 5px;
   background: #fafafa;
   font: 13px sans-serif;
   fill: #444;
+}
+
+/* Compact preview until the full UI redesign; values remain beside the controls. */
+#envelope-diagram text {
+  display: none;
 }
 
 .envelope-grid {
@@ -94,15 +114,10 @@ svg,
   stroke-width: 2.5;
   stroke-linejoin: round;
 }
-#envelope-help {
-  margin: 10px 0;
-  color: #555;
-  font-size: 12px;
-  line-height: 1.4;
-}
 #envelope-controls label {
   margin: 0;
   font-weight: bold;
+  font-size: 12px;
 }
 #envelope-controls output {
   float: right;
@@ -112,12 +127,23 @@ svg,
 #envelope-controls input {
   display: block;
   width: 100%;
-  margin: 2px 0 8px;
+  height: 18px;
+  margin: 0 0 4px;
   accent-color: #087ca7;
 }
 #envelope-controls input:focus-visible {
-  outline: 2px solid #087ca7;
+  outline: 2px solid #087ca7 !important;
   outline-offset: 3px;
+}
+
+@media (min-width: 768px) and (max-width: 979px) {
+  #settings-content {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  #waveform.active {
+    gap: 8px;
+  }
 }
 
 svg,

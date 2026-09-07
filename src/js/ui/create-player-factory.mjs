@@ -1,5 +1,6 @@
 import { $, timbre } from "../vendor.mjs";
 import { drawEnvelopeDiagram } from "./envelope-diagram.ts";
+import { drawStringPreview } from "./string-preview.ts";
 import { select } from "d3-selection";
 import { createMidiBytes } from "../midi/create-midi-bytes.mjs";
 import { visualizations } from "../visualizations/visualization-registry.mjs";
@@ -413,6 +414,17 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
       player.drawEnvelope();
       // Waveform
       clearCanvas(canvas);
+      const isString = settings.getSelected("waveform") === "string";
+      const label = isString
+        ? "String: illustrative decaying plucked tone (not a live audio trace)"
+        : `${settings.getSelected("waveform")} oscillator waveform`;
+      canvas.setAttribute("role", "img");
+      canvas.setAttribute("aria-label", label);
+      canvas.title = label;
+      if (isString) {
+        drawStringPreview(canvas);
+        return;
+      }
       if (waveGenerator && waveGenerator.osc) {
         waveGenerator.osc.plot({
           target: canvas,

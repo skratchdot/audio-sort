@@ -778,6 +778,23 @@ test("audio settings render selections and survive subscription reconnection", a
   expect(errors).toEqual([]);
 });
 
+test("envelope controls preserve the compact settings panel", async ({ page }) => {
+  await page.goto("index.html");
+  for (const width of [1280, 1024, 768, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.locator('#settings a[href="#audio"]').click();
+    const before = await page.locator("#sort-section").boundingBox();
+    await page.locator('#settings a[href="#waveform"]').click();
+    const after = await page.locator("#sort-section").boundingBox();
+    expect(Math.abs(after.y - before.y)).toBeLessThanOrEqual(2);
+    const panel = await page.locator("#settings-content").boundingBox();
+    for (const selector of ["#envelope-controls", ".waveform-section"]) {
+      const controls = await page.locator(selector).boundingBox();
+      expect(controls.y + controls.height).toBeLessThanOrEqual(panel.y + panel.height);
+    }
+  }
+});
+
 test("waveform envelope edits survive switching presets", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
@@ -785,13 +802,22 @@ test("waveform envelope edits survive switching presets", async ({ page }) => {
   await page.locator('#settings a[href="#waveform"]').click();
   await page.locator('#waveform button[data-waveform="string"]').click();
   const display = page.locator("#waveform-adshr-attack-display");
+  const preview = page.locator("#waveform-canvas");
+  await expect(preview).toHaveAttribute("aria-label", /String: illustrative/);
+  const stringPreview = await preview.evaluate((canvas) => canvas.toDataURL());
+  expect(
+    await preview.evaluate((canvas) => {
+      const pixels = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height).data;
+      return pixels.some((value, index) => index % 4 === 3 && value > 0);
+    }),
+  ).toBe(true);
   await expect(page.locator("#waveform-adshr-hold-display")).toHaveText("200 ms");
   await expect(page.locator("#waveform-adshr-release-display")).toHaveText("300 ms");
   await expect(page.locator("#envelope-diagram")).toHaveAttribute(
     "aria-label",
     /sustain 50% for 200 ms/,
   );
-  await expect(page.locator("#envelope-diagram")).toHaveAttribute("viewBox", "0 0 400 230");
+  await expect(page.locator("#envelope-diagram")).toHaveAttribute("viewBox", "35 25 350 135");
   await expect(page.locator("#base-chart svg rect").first()).toBeVisible();
   await expect(display).toHaveText("50 ms");
   const slider = page.getByRole("slider", { name: "Attack", exact: true });
@@ -801,6 +827,8 @@ test("waveform envelope edits survive switching presets", async ({ page }) => {
   const attack = await display.textContent();
   await page.locator('#waveform button[data-waveform="sin"]').click();
   await expect(display).toHaveText(attack);
+  await expect(preview).toHaveAttribute("aria-label", "sin oscillator waveform");
+  expect(await preview.evaluate((canvas) => canvas.toDataURL())).not.toBe(stringPreview);
   const sustain = page.getByRole("slider", { name: "Sustain level", exact: true });
   await sustain.focus();
   await sustain.press("ArrowRight");
@@ -812,6 +840,7 @@ test("waveform envelope edits survive switching presets", async ({ page }) => {
   );
   await page.locator('#waveform button[data-waveform="string"]').click();
   await expect(display).toHaveText(attack);
+  expect(await preview.evaluate((canvas) => canvas.toDataURL())).toBe(stringPreview);
   expect(errors).toEqual([]);
 });
 
