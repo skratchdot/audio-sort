@@ -10,7 +10,7 @@ algorithms, and static hosting throughout. Skip an interim Bootstrap 5 migration
    and their registry while preserving runtime behavior. Keep the current
    algorithm function/metadata format and JavaScript editor unchanged; a format
    redesign is deferred until it simplifies code or enables useful type checking.
-3. **Typed recording API.** Type items, frames, metadata, and worker messages
+3. **Typed recording API.** Type items, frames, and worker messages
    without changing recording semantics. Keep the factory unless a class solves
    a concrete problem; algorithms depend on an interface, not its implementation.
 4. **Jotai settings.** Introduce an application-scoped vanilla store behind the
@@ -56,8 +56,9 @@ installs, and working editor, playback, MIDI export, and static-path checks.
 ## Current phase
 
 TypeScript checks cover scales, instruments, all array utilities, generators,
-and the generator registry.
+the generator registry, sort recorder, and request/response handling.
 Remaining `.mjs` modules and browser-entered algorithms are not type-checked yet.
 
-Next: type the recording API and worker contracts without changing their public
-behavior. Do not add parser/build machinery solely to reorganize metadata.
+Next: introduce the Jotai settings store behind the existing UI. The algorithm
+function/metadata format and editor remain unchanged; do not add parser/build
+machinery solely to reorganize metadata.

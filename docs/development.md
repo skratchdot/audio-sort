@@ -32,6 +32,9 @@ been removed so its styles work with the CSS minifier.
 - `pnpm run format`: format with Oxfmt; `pnpm run format:check` checks without editing.
 - `pnpm test`: run unit tests; `pnpm run test:watch` reruns them while editing.
 
+TypeScript can infer imported JavaScript modules (`allowJs`), but `checkJs` stays
+off until those modules are migrated. Worker payloads are still checked at runtime.
+
 Vendor and generated files are excluded from linting and formatting. Source CSS
 and HTML are formatted by Oxfmt. Pages use `src/_includes/layout.html` for the
 document wrapper so header/footer fragments can be formatted independently.

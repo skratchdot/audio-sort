@@ -41,12 +41,17 @@ groups; no subcollider global or prototype extensions are loaded.
 
 ## Engine and workers
 
-[`create-sort-engine.mjs`](../src/js/sorting/create-sort-engine.mjs) exports `createSortEngine()`. Each default sort request
+[`create-sort-engine.ts`](../src/js/sorting/create-sort-engine.ts) exports `createSortEngine()`. Each default sort request
 gets a fresh engine so recorded frames, counters, and custom API changes do not
 leak between requests. `engine.init()` resets recording state, but does not undo
 changes to engine methods when deliberately reusing an instance.
 
-[`sort-requests.mjs`](../src/js/sorting/sort-requests.mjs) handles two message types:
+[`sort-types.ts`](../src/js/sorting/sort-types.ts) defines items, frames, the
+algorithm-facing API, and request/response contracts. Operations accept indices
+or item references; callers remain responsible for valid indices. The recorder
+preserves the legacy extra terminal frame for nonempty sorts.
+
+[`sort-requests.ts`](../src/js/sorting/sort-requests.ts) handles two message types:
 
 - Built-in: `{ key, type: "builtin", id, arr }` runs an imported algorithm.
 - Custom: `{ key, type: "custom", source, arr }` compiles an editor body with

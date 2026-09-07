@@ -1,4 +1,4 @@
-import { createSortEngine } from "../src/js/sorting/create-sort-engine.mjs";
+import { createSortEngine } from "../src/js/sorting/create-sort-engine.ts";
 import { describe, expect, test, vi } from "vitest";
 import { algorithms } from "../src/js/sorting/algorithm-registry.mjs";
 import { sources } from "../src/js/sorting/algorithm-sources.mjs";
@@ -6,7 +6,7 @@ import {
   createSortRequest,
   getFunctionBody,
   runSortRequest,
-} from "../src/js/sorting/sort-requests.mjs";
+} from "../src/js/sorting/sort-requests.ts";
 import { algorithmNames, seededValues } from "./helpers/algorithms.mjs";
 
 function run(request) {
