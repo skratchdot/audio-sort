@@ -19,7 +19,9 @@ factories. Visualizations are registered in
 
 [`vendor.mjs`](../src/js/vendor.mjs) captures globals from the classic scripts in
 the footer, which must load before the module entry. The UI uses jQuery plugins,
-timbre and D3 v3. Ace is imported from the pinned `ace-builds` npm package, with its
+timbre and D3 v3. MIDI export and downloads import pinned `jsmidgen` and
+`file-saver` packages and use the browser's native Blob implementation.
+Ace is imported from the pinned `ace-builds` npm package, with its
 JavaScript mode, Monokai theme, and diagnostics worker bundled by Vite. The editor uses
 two-space soft tabs and preserves source text without a separate beautifier.
 It targets fixed DOM IDs and has no multi-mount or teardown

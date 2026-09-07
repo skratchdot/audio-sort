@@ -1,4 +1,5 @@
-import { $, sc, d3, timbre, saveAs } from "../vendor.mjs";
+import { $, sc, d3, timbre } from "../vendor.mjs";
+import { saveAs } from "file-saver";
 import { createHelpers } from "./create-helpers.mjs";
 import { createPlayerFactory } from "./create-player-factory.mjs";
 import { MidiExport } from "../midi/midi-export.mjs";
