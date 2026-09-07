@@ -19,7 +19,7 @@
 - Fix the play intervalCallback() function. Shouldn't be looping so much in there. The
   program was running faster before I re-factored a bunch of stuff and added this stupid loop.
 
-- Review engine frame-recording quirks and shared bar-pointer state.
+- Review engine frame-recording quirks.
 
 ## Maintenance ideas
 

@@ -124,16 +124,27 @@ test.beforeEach(async ({ page, baseURL }) => {
   await page.addInitScript(() => {
     globalThis.sortRequests = [];
     globalThis.sortReplies = [];
+    globalThis.sortWorkers = [];
     const OriginalWorker = globalThis.Worker;
     if (!OriginalWorker) return;
     globalThis.Worker = class extends OriginalWorker {
       constructor(...args) {
         super(...args);
+        if (
+          String(args[0]).includes("/assets/worker-") &&
+          !String(args[0]).includes("worker-javascript")
+        ) {
+          globalThis.sortWorkers.push(this);
+        }
         this.addEventListener("message", ({ data }) => globalThis.sortReplies.push(data));
       }
       postMessage(data) {
         globalThis.sortRequests.push(data);
         super.postMessage(data);
+      }
+      terminate() {
+        this.wasTerminated = true;
+        super.terminate();
       }
     };
   });
@@ -559,6 +570,175 @@ test("settings subscriptions reconnect after a cached-page lifecycle", async ({ 
   );
   await autoPlay.click();
   await expect(autoPlay).toHaveAttribute("aria-pressed", "false");
+});
+
+test("teardown clears owned resources and repeated remounts do not duplicate UI or handlers", async ({
+  page,
+}) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("index.html");
+  await page.locator('#sort-options [data-sort="insertion"]').click();
+  const initialScaleCount = await page.locator("#scale-options li").count();
+  const initialSliderCount = await page.locator(".audio-sort-slider").count();
+  for (let cycle = 0; cycle < 2; cycle++) {
+    await page.locator("#add-algorithm-btn").click();
+    await expect(page.locator("#new-sort-algorithm .js-editor")).toHaveCount(1);
+    await page.evaluate(() => {
+      globalThis.dispatchEvent(
+        new globalThis.PageTransitionEvent("pagehide", { persisted: false }),
+      );
+      globalThis.dispatchEvent(
+        new globalThis.PageTransitionEvent("pagehide", { persisted: false }),
+      );
+    });
+    await expect(
+      page.locator(".js-editor, .editor-status, .modal-backdrop, .audio-sort-slider"),
+    ).toHaveCount(0);
+    expect(
+      await page.evaluate(() => globalThis.sortWorkers.every((worker) => worker.wasTerminated)),
+    ).toBe(true);
+    expect(
+      await page.evaluate(() => {
+        const $ = globalThis.jQuery;
+        return $("body")
+          .find("*")
+          .addBack()
+          .get()
+          .some((element) =>
+            Object.values($._data(element, "events") || {})
+              .flat()
+              .some((handler) => /audioSort/.test(handler.namespace)),
+          );
+      }),
+    ).toBe(false);
+    await page.evaluate(() =>
+      globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pageshow", { persisted: true })),
+    );
+    await expect(page.locator("#scale-options li")).toHaveCount(initialScaleCount);
+    await expect(page.locator(".audio-sort-slider")).toHaveCount(initialSliderCount);
+    await expect(page.locator("#sort-options li.active a")).toHaveAttribute(
+      "data-sort",
+      "insertion",
+    );
+    const before = await page.evaluate(() => globalThis.sortRequests.length);
+    await page.locator('#sort-options [data-sort="bubble"]').click();
+    await expect.poll(() => page.evaluate(() => globalThis.sortRequests.length)).toBe(before + 1);
+    await page.locator('#sort-options [data-sort="insertion"]').click();
+  }
+  expect(errors).toEqual([]);
+});
+
+test("destroy during an editor download cannot initialize a stale editor", async ({ page }) => {
+  let release;
+  const pending = new Promise((resolve) => {
+    release = resolve;
+  });
+  let requested;
+  const requestStarted = new Promise((resolve) => {
+    requested = resolve;
+  });
+  await page.route("**/assets/create-code-editor-*.js", async (route) => {
+    requested();
+    await pending;
+    await route.continue();
+  });
+  await page.goto("index.html");
+  await page.locator("#add-algorithm-btn").click();
+  await requestStarted;
+  await page.evaluate(() =>
+    globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pagehide", { persisted: false })),
+  );
+  const loaded = page.waitForResponse(/create-code-editor-.*\.js/);
+  release();
+  await loaded;
+  await expect(page.locator(".js-editor, .editor-status")).toHaveCount(0);
+  await page.evaluate(() =>
+    globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pageshow", { persisted: true })),
+  );
+  await page.locator("#add-algorithm-btn").click();
+  await expect(page.locator("#new-sort-algorithm .js-editor")).toHaveCount(1);
+});
+
+test("teardown cancels pending audio resume and removes only owned slider drag handlers", async ({
+  page,
+}) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("index.html");
+  await page.evaluate(() => {
+    globalThis.pendingResume = new Promise((resolve) => {
+      globalThis.finishResume = resolve;
+    });
+    globalThis.timbre.fn._audioContext.resume = () => globalThis.pendingResume;
+    globalThis.jQuery(globalThis.document).on("mousemove.lifecycleWitness", () => {});
+  });
+  await page.locator('#sort-player [data-action="play"]').click();
+  const slider = page.locator("#volume-container .slider");
+  const box = await slider.boundingBox();
+  await page.mouse.move(box.x + box.width * 0.5, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.evaluate(() => {
+    globalThis.oldDrag = globalThis
+      .jQuery("#volume-container .audio-sort-slider")
+      .data("slider").mousemove;
+    globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pagehide", { persisted: false }));
+    globalThis.finishResume();
+  });
+  await page.mouse.up();
+  const handlers = await page.evaluate(() => {
+    const events = globalThis.jQuery._data(globalThis.document, "events") || {};
+    return {
+      ownsDrag: Object.values(events)
+        .flat()
+        .some((handler) => handler.guid === globalThis.oldDrag.guid),
+      keepsOther: (events.mousemove || []).some(
+        (handler) => handler.namespace === "lifecycleWitness",
+      ),
+    };
+  });
+  expect(handlers).toEqual({ ownsDrag: false, keepsOther: true });
+  await expect(page.locator(".audio-sort-slider")).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test("base data remains draggable across renderer data updates", async ({ page }) => {
+  await page.goto("index.html");
+  const svg = page.locator("#base-svg");
+  const box = await svg.boundingBox();
+  await page.mouse.move(box.x + box.width * 0.1, box.y + box.height * 0.8);
+  const before = await page.evaluate(() => globalThis.sortRequests.length);
+  await page.mouse.down();
+  await expect
+    .poll(() => page.evaluate(() => globalThis.sortRequests.length))
+    .toBeGreaterThan(before);
+  const afterFirst = await page.evaluate(() => globalThis.sortRequests.length);
+  await page.mouse.move(box.x + box.width * 0.8, box.y + box.height * 0.2);
+  await expect
+    .poll(() => page.evaluate(() => globalThis.sortRequests.length))
+    .toBeGreaterThan(afterFirst);
+  await page.mouse.up();
+});
+
+test("resizing and saving a selected algorithm update sorting without reselecting", async ({
+  page,
+}) => {
+  await page.goto("index.html");
+  const sizeSlider = page.locator("#data-size-container .slider");
+  const bounds = await sizeSlider.boundingBox();
+  await sizeSlider.click({ position: { x: bounds.width * 0.4, y: bounds.height / 2 } });
+  const size = Number(await page.locator("#data-size-display").textContent());
+  await expect
+    .poll(() => page.evaluate(() => globalThis.sortRequests.at(-1)?.arr.length))
+    .toBe(size);
+  await page.locator("#modal-sort-open").click();
+  await page.locator('#modal-sort a[href="#sort-algorithm"]').click();
+  await page
+    .locator("#sort-algorithm .js-editor")
+    .evaluate((element) => globalThis.ace.edit(element).setValue("AS.play(0);"));
+  await page.locator("#save-algorithm-edit").click();
+  await expect.poll(() => page.evaluate(() => globalThis.sortRequests.at(-1)?.type)).toBe("custom");
+  await expect(page.locator("#sort-player .position-max")).toHaveText("2");
 });
 
 test("audio settings render selections and survive subscription reconnection", async ({ page }) => {

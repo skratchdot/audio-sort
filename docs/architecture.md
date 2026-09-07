@@ -32,19 +32,37 @@ generator presets stay fixed, and sustain edits retain two-decimal rounding.
 [`connect-playback-settings.ts`](../src/js/ui/connect-playback-settings.ts) connects
 volume, tempo, AutoPlay, and loop preferences to UI/audio effects. It applies
 current values immediately, observes relevant changes, and returns a disconnect
-function. The controller replaces its old connection before reconnecting; pagehide
-disconnects subscriptions and a cached pageshow reconnects them. This is subscription
-cleanup, not full player/worker/editor teardown.
+function. The controller replaces its old connections before reconnecting.
 [`connect-audio-settings.ts`](../src/js/ui/connect-audio-settings.ts) shares that
 lifecycle and synchronizes audio type, waveform/envelopes, center note, scale,
 and instrument. It sets the instrument before soundfont preloading and avoids
 rebuilding generators for unrelated settings or unselected envelope edits.
-Envelope labels now populate on initial connection. Algorithm selection/catalog
-and data-size side effects still rely on their existing handlers. AutoPlay and each player's
+Envelope labels now populate on initial connection.
+[`connect-sort-settings.ts`](../src/js/ui/connect-sort-settings.ts) renders the
+catalog/selection and data size, resizes data before sorting, and reruns the
+selected algorithm when its implementation changes. Adding or editing an
+unselected algorithm updates the catalog without unnecessary sorting.
+AutoPlay and each player's
 loop preference live in `state/playback-preferences.ts`; their handlers render
 button state from the store instead of reading CSS classes. AutoPlay no longer
 uses Bootstrap's button toggle. Playing/stopped state, direction, position,
 timers, and audio nodes remain owned by the player.
+
+Controllers are single-use: `init()` rejects repeated initialization; `destroy()`
+is idempotent. Destruction disconnects subscriptions, cancels the sort worker and
+click debounce, invalidates pending editor loads and audio-resume callbacks,
+destroys the Ace editor/session, releases player audio nodes, and removes owned
+sliders and namespaced events. Slider disposal also removes active document drag
+handlers without disturbing unrelated handlers. Bar pointer state is per renderer
+and survives data updates during a drag.
+
+Cached-page `pagehide` suspends playback and subscriptions, cancels pending sorts,
+and closes dialogs while keeping data/settings. Cached `pageshow` reconnects and
+re-sorts without automatically resuming audio. Non-cached exits and Vite disposal
+destroy the controller. A new controller can mount the existing markup and store;
+simultaneous controllers sharing the same fixed DOM IDs are not supported.
+Global vendor libraries and remote soundfont caches remain library-owned, pending
+the audio dependency migration; teardown does not shut down the shared AudioContext.
 
 [`vendor.mjs`](../src/js/vendor.mjs) captures globals from the classic scripts in
 the footer, which must load before the module entry. The UI uses jQuery plugins,
@@ -55,8 +73,8 @@ MIDI export and downloads import pinned `jsmidgen` and
 Ace is imported from the pinned `ace-builds` npm package, with its
 JavaScript mode, Monokai theme, and diagnostics worker bundled by Vite. The editor uses
 two-space soft tabs and preserves source text without a separate beautifier.
-It targets fixed DOM IDs and has no multi-mount or teardown
-lifecycle. Data generators and utilities are modules with explicit imports;
+It targets fixed DOM IDs and is destroyed with its owning controller.
+Data generators and utilities are modules with explicit imports;
 [`generator-registry.ts`](../src/js/generators/generator-registry.ts) supplies the controller's generator catalog.
 
 Musical scales are immutable local data in `src/js/midi/scales.ts`, extracted

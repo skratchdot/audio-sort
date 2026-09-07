@@ -4,9 +4,15 @@ import { createMidiBytes } from "../midi/create-midi-bytes.mjs";
 import { visualizations } from "../visualizations/visualization-registry.mjs";
 import { playbackPreferencesAtom, toggleLoopAtom } from "../state/playback-preferences.ts";
 
+let nextPlayerId = 0;
+
 export function createPlayerFactory(settings, Helper, settingsStore) {
   return function createPlayer(containerSelector, options) {
     const player = {};
+    const eventNamespace = ".audioSortPlayer" + ++nextPlayerId;
+    let destroyed = false;
+    let playbackGeneration = 0;
+    let $container;
     // Config Values
     const canvasBackground = "rgba(255, 255, 255, 0)";
     // State Variables
@@ -52,7 +58,7 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
         onClick = $.noop;
       }
       intervalIndex = 0;
-      const $container = $(containerSelector || null);
+      $container = $(containerSelector || null);
       $compareCurrent = $container.find(".compare-current");
       $compareMax = $container.find(".compare-max");
       $swapCurrent = $container.find(".swap-current");
@@ -68,16 +74,16 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
       interval = timbre("interval", { interval: settings.getTempoString() }, intervalCallback);
 
       // listen for player button clicks
-      $container.find(".player-buttons").on("click", ".btn", onPlayerButtonClick);
+      $container.find(".player-buttons").on("click" + eventNamespace, ".btn", onPlayerButtonClick);
 
       // handle hovers
       if (allowHover) {
-        $svg.on("mousemove", function (e) {
+        $svg.on("mousemove" + eventNamespace, function (e) {
           if (visualization.onMouseMove) {
             visualization.onMouseMove(e);
           }
         });
-        $svg.on("mouseout", function (e) {
+        $svg.on("mouseout" + eventNamespace, function (e) {
           if (visualization.onMouseOut) {
             visualization.onMouseOut(e);
           }
@@ -86,12 +92,12 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
 
       // handle clicks
       if (allowClick) {
-        $svg.on("mousedown", function (e) {
+        $svg.on("mousedown" + eventNamespace, function (e) {
           if (visualization.onMouseDown) {
             visualization.onMouseDown(e);
           }
         });
-        $("body").on("mouseup", function (e) {
+        $("body").on("mouseup" + eventNamespace, function (e) {
           if (visualization.onMouseUp) {
             visualization.onMouseUp(e);
           }
@@ -155,6 +161,7 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
     };
 
     const intervalCallback = function () {
+      if (destroyed) return;
       if (isPlaying) {
         ensureIntervalIndex();
         refreshSliderPosition();
@@ -201,9 +208,11 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
     };
 
     const onPlayerButtonClick = function () {
+      const generation = playbackGeneration;
       const $item = $(this);
       const action = $item.data("action");
       timbre.fn._audioContext.resume().then(function () {
+        if (destroyed || generation !== playbackGeneration) return;
         if (action === "stop") {
           player.stop();
         } else if (action === "play") {
@@ -234,6 +243,7 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
     };
 
     player.setData = function (d) {
+      if (destroyed) return;
       const selector = containerSelector + " .position-container";
       data = d;
       $slider = Helper.createSlider(
@@ -261,6 +271,11 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
       if (shouldInit) {
         $svg.empty();
       }
+      if (!shouldInit && forceInit && visualization?.setData) {
+        visualization.setData(data);
+        drawSvg();
+        return;
+      }
       if (shouldInit || forceInit) {
         visualization = visualizations[selectedVisualization]({
           data: data,
@@ -282,6 +297,7 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
     };
 
     player.play = function (reverse) {
+      if (destroyed) return;
       interval.stop();
       isPlaying = true;
       if (reverse === true) {
@@ -304,7 +320,31 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
 
     player.stop = function () {
       isPlaying = false;
-      interval.stop();
+      interval?.stop();
+    };
+
+    player.suspend = function () {
+      playbackGeneration++;
+      player.stop();
+      waveGenerator?.pause();
+      env?.pause();
+    };
+
+    player.destroy = function () {
+      if (destroyed) return;
+      destroyed = true;
+      player.suspend();
+      for (const node of [interval, waveGenerator, env]) {
+        node?.removeAllListeners?.();
+        node?.removeAll?.();
+      }
+      $container?.find(".player-buttons").off(eventNamespace);
+      $svg?.off(eventNamespace).empty();
+      $("body").off(eventNamespace);
+      Helper.destroySlider($slider);
+      data = [];
+      visualization = null;
+      interval = waveGenerator = env = null;
     };
 
     player.isPlaying = function () {
@@ -328,6 +368,7 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
     };
 
     player.refreshWaveGenerator = function () {
+      if (destroyed) return;
       const waveInfo = settings.getSelectedWaveformInfo();
       $.each([env, waveGenerator], function (index, obj) {
         $.each(["pause", "removeAllListeners"], function (index, key) {
@@ -387,7 +428,12 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
     };
 
     // initialize player
-    _init();
+    try {
+      _init();
+    } catch (error) {
+      player.destroy();
+      throw error;
+    }
 
     return player;
   };

@@ -1,6 +1,6 @@
 # Modernization plan
 
-Deliver small, working PRs in this order. Preserve sorting, playback, editable
+Deliver cohesive, substantial PRs in this order. Preserve sorting, playback, editable
 algorithms, and static hosting throughout. Skip an interim Bootstrap 5 migration.
 
 1. **TypeScript foundation.** Add strict, no-emit checking and migrate independent
@@ -59,14 +59,15 @@ TypeScript checks cover scales, instruments, all array utilities, generators,
 the generator registry, sort recorder, and request/response handling.
 Remaining `.mjs` modules and browser-entered algorithms are not type-checked yet.
 
-Jotai now owns the nine selected settings and per-waveform envelopes behind the existing UI, with an isolated
-vanilla store per controller. No React dependency or audio lifecycle changes.
-Custom algorithm overrides now live in the same store, with the catalog derived
-from imported built-ins and overrides. AutoPlay and per-player looping also live
-in state; transport status and scheduling remain player-owned. Volume, tempo,
-AutoPlay, and loop-button state now synchronize through a disposable connection.
-Audio type, waveform/envelopes, center note, scale, and instrument now have a
-second disposable connection. Next: synchronize algorithm/catalog and data-size
-changes, then implement full controller/player teardown before multiple UI owners.
+Phase 4 is complete: selected settings, waveform envelopes, custom algorithm
+overrides, AutoPlay, and looping use an application-scoped Jotai store. Disposable
+connections synchronize audio controls, algorithm/catalog changes, and data size.
+Controllers/players now have explicit suspension and teardown for subscriptions,
+workers, timers, editors, owned audio nodes, sliders, and event handlers. Cached
+pages preserve data/settings; remounting does not duplicate controls or listeners.
+
+Next is phase 5: separate playback/scheduling from DOM controls and audit/package
+the remaining audio dependencies as a larger cohesive changeset. Keep transport
+state and shared vendor resources out of Jotai; retain manual listening checks.
 The algorithm function/metadata format and editor remain unchanged; do not add parser/build
 machinery solely to reorganize metadata.
