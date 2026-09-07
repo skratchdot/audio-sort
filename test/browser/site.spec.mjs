@@ -508,6 +508,39 @@ test("module UI connects data, visualization, playback navigation, sliders, and 
   expect(errors).toEqual([]);
 });
 
+test("playback preferences toggle independently and autoplay starts a selected sort", async ({
+  page,
+}) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("index.html");
+  const baseLoop = page.locator('#base-section [data-action="loop"]');
+  const sortLoop = page.locator('#sort-section [data-action="loop"]');
+  const autoPlay = page.locator("#sort-autoplay");
+  await expect(baseLoop).toHaveAttribute("aria-pressed", "true");
+  await expect(sortLoop).toHaveAttribute("aria-pressed", "true");
+  await baseLoop.click();
+  await expect(baseLoop).toHaveAttribute("aria-pressed", "false");
+  await expect(sortLoop).toHaveAttribute("aria-pressed", "true");
+  await sortLoop.click();
+  await expect(sortLoop).toHaveAttribute("aria-pressed", "false");
+  await sortLoop.click();
+  await expect(sortLoop).toHaveAttribute("aria-pressed", "true");
+  await expect(autoPlay).toHaveAttribute("aria-pressed", "false");
+  await autoPlay.click();
+  await expect(autoPlay).toHaveAttribute("aria-pressed", "true");
+  await expect(autoPlay).toHaveClass(/active/);
+  await page.locator('#sort-options [data-sort="insertion"]').click();
+  await expect
+    .poll(async () => Number(await page.locator("#sort-player .position-current").textContent()))
+    .toBeGreaterThan(1);
+  await page.locator('#sort-player [data-action="stop"]').click();
+  await autoPlay.click();
+  await expect(autoPlay).toHaveAttribute("aria-pressed", "false");
+  await expect(autoPlay).not.toHaveClass(/active/);
+  expect(errors).toEqual([]);
+});
+
 test("waveform envelope edits survive switching presets", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));

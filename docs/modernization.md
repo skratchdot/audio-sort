@@ -62,7 +62,8 @@ Remaining `.mjs` modules and browser-entered algorithms are not type-checked yet
 Jotai now owns the nine selected settings and per-waveform envelopes behind the existing UI, with an isolated
 vanilla store per controller. No React dependency or audio lifecycle changes.
 Custom algorithm overrides now live in the same store, with the catalog derived
-from imported built-ins and overrides. Next: move playback toggles into state,
-then add explicit UI/audio synchronization before multiple UI owners.
+from imported built-ins and overrides. AutoPlay and per-player looping also live
+in state; transport status and scheduling remain player-owned. Next: add explicit
+UI/audio synchronization and cleanup before multiple UI owners.
 The algorithm function/metadata format and editor remain unchanged; do not add parser/build
 machinery solely to reorganize metadata.
