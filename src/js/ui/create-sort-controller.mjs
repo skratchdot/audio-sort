@@ -9,6 +9,7 @@ import { MidiExport } from "../midi/midi-export.mjs";
 import { instruments } from "../midi/instruments.ts";
 import { createStore } from "jotai/vanilla";
 import { defaults, settingsAtom, updateSettingAtom } from "../state/settings.ts";
+import { waveformDefaults, waveformsAtom, updateEnvelopeAtom } from "../state/waveforms.ts";
 
 export function createSortController(generators, settingsStore = createStore()) {
   const Sort = {};
@@ -17,17 +18,7 @@ export function createSortController(generators, settingsStore = createStore()) 
   // Read the current atom value on demand; do not keep a second settings cache.
   const getSelected = () => settingsStore.get(settingsAtom);
   const setSelected = (key, value) => settingsStore.set(updateSettingAtom, { key, value });
-  // Waveform Data
-  const waveform = {
-    string: { gen: "PluckGen", poly: 10, mul: 1, a: 50, d: 300, s: 0.5, h: 500, r: 2500 },
-    sin: { gen: "OscGen", poly: 10, mul: 1, a: 50, d: 300, s: 0.5, h: 200, r: 300 },
-    cos: { gen: "OscGen", poly: 10, mul: 1, a: 50, d: 300, s: 0.5, h: 200, r: 300 },
-    pulse: { gen: "OscGen", poly: 10, mul: 0.25, a: 50, d: 300, s: 0.5, h: 200, r: 300 },
-    tri: { gen: "OscGen", poly: 10, mul: 1, a: 50, d: 300, s: 0.5, h: 200, r: 300 },
-    saw: { gen: "OscGen", poly: 10, mul: 0.25, a: 50, d: 300, s: 0.5, h: 200, r: 300 },
-    fami: { gen: "OscGen", poly: 10, mul: 1, a: 50, d: 300, s: 0.5, h: 200, r: 300 },
-    konami: { gen: "OscGen", poly: 10, mul: 0.4, a: 50, d: 300, s: 0.5, h: 200, r: 300 },
-  };
+  const getWaveform = () => settingsStore.get(waveformsAtom)[getSelected().waveform];
   const waveformSliders = {};
   // Audio players
   const players = {
@@ -78,7 +69,7 @@ export function createSortController(generators, settingsStore = createStore()) 
 
   const populateWaveformButtons = function () {
     let html = "";
-    $.each(waveform, function (waveformName) {
+    $.each(waveformDefaults, function (waveformName) {
       html += $("<button />")
         .addClass("btn btn-mini" + (waveformName === getSelected().waveform ? " active" : ""))
         .attr("type", "button")
@@ -199,7 +190,7 @@ export function createSortController(generators, settingsStore = createStore()) 
     onSlider("volume", "#volume-display", e, function (val) {
       return val.toFixed(2);
     });
-    const volume = waveform[getSelected().waveform].mul * getSelected().volume;
+    const volume = getWaveform().mul * getSelected().volume;
     players.base.setVolume(volume);
     players.sort.setVolume(volume);
   };
@@ -226,8 +217,11 @@ export function createSortController(generators, settingsStore = createStore()) 
     const $slider = $(e.target);
     const $container = $slider.parents("[data-adshr]:first");
     const adshr = $container.attr("data-adshr");
-    waveform[getSelected().waveform][adshr] =
-      adshr === "s" ? parseFloat(e.value.toFixed(2)) : e.value;
+    settingsStore.set(updateEnvelopeAtom, {
+      waveform: getSelected().waveform,
+      key: adshr,
+      value: e.value,
+    });
     updateWaveformDisplays();
     players.base.refreshWaveGenerator();
     players.sort.refreshWaveGenerator();
@@ -259,16 +253,16 @@ export function createSortController(generators, settingsStore = createStore()) 
   };
 
   const updateWaveformDisplays = function () {
-    updateDisplayCache("#waveform-adshr-attack-display", waveform[getSelected().waveform].a);
-    updateDisplayCache("#waveform-adshr-decay-display", waveform[getSelected().waveform].d);
-    updateDisplayCache("#waveform-adshr-sustain-display", waveform[getSelected().waveform].s);
-    updateDisplayCache("#waveform-adshr-hold-display", waveform[getSelected().waveform].h);
-    updateDisplayCache("#waveform-adshr-release-display", waveform[getSelected().waveform].r);
+    updateDisplayCache("#waveform-adshr-attack-display", getWaveform().a);
+    updateDisplayCache("#waveform-adshr-decay-display", getWaveform().d);
+    updateDisplayCache("#waveform-adshr-sustain-display", getWaveform().s);
+    updateDisplayCache("#waveform-adshr-hold-display", getWaveform().h);
+    updateDisplayCache("#waveform-adshr-release-display", getWaveform().r);
   };
 
   const setSliderWaveformFromSelected = function () {
     $.each(["a", "d", "s", "h", "r"], function (index, key) {
-      waveformSliders[key].slider("setValue", waveform[getSelected().waveform][key]);
+      waveformSliders[key].slider("setValue", getWaveform()[key]);
     });
     updateWaveformDisplays();
   };
@@ -679,7 +673,7 @@ export function createSortController(generators, settingsStore = createStore()) 
   };
 
   Sort.getSelectedWaveformInfo = function () {
-    return waveform[getSelected().waveform];
+    return getWaveform();
   };
 
   Sort.getTempoString = function () {
@@ -739,7 +733,7 @@ export function createSortController(generators, settingsStore = createStore()) 
     waveformSliders.a = Helper.createSlider(
       "#waveform-adshr-attack-container",
       {
-        value: waveform[getSelected().waveform].a,
+        value: getWaveform().a,
         min: 10,
         max: 500,
         step: 5,
@@ -749,7 +743,7 @@ export function createSortController(generators, settingsStore = createStore()) 
     waveformSliders.d = Helper.createSlider(
       "#waveform-adshr-decay-container",
       {
-        value: waveform[getSelected().waveform].d,
+        value: getWaveform().d,
         min: 10,
         max: 2000,
         step: 5,
@@ -759,7 +753,7 @@ export function createSortController(generators, settingsStore = createStore()) 
     waveformSliders.s = Helper.createSlider(
       "#waveform-adshr-sustain-container",
       {
-        value: waveform[getSelected().waveform].s,
+        value: getWaveform().s,
         min: 0,
         max: 1,
         step: 0.01,
@@ -769,7 +763,7 @@ export function createSortController(generators, settingsStore = createStore()) 
     waveformSliders.h = Helper.createSlider(
       "#waveform-adshr-hold-container",
       {
-        value: waveform[getSelected().waveform].h,
+        value: getWaveform().h,
         min: 10,
         max: 3000,
         step: 5,
@@ -779,7 +773,7 @@ export function createSortController(generators, settingsStore = createStore()) 
     waveformSliders.r = Helper.createSlider(
       "#waveform-adshr-release-container",
       {
-        value: waveform[getSelected().waveform].r,
+        value: getWaveform().r,
         min: 10,
         max: 3000,
         step: 5,

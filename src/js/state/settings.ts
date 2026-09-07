@@ -1,4 +1,5 @@
 import { atom } from "jotai/vanilla";
+import type { WaveformId } from "./waveforms.ts";
 
 export type Settings = Readonly<{
   volume: number;
@@ -8,7 +9,7 @@ export type Settings = Readonly<{
   sort: string;
   dataSize: number;
   audioType: "waveform" | "soundfont";
-  waveform: string;
+  waveform: WaveformId;
   soundfont: number;
 }>;
 
@@ -21,7 +22,7 @@ export const defaults = Object.freeze({
   sort: Object.freeze({ value: "bubble" }),
   dataSize: Object.freeze({ value: 12, min: 4, max: 48, step: 1 }),
   audioType: Object.freeze({ value: "waveform" as const }),
-  waveform: Object.freeze({ value: "string" }),
+  waveform: Object.freeze({ value: "string" as const }),
   soundfont: Object.freeze({ value: 0 }),
 });
 

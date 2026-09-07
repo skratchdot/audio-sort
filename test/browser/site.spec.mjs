@@ -508,6 +508,26 @@ test("module UI connects data, visualization, playback navigation, sliders, and 
   expect(errors).toEqual([]);
 });
 
+test("waveform envelope edits survive switching presets", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("index.html");
+  await page.locator('#settings a[href="#waveform"]').click();
+  await page.locator('#waveform button[data-waveform="string"]').click();
+  const display = page.locator("#waveform-adshr-attack-display");
+  await expect(display).toHaveText("50");
+  const slider = page.locator("#waveform-adshr-attack-container .slider");
+  const bounds = await slider.boundingBox();
+  await slider.click({ position: { x: bounds.width * 0.6, y: bounds.height / 2 } });
+  await expect(display).not.toHaveText("50");
+  const attack = await display.textContent();
+  await page.locator('#waveform button[data-waveform="sin"]').click();
+  await expect(display).toHaveText("50");
+  await page.locator('#waveform button[data-waveform="string"]').click();
+  await expect(display).toHaveText(attack);
+  expect(errors).toEqual([]);
+});
+
 for (const filename of ["about.html", "api.html"]) {
   test(`${filename} and its local assets load`, async ({ page, baseURL }) => {
     const missing = [];

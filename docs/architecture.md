@@ -25,11 +25,13 @@ Selected settings live in [`state/settings.ts`](../src/js/state/settings.ts), us
 `jotai/vanilla` without React. Each controller owns a separate store unless one
 is supplied. UI handlers write through `updateSettingAtom`; helpers and players
 read fresh values through the existing controller getters. There is no mirrored
-settings object. Snapshots and defaults are immutable.
+settings object. Snapshots and defaults are immutable. Per-waveform envelope edits
+live in [`state/waveforms.ts`](../src/js/state/waveforms.ts) in the same store;
+generator presets stay fixed, and sustain edits retain two-decimal rounding.
 
 This is a state-storage migration, not a reactive UI rewrite: existing handlers
 still update DOM controls and audio resources. Writing directly to an injected
-store does not yet synchronize those side effects. Waveform envelopes, custom
+store does not yet synchronize those side effects. Custom
 algorithm overrides, and player-local toggles remain for subsequent steps.
 
 [`vendor.mjs`](../src/js/vendor.mjs) captures globals from the classic scripts in
