@@ -1,5 +1,8 @@
 # Adding algorithms
 
+See the [sorting algorithm catalog](sorting-algorithms.md) for candidates, complexity,
+stability, implementation status, and compatibility notes.
+
 1. Add `src/js/sorting/algorithms/<id>.mjs`, following an existing algorithm's default
    function and metadata properties. Use its `AS` argument to record operations
    and animation frames; see the [engine API](../src/api.html).
