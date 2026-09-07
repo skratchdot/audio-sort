@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["eslint", "unicorn", "oxc", "vitest"],
+  "plugins": ["eslint", "unicorn", "oxc", "vitest", "typescript"],
   "categories": { "correctness": "error" },
   "env": { "node": true },
   "ignorePatterns": [
@@ -12,6 +12,7 @@
     "test-results/**"
   ],
   "rules": {
+    "typescript/consistent-type-definitions": ["error", "type"],
     "no-undef": "error",
     "no-var": "error",
     "prefer-const": "error",

@@ -1,8 +1,8 @@
-export interface Instrument {
+export type Instrument = {
   val: number;
   name: string;
   group: string;
-}
+};
 
 export const instruments: Instrument[] = [
   { val: 0, name: "Acoustic Grand Piano", group: "Piano" },
