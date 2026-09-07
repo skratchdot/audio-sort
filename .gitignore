@@ -1,4 +1,5 @@
 /node_modules/
+/.pnpm-store/
 /_ignore/
 /dist/
 /src/.11ty-vite/

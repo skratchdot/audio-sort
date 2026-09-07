@@ -9,14 +9,14 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 ## Development
 
-Requires Node.js 24+.
+Requires Node.js 24+ and pnpm (version pinned in `package.json`).
 
 ```sh
-npm ci
-npm start
+pnpm install --frozen-lockfile
+pnpm start
 ```
 
-Build with `npm run build` (output: `dist/`). Run checks with `npm run check`.
+Build with `pnpm run build` (output: `dist/`). Run checks with `pnpm run check`.
 
 See [development documentation](docs/development.md) for browser tests and deployment.
 

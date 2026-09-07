@@ -1,12 +1,15 @@
 # Development
 
-Use Node.js 24 or newer with your preferred version manager. Run npm commands
-from the repository root; `npm ci` installs dependencies.
+Use Node.js 24 or newer and the pnpm version pinned in `package.json`, installed with
+your preferred version manager (such as mise) or the [pnpm installer](https://pnpm.io/installation).
+Run commands from the repository root; `pnpm install --frozen-lockfile` installs the
+locked dependencies. Use `pnpm add` / `pnpm add -D` for dependency changes and commit
+the resulting `pnpm-lock.yaml`. Do not generate an npm lockfile.
 
 ## Build and preview
 
-`npm start` serves the site with live updates. `npm run build` creates `dist/`;
-`npm run preview` serves that production build.
+`pnpm start` serves the site with live updates. `pnpm run build` creates `dist/`;
+`pnpm run preview` serves that production build.
 
 Eleventy renders the HTML and Vite bundles JavaScript and CSS. Site files live in
 `src/`; tests and tool configuration stay at the root. `dist/` and temporary
@@ -22,11 +25,11 @@ been removed so its styles work with the CSS minifier.
 
 ## Checks
 
-`npm run check` runs lint, formatting checks, unit tests, and a production build.
+`pnpm run check` runs lint, formatting checks, unit tests, and a production build.
 
-- `npm run lint`: check first-party JavaScript with Oxlint.
-- `npm run format`: format with Oxfmt; `npm run format:check` checks without editing.
-- `npm test`: run unit tests; `npm run test:watch` reruns them while editing.
+- `pnpm run lint`: check first-party JavaScript with Oxlint.
+- `pnpm run format`: format with Oxfmt; `pnpm run format:check` checks without editing.
+- `pnpm test`: run unit tests; `pnpm run test:watch` reruns them while editing.
 
 Vendor and generated files are excluded from linting and formatting. Source CSS
 and HTML are formatted by Oxfmt. Pages use `src/_includes/layout.html` for the
@@ -35,9 +38,9 @@ document wrapper so header/footer fragments can be formatted independently.
 Run browser tests against a completed production build:
 
 ```sh
-npx playwright install chromium
-npm run build
-npm run test:browser
+pnpm exec playwright install chromium
+pnpm run build
+pnpm run test:browser
 ```
 
 Do not rebuild `dist/` while browser tests are running. To use an existing Chrome
