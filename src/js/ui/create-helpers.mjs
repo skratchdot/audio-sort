@@ -1,4 +1,5 @@
-import { $, sc } from "../vendor.mjs";
+import { $ } from "../vendor.mjs";
+import { scales } from "../midi/scales.mjs";
 /*!
  * Project: Audio Sort
  *    File: create-helpers.mjs
@@ -7,8 +8,8 @@ import { $, sc } from "../vendor.mjs";
  * Copyright (c) 2013 skratchdot
  * Licensed under the MIT license.
  */
-export function createHelpers(settings, dependencies = { $, sc }) {
-  const { $, sc } = dependencies;
+export function createHelpers(settings, dependencies = { $, scales }) {
+  const { $, scales } = dependencies;
 
   var Helper = {},
     // functions
@@ -22,9 +23,9 @@ export function createHelpers(settings, dependencies = { $, sc }) {
     var scale, octaveSize, degrees, degreeSize, centerValue, playMidi, centerMidi;
 
     // get some info from our current scale
-    scale = sc.ScaleInfo.at(settings.getSelected("scale"));
-    octaveSize = scale.pitchesPerOctave();
-    degrees = scale.degrees();
+    scale = scales[settings.getSelected("scale")];
+    octaveSize = scale.pitchesPerOctave;
+    degrees = scale.degrees;
     degreeSize = degrees.length;
     centerValue = Math.floor(settings.getSelected("dataSize") / 2);
 

@@ -30,6 +30,11 @@ It targets fixed DOM IDs and has no multi-mount or teardown
 lifecycle. Data generators and utilities are modules with explicit imports;
 [`generator-registry.mjs`](../src/js/generators/generator-registry.mjs) supplies the controller's generator catalog.
 
+Musical scales are immutable local data in `src/js/midi/scales.mjs`, extracted
+from the former subcollider.js bundle with its MIT notice. Scale grouping and
+note mapping retain the original behavior, including 24- and 43-pitch octave
+groups; no subcollider global or prototype extensions are loaded.
+
 ## Engine and workers
 
 [`create-sort-engine.mjs`](../src/js/sorting/create-sort-engine.mjs) exports `createSortEngine()`. Each default sort request

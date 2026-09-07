@@ -33,7 +33,6 @@ See [development documentation](docs/development.md) for browser tests and deplo
 ## Built With
 
 - [timbre.js](https://mohayonao.github.io/timbre.js/) — Synthesizes tones and plays soundfont instruments for sorting playback.
-- [subcollider.js](https://www.npmjs.com/package/subcollider) — Supplies musical scales used to map array values to notes.
 - [D3](https://d3js.org/) — Draws SVG bars, markers, and paths using modular selection, scale, color, shape, and array utilities.
 - [jQuery](https://jquery.com/) — Handles DOM updates, UI events, and legacy plugins.
 - [Bootstrap 2](https://getbootstrap.com/2.3.2/) — Provides the responsive layout, styling, tabs, dropdowns, and modals.
@@ -43,6 +42,9 @@ See [development documentation](docs/development.md) for browser tests and deplo
 - [FileSaver.js](https://github.com/eligrey/FileSaver.js) — Downloads generated MIDI files in the browser.
 
 ## See Also / Credits
+
+Musical scale data is adapted from [subcollider.js](https://github.com/mohayonao/subcollider).
+All 108 scales and the original license notice are preserved in [scales.mjs](src/js/midi/scales.mjs).
 
 ### About Sorting Algorithms
 
