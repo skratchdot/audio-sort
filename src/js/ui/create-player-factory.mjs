@@ -1,4 +1,5 @@
-import { $, timbre, d3 } from "../vendor.mjs";
+import { $, timbre } from "../vendor.mjs";
+import { select } from "d3-selection";
 import { createMidiBytes } from "../midi/create-midi-bytes.mjs";
 import { visualizations } from "../visualizations/visualization-registry.mjs";
 /*!
@@ -77,7 +78,7 @@ export function createPlayerFactory(settings, Helper) {
       $positionCurrent = $container.find(".position-current");
       $positionMax = $container.find(".position-max");
       $svg = $container.find("svg");
-      svg = d3.select("#" + $svg.attr("id"));
+      svg = select("#" + $svg.attr("id"));
       onPlayerButtonClickCallback = options.onPlayerButtonClickCallback || null;
 
       // setup audio envelopes/generators and interval

@@ -349,6 +349,40 @@ for (const fallback of [false, true]) {
   });
 }
 
+test("D3 joins resize bars, markers, and paths without stale elements", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("index.html");
+  const slider = page.locator("#data-size-container .slider");
+  const bounds = await slider.boundingBox();
+  let previousSize = 12;
+  for (const fraction of [0.7, 0.15]) {
+    await slider.click({ position: { x: bounds.width * fraction, y: bounds.height / 2 } });
+    const size = Number(await page.locator("#data-size-display").textContent());
+    expect(size).not.toBe(previousSize);
+    previousSize = size;
+    await expect(page.locator("#base-chart svg rect")).toHaveCount(size);
+    await expect(page.locator("#sort-chart svg rect")).toHaveCount(size);
+    for (const marker of ["highlight", "justSwapped", "swap", "compare", "mark"]) {
+      await expect(page.locator(`#sort-chart svg circle.${marker}`)).toHaveCount(size);
+      await expect(page.locator(`#sort-chart svg circle.${marker}`).first()).toHaveAttribute(
+        "cx",
+        /%$/,
+      );
+    }
+    await page.locator('[data-visualization="flat"]').click();
+    await expect(page.locator("#sort-chart svg path.line")).toHaveCount(size);
+    const paths = await page
+      .locator("#sort-chart svg path.line")
+      .evaluateAll((elements) => elements.map((element) => element.getAttribute("d")));
+    expect(paths.every((path) => path?.startsWith("M") && !/NaN|Infinity/.test(path))).toBe(true);
+    await page.locator('[data-visualization="bar"]').click();
+    await expect(page.locator("#sort-chart svg path.line")).toHaveCount(0);
+    await expect(page.locator("#sort-chart svg rect")).toHaveCount(size);
+  }
+  expect(errors).toEqual([]);
+});
+
 test("module UI connects data, visualization, playback navigation, sliders, and MIDI export", async ({
   page,
 }) => {
@@ -361,6 +395,9 @@ test("module UI connects data, visualization, playback navigation, sliders, and 
     .toBeGreaterThan(0);
   await page.locator('[data-visualization="flat"]').click();
   await expect(page.locator("#sort-chart svg path.line").first()).toBeVisible();
+  await expect(page.locator("#sort-chart svg path.line").first()).toHaveAttribute("d", /^M/);
+  expect(await page.evaluate(() => typeof globalThis.d3)).toBe("undefined");
+  await expect(page.locator('script[src*="d3.v3"]')).toHaveCount(0);
   await page.locator('[data-visualization="bar"]').click();
   await expect(page.locator("#sort-chart svg rect").first()).toBeVisible();
   await page.locator('#sort-player [data-action="goToLast"]').click();

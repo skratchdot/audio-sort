@@ -1,4 +1,5 @@
-import { d3 } from "../../vendor.mjs";
+import { rgb } from "d3-color";
+import { line as createLine } from "d3-shape";
 
 export default function flat(settings) {
   var flat = {},
@@ -59,12 +60,10 @@ export default function flat(settings) {
         ids.push(id);
         flattenedLines[i] = {
           id: id,
-          dataColor: d3
-            .rgb(dataColor)
+          dataColor: rgb(dataColor)
             .darker((i - half) / half)
             .toString(),
-          playColor: d3
-            .rgb(playColor)
+          playColor: rgb(playColor)
             .darker((i - half) / half)
             .toString(),
           playIndexes: [],
@@ -95,9 +94,7 @@ export default function flat(settings) {
     var line;
 
     // create our line function
-    line = d3.svg
-      .line()
-      .interpolate("linear")
+    line = createLine()
       .x(function (d) {
         return d.x;
       })
@@ -106,10 +103,7 @@ export default function flat(settings) {
       });
 
     // select our lines
-    lines = svg.selectAll(".line").data(flattenedLines);
-
-    // create
-    lines.enter().append("path");
+    lines = svg.selectAll(".line").data(flattenedLines).join("path");
 
     // update
     lines
@@ -125,9 +119,6 @@ export default function flat(settings) {
       .attr("d", function (d) {
         return line(d.lineData);
       });
-
-    // exit
-    lines.exit().remove();
   };
 
   flat.draw = function (index) {
