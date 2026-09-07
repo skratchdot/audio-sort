@@ -65,7 +65,8 @@ Custom algorithm overrides now live in the same store, with the catalog derived
 from imported built-ins and overrides. AutoPlay and per-player looping also live
 in state; transport status and scheduling remain player-owned. Volume, tempo,
 AutoPlay, and loop-button state now synchronize through a disposable connection.
-Next: extend synchronization to remaining settings and implement full controller/
-player teardown before multiple UI owners.
+Audio type, waveform/envelopes, center note, scale, and instrument now have a
+second disposable connection. Next: synchronize algorithm/catalog and data-size
+changes, then implement full controller/player teardown before multiple UI owners.
 The algorithm function/metadata format and editor remain unchanged; do not add parser/build
 machinery solely to reorganize metadata.
