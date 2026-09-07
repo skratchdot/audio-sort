@@ -48,7 +48,9 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Build for the GitHub Pages path
-        run: pnpm run build:pages
+        run: pnpm run build
+        env:
+          VITE_BASE_PATH: /audio-sort/
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v4

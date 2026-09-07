@@ -20,11 +20,10 @@
   "type": "module",
   "scripts": {
     "build": "pnpm run clean && vite build",
-    "build:pages": "VITE_BASE_PATH=/audio-sort/ pnpm run build",
     "build:test-pages": "VITE_BASE_PATH=/audio-sort/ SITE_OUTPUT_DIR=.test-pages/audio-sort vite build",
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
-    "serve": "vite dev",
-    "start": "pnpm run serve",
+    "dev": "vite dev",
+    "start": "pnpm run dev",
     "preview": "sirv dist",
     "test:browser": "pnpm run build:test-pages && playwright test",
     "test": "vitest run",
@@ -33,8 +32,7 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm run lint && pnpm run format:check && pnpm run typecheck && pnpm test && pnpm run build",
-    "watch": "pnpm run serve"
+    "check": "pnpm run lint && pnpm run format:check && pnpm run typecheck && pnpm test && pnpm run build"
   },
   "dependencies": {
     "@tanstack/react-router": "^1.170.33",

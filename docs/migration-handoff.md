@@ -47,7 +47,8 @@ The existing workspace, runtime, and visual design are retained.
   TanStack navigation; static hosting may append a directory trailing slash.
 - `vite.config.mjs` emits directory index HTML and client assets to `dist/`, and build-time
   server files to ignored `.tanstack/server/`. No server is deployed.
-- Builds use an explicit base: `/` by default, `/audio-sort/` via `build:pages`.
+- Builds use an explicit base: `/` by default; the deployment workflow sets
+  `VITE_BASE_PATH=/audio-sort/` and runs the same `build` command.
   Browser tests build `.test-pages/audio-sort/` separately and serve both using
   `sirv-cli`, with no custom preview configuration or SPA fallback. CI rebuilds
   for Pages before uploading `dist/`; timeouts remain.

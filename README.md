@@ -13,7 +13,7 @@ Requires Node.js 24+ and pnpm (version pinned in `package.json`).
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm start
+pnpm dev
 ```
 
 Build with `pnpm run build` (output: `dist/`). Run checks with `pnpm run check`.
