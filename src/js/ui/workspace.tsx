@@ -7,6 +7,8 @@ import { Settings } from "./settings-controls.tsx";
 import { Transport, Scrubber, Counters } from "./playback-controls.tsx";
 import { AlgorithmDialog, MidiDialog } from "./workspace-dialogs.tsx";
 import type { Props, PlayerId } from "./workspace-types.ts";
+import { Download, Info, CirclePlus, ChartNoAxesColumnIncreasing, List } from "lucide-react";
+import { ControlIcon } from "./control-icon.tsx";
 type Modal = "sort" | "add-algorithm" | "midi-export" | null;
 export function Workspace({ runtime }: Props) {
   const store = runtime.store;
@@ -47,7 +49,7 @@ export function Workspace({ runtime }: Props) {
         setModal("midi-export");
       }}
     >
-      Export As Midi ↧
+      <span>Export As Midi</span> <ControlIcon icon={Download} />
     </button>
   );
   return (
@@ -116,7 +118,8 @@ export function Workspace({ runtime }: Props) {
                   className="button button-info"
                   onClick={() => setModal("sort")}
                 >
-                  <em id="sort-display">{catalog[selected.sort]?.display}</em> ⓘ
+                  <em id="sort-display">{catalog[selected.sort]?.display}</em>{" "}
+                  <ControlIcon icon={Info} />
                 </button>
               </div>
               <ul id="sort-options">
@@ -149,16 +152,13 @@ export function Workspace({ runtime }: Props) {
                   className="button button-info"
                   onClick={() => setModal("add-algorithm")}
                 >
-                  Add Algorithm ⊕
+                  <span>Add Algorithm</span> <ControlIcon icon={CirclePlus} />
                 </button>
               </div>
             </div>
             <div className="sort-counters">
               <div className="tw:flex tw:justify-center tw:mb-2">
-                {[
-                  ["bar", "▥"],
-                  ["flat", "☷"],
-                ].map(([id, icon]) => (
+                {(["bar", "flat"] as const).map((id) => (
                   <button
                     type="button"
                     className="button sort-visualization"
@@ -171,7 +171,7 @@ export function Workspace({ runtime }: Props) {
                       runtime.visualization(id);
                     }}
                   >
-                    {icon}
+                    <ControlIcon icon={id === "bar" ? ChartNoAxesColumnIncreasing : List} />
                   </button>
                 ))}
               </div>

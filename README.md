@@ -37,6 +37,7 @@ See [development documentation](docs/development.md) for browser tests and deplo
 - [Jotai](https://jotai.org/) — Stores selected audio and sorting settings independently of the UI.
 - [React](https://react.dev/) — Renders settings, playback controls, and editing/export dialogs.
 - [Tailwind CSS](https://tailwindcss.com/) — Styles the workspace alongside first-party CSS.
+- [Lucide](https://lucide.dev/) — Provides consistent SVG icons for playback and other controls.
 - [Ace](https://ace.c9.io/) — Powers the algorithm editor with syntax highlighting and JavaScript diagnostics.
 - [jsmidgen](https://github.com/dingram/jsmidgen) — Encodes sorting playback as MIDI files.
 - [FileSaver.js](https://github.com/eligrey/FileSaver.js) — Downloads generated MIDI files in the browser.

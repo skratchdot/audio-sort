@@ -156,6 +156,41 @@ test.beforeEach(async ({ page, baseURL }) => {
   });
 });
 
+test("option hover and keyboard focus preserve readable selected and unselected colors", async ({
+  page,
+}) => {
+  await page.goto("index.html");
+  for (const id of ["sort", "scale", "soundfont"]) {
+    if (id === "scale") await page.locator("#tab-scale").click();
+    if (id === "soundfont") {
+      await page.locator("#tab-audio").click();
+      await page.locator('button[data-audio-type="soundfont"]').click();
+      await page.locator("#tab-soundfont").click();
+    }
+    const selected = page.locator(`#${id}-options button[aria-pressed="true"]`);
+    await page.mouse.move(0, 0);
+    await expect(selected).toHaveCSS("background-color", "rgb(0, 136, 204)");
+    await selected.hover();
+    await expect(selected).toHaveCSS("color", "rgb(255, 255, 255)");
+    await expect(selected).toHaveCSS("background-color", "rgb(0, 102, 153)");
+    const unselected = page.locator(`#${id}-options button[aria-pressed="false"]`).first();
+    await unselected.hover();
+    await expect(unselected).toHaveCSS("color", "rgb(0, 85, 128)");
+    await expect(unselected).toHaveCSS("background-color", "rgb(253, 253, 253)");
+    await expect(selected).toHaveCSS("background-color", "rgb(0, 136, 204)");
+    await page.mouse.move(0, 0);
+    await unselected.focus();
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Shift+Tab");
+    await expect(unselected).toBeFocused();
+    await expect(unselected).toHaveCSS("color", "rgb(0, 85, 128)");
+    await expect(unselected).toHaveCSS("background-color", "rgb(253, 253, 253)");
+    await selected.focus();
+    await expect(selected).toHaveCSS("color", "rgb(255, 255, 255)");
+    await expect(selected).toHaveCSS("background-color", "rgb(0, 102, 153)");
+  }
+});
+
 test("header stays within the viewport without sharing widgets", async ({ page }) => {
   for (const width of [320, 375, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
@@ -163,6 +198,8 @@ test("header stays within the viewport without sharing widgets", async ({ page }
     const title = page.locator("#header-title");
     const navigation = page.locator("#header-nav");
     await expect(title).toBeVisible();
+    await expect(page.locator("#header-author")).toHaveCSS("font-weight", "400");
+    await expect(page.locator("#header .home-link")).toHaveCSS("font-weight", "700");
     await expect(navigation.locator("a")).toHaveText(["Home", "About", "API", "Source"]);
     const titleBox = await title.boundingBox();
     const navBox = await navigation.boundingBox();
@@ -188,6 +225,17 @@ test("React controls work without Bootstrap, jQuery, or classic vendor scripts",
 }) => {
   await page.goto("index.html");
   await expect(page.locator("#base-svg rect")).toHaveCount(12);
+  for (const id of ["base", "sort"]) {
+    const icons = page.locator(`#${id}-player .control-icon`);
+    await expect(icons).toHaveCount(6);
+    for (const icon of await icons.all()) {
+      await expect(icon).toHaveAttribute("aria-hidden", "true");
+      await expect(icon).toHaveCSS("width", "14px");
+      await expect(icon).toHaveCSS("height", "14px");
+    }
+    await expect(page.getByRole("button", { name: `${id} First`, exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: `${id} Last`, exact: true })).toBeVisible();
+  }
   expect(await page.evaluate(() => [typeof globalThis.jQuery, typeof globalThis.$])).toEqual([
     "undefined",
     "undefined",

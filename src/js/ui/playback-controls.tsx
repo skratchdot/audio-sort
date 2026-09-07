@@ -2,6 +2,8 @@ import { useSyncExternalStore } from "react";
 import { useAtomValue } from "jotai";
 import { playbackPreferencesAtom } from "../state/playback-preferences.ts";
 import type { Props, PlayerId } from "./workspace-types.ts";
+import { FastForward, Rewind, SkipBack, SkipForward, Square, RotateCcw } from "lucide-react";
+import { ControlIcon } from "./control-icon.tsx";
 
 export function Counters({ runtime }: Props) {
   const state = useSyncExternalStore(runtime.subscribe, () => runtime.getSnapshot().sort);
@@ -36,11 +38,11 @@ export function Transport({ runtime, id }: Props & { id: PlayerId }) {
       )}
       <div className="transport-actions">
         {[
-          ["goToFirst", "⏮", "First"],
-          ["reverse", "◀ Reverse", "Reverse"],
-          ["stop", "■ Stop", "Stop"],
-          ["play", "Play ▶", "Play"],
-          ["goToLast", "⏭", "Last"],
+          ["goToFirst", "", "First"],
+          ["reverse", "Reverse", "Reverse"],
+          ["stop", "Stop", "Stop"],
+          ["play", "Play", "Play"],
+          ["goToLast", "", "Last"],
         ].map(([action, text, label]) => (
           <button
             key={action}
@@ -48,9 +50,25 @@ export function Transport({ runtime, id }: Props & { id: PlayerId }) {
             className="button button-success"
             data-action={action}
             aria-label={`${id} ${label}`}
+            title={label}
             onClick={() => void runtime.action(id, action)}
           >
-            {text}
+            {action !== "play" && (
+              <ControlIcon
+                icon={
+                  action === "goToFirst"
+                    ? Rewind
+                    : action === "reverse"
+                      ? SkipBack
+                      : action === "stop"
+                        ? Square
+                        : FastForward
+                }
+                solid
+              />
+            )}
+            {text && <span>{text}</span>}
+            {action === "play" && <ControlIcon icon={SkipForward} solid />}
           </button>
         ))}
         <button
@@ -60,7 +78,7 @@ export function Transport({ runtime, id }: Props & { id: PlayerId }) {
           aria-pressed={preferences.loop[id]}
           onClick={() => void runtime.action(id, "loop")}
         >
-          ↻ Loop?
+          <ControlIcon icon={RotateCcw} /> <span>Loop?</span>
         </button>
       </div>
       <span className="transport-position">

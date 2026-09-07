@@ -12,6 +12,8 @@ import { sources } from "../sorting/algorithm-sources.mjs";
 import { getFunctionBody } from "../sorting/sort-requests.ts";
 import type { createCodeEditor } from "./create-code-editor.mjs";
 import type { Props, PlayerId } from "./workspace-types.ts";
+import { X } from "lucide-react";
+import { ControlIcon } from "./control-icon.tsx";
 function Dialog({
   id,
   title,
@@ -79,7 +81,7 @@ function Dialog({
       <header className="modal-header">
         <h3 id={`${id}-title`}>{title}</h3>
         <button type="button" className="close" aria-label="Close dialog" onClick={onClose}>
-          ×
+          <ControlIcon icon={X} />
         </button>
       </header>
       <div className="modal-body">{children}</div>
