@@ -1,38 +1,77 @@
 <div class="tab-pane" id="waveform">
-  <div class="pull-left waveform-section">
-    <div>
-      <strong>Attack:</strong>
-      <em id="waveform-adshr-attack-display" class="pull-right">&nbsp;</em>
-    </div>
-    <div data-adshr="a" id="waveform-adshr-attack-container"></div>
-
-    <div>
-      <strong>Decay:</strong>
-      <em id="waveform-adshr-decay-display" class="pull-right">&nbsp;</em>
-    </div>
-    <div data-adshr="d" id="waveform-adshr-decay-container"></div>
-
-    <div>
-      <strong>Sustain:</strong>
-      <em id="waveform-adshr-sustain-display" class="pull-right">&nbsp;</em>
-    </div>
-    <div data-adshr="s" id="waveform-adshr-sustain-container"></div>
-
-    <div>
-      <strong>Hold:</strong>
-      <em id="waveform-adshr-hold-display" class="pull-right">&nbsp;</em>
-    </div>
-    <div data-adshr="h" id="waveform-adshr-hold-container"></div>
-
-    <div>
-      <strong>Release:</strong>
-      <em id="waveform-adshr-release-display" class="pull-right">&nbsp;</em>
-    </div>
-    <div data-adshr="r" id="waveform-adshr-release-container"></div>
-  </div>
-  <div class="pull-right waveform-section">
-    <canvas id="waveform-adshr-canvas"></canvas>
+  <div class="waveform-section">
+    <svg
+      id="envelope-diagram"
+      role="img"
+      viewBox="35 25 350 135"
+      aria-label="Amplitude envelope"
+      preserveAspectRatio="none"
+    ></svg>
     <canvas id="waveform-canvas"></canvas>
     <div class="btn-group"></div>
+  </div>
+  <div id="envelope-controls">
+    <label for="envelope-attack"
+      >Attack <output id="waveform-adshr-attack-display" for="envelope-attack"></output
+    ></label>
+    <input
+      type="range"
+      id="envelope-attack"
+      data-envelope="a"
+      min="10"
+      max="500"
+      step="5"
+      value="50"
+    />
+    <label for="envelope-decay"
+      >Decay <output id="waveform-adshr-decay-display" for="envelope-decay"></output
+    ></label>
+    <input
+      type="range"
+      id="envelope-decay"
+      data-envelope="d"
+      min="10"
+      max="2000"
+      step="5"
+      value="300"
+    />
+    <label for="envelope-sustain"
+      >Sustain <output id="waveform-adshr-sustain-display" for="envelope-sustain"></output
+    ></label>
+    <input
+      type="range"
+      id="envelope-sustain"
+      aria-label="Sustain level"
+      data-envelope="s"
+      min="0"
+      max="1"
+      step="0.01"
+      value="0.5"
+    />
+    <label for="envelope-hold"
+      >Hold <output id="waveform-adshr-hold-display" for="envelope-hold"></output
+    ></label>
+    <input
+      type="range"
+      id="envelope-hold"
+      aria-label="Sustain hold"
+      data-envelope="h"
+      min="10"
+      max="3000"
+      step="5"
+      value="200"
+    />
+    <label for="envelope-release"
+      >Release <output id="waveform-adshr-release-display" for="envelope-release"></output
+    ></label>
+    <input
+      type="range"
+      id="envelope-release"
+      data-envelope="r"
+      min="10"
+      max="3000"
+      step="5"
+      value="300"
+    />
   </div>
 </div>

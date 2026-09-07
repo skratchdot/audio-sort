@@ -1,6 +1,6 @@
 import type { createStore } from "jotai/vanilla";
 import { settingsAtom, type Settings } from "../state/settings.ts";
-import { waveformsAtom, type Waveform } from "../state/waveforms.ts";
+import { selectedWaveformAtom, type Waveform } from "../state/waveforms.ts";
 
 type Effects = {
   render: (settings: Settings, waveform: Waveform) => void;
@@ -15,7 +15,7 @@ export function connectAudioSettings(store: ReturnType<typeof createStore>, effe
   let previousWaveform: Waveform | undefined;
   const sync = () => {
     const settings = store.get(settingsAtom);
-    const waveform = store.get(waveformsAtom)[settings.waveform];
+    const waveform = store.get(selectedWaveformAtom);
     const old = previous;
     const waveformChanged = waveform !== previousWaveform;
     const typeChanged = !old || old.audioType !== settings.audioType;
@@ -40,7 +40,7 @@ export function connectAudioSettings(store: ReturnType<typeof createStore>, effe
     }
   };
   const unsubscribeSettings = store.sub(settingsAtom, sync);
-  const unsubscribeWaveforms = store.sub(waveformsAtom, sync);
+  const unsubscribeWaveforms = store.sub(selectedWaveformAtom, sync);
   const disconnect = () => {
     unsubscribeSettings();
     unsubscribeWaveforms();

@@ -12,7 +12,9 @@ import { MidiExport } from "../midi/midi-export.mjs";
 import { instruments } from "../midi/instruments.ts";
 import { createStore } from "jotai/vanilla";
 import { defaults, settingsAtom, updateSettingAtom } from "../state/settings.ts";
-import { waveformDefaults, waveformsAtom, updateEnvelopeAtom } from "../state/waveforms.ts";
+import { waveformDefaults, selectedWaveformAtom } from "../state/waveforms.ts";
+import { updateEnvelopeAtom } from "../state/envelope.ts";
+import { formatEnvelopeValue } from "./envelope-diagram.ts";
 import { playbackPreferencesAtom, toggleAutoPlayAtom } from "../state/playback-preferences.ts";
 import {
   algorithmCatalogAtom,
@@ -38,8 +40,7 @@ export function createSortController(generators, settingsStore = createStore()) 
   // Read the current atom value on demand; do not keep a second settings cache.
   const getSelected = () => settingsStore.get(settingsAtom);
   const setSelected = (key, value) => settingsStore.set(updateSettingAtom, { key, value });
-  const getWaveform = () => settingsStore.get(waveformsAtom)[getSelected().waveform];
-  const waveformSliders = {};
+  const getWaveform = () => settingsStore.get(selectedWaveformAtom);
   // Audio players
   const players = {
     base: null,
@@ -186,13 +187,9 @@ export function createSortController(generators, settingsStore = createStore()) 
   };
 
   const onSliderWaveform = function (e) {
-    const $slider = $(e.target);
-    const $container = $slider.parents("[data-adshr]:first");
-    const adshr = $container.attr("data-adshr");
     settingsStore.set(updateEnvelopeAtom, {
-      waveform: getSelected().waveform,
-      key: adshr,
-      value: e.value,
+      key: e.target.dataset.envelope,
+      value: Number(e.target.value),
     });
   };
 
@@ -217,16 +214,25 @@ export function createSortController(generators, settingsStore = createStore()) 
   };
 
   const updateWaveformDisplays = function () {
-    updateDisplayCache("#waveform-adshr-attack-display", getWaveform().a);
-    updateDisplayCache("#waveform-adshr-decay-display", getWaveform().d);
-    updateDisplayCache("#waveform-adshr-sustain-display", getWaveform().s);
-    updateDisplayCache("#waveform-adshr-hold-display", getWaveform().h);
-    updateDisplayCache("#waveform-adshr-release-display", getWaveform().r);
+    for (const [key, name] of Object.entries({
+      a: "attack",
+      d: "decay",
+      s: "sustain",
+      h: "hold",
+      r: "release",
+    })) {
+      updateDisplayCache(
+        `#waveform-adshr-${name}-display`,
+        formatEnvelopeValue(key, getWaveform()[key]),
+      );
+    }
   };
 
   const setSliderWaveformFromSelected = function () {
-    $.each(["a", "d", "s", "h", "r"], function (index, key) {
-      waveformSliders[key].slider("setValue", getWaveform()[key]);
+    $("#envelope-controls input").each(function () {
+      const key = this.dataset.envelope;
+      this.value = getWaveform()[key];
+      this.setAttribute("aria-valuetext", formatEnvelopeValue(key, getWaveform()[key]));
     });
     updateWaveformDisplays();
   };
@@ -870,55 +876,9 @@ export function createSortController(generators, settingsStore = createStore()) 
         defaults.dataSize,
         onSliderDataSize,
       );
-      // create our waveform sliders
-      waveformSliders.a = Helper.createSlider(
-        "#waveform-adshr-attack-container",
-        {
-          value: getWaveform().a,
-          min: 10,
-          max: 500,
-          step: 5,
-        },
-        onSliderWaveform,
-      );
-      waveformSliders.d = Helper.createSlider(
-        "#waveform-adshr-decay-container",
-        {
-          value: getWaveform().d,
-          min: 10,
-          max: 2000,
-          step: 5,
-        },
-        onSliderWaveform,
-      );
-      waveformSliders.s = Helper.createSlider(
-        "#waveform-adshr-sustain-container",
-        {
-          value: getWaveform().s,
-          min: 0,
-          max: 1,
-          step: 0.01,
-        },
-        onSliderWaveform,
-      );
-      waveformSliders.h = Helper.createSlider(
-        "#waveform-adshr-hold-container",
-        {
-          value: getWaveform().h,
-          min: 10,
-          max: 3000,
-          step: 5,
-        },
-        onSliderWaveform,
-      );
-      waveformSliders.r = Helper.createSlider(
-        "#waveform-adshr-release-container",
-        {
-          value: getWaveform().r,
-          min: 10,
-          max: 3000,
-          step: 5,
-        },
+      $("#envelope-controls").on(
+        "input" + eventNamespace,
+        "input[data-envelope]",
         onSliderWaveform,
       );
       // cache a few items
