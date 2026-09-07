@@ -1,12 +1,12 @@
 import { $, timbre } from "../vendor.mjs";
-import { scales } from "../midi/scales.mjs";
+import { scales } from "../midi/scales.ts";
 import { min, max } from "d3-array";
 import { scaleLinear } from "d3-scale";
 import { saveAs } from "file-saver";
 import { createHelpers } from "./create-helpers.mjs";
 import { createPlayerFactory } from "./create-player-factory.mjs";
 import { MidiExport } from "../midi/midi-export.mjs";
-import { instruments } from "../midi/instruments.mjs";
+import { instruments } from "../midi/instruments.ts";
 
 export function createSortController(generators) {
   const Sort = {};

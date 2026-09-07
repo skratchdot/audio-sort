@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { expect, test } from "vitest";
-import { scales } from "../src/js/midi/scales.mjs";
+import { scales } from "../src/js/midi/scales.ts";
 import { createHelpers } from "../src/js/ui/create-helpers.mjs";
 
 test("preserves all scale data extracted from the bundled subcollider 0.1.0", () => {

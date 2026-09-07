@@ -1,5 +1,5 @@
 import { $ } from "../vendor.mjs";
-import { instruments } from "./instruments.mjs";
+import { instruments } from "./instruments.ts";
 
 export const MidiExport = {};
 

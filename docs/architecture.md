@@ -6,6 +6,10 @@ controller/player factories, `sorting/` the engine and request handling, and
 MIDI support, and visualizations each have their own directory. The app entry,
 worker entry, and vendor bridge stay at the top level.
 
+TypeScript is introduced incrementally alongside `.mjs` modules. Vite handles
+bundling; `pnpm run typecheck` checks `.ts` application modules separately.
+Built-in algorithm source and the Ace editor remain JavaScript for now.
+
 Generator implementations live in `generators/patterns/`; visualization
 implementations live in `visualizations/renderers/`. Their named registries sit
 one level above, separate from the implementations they register.
@@ -30,7 +34,7 @@ It targets fixed DOM IDs and has no multi-mount or teardown
 lifecycle. Data generators and utilities are modules with explicit imports;
 [`generator-registry.mjs`](../src/js/generators/generator-registry.mjs) supplies the controller's generator catalog.
 
-Musical scales are immutable local data in `src/js/midi/scales.mjs`, extracted
+Musical scales are immutable local data in `src/js/midi/scales.ts`, extracted
 from the former subcollider.js bundle with its MIT notice. Scale grouping and
 note mapping retain the original behavior, including 24- and 43-pitch octave
 groups; no subcollider global or prototype extensions are loaded.

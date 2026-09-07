@@ -1,5 +1,5 @@
 import sorted from "./sorted.mjs";
-import random from "../../utilities/random.mjs";
+import random from "../../utilities/random.ts";
 import swap from "../../utilities/swap.mjs";
 
 const almostSortedFactor = 2;

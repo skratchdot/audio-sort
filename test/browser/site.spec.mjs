@@ -4,7 +4,7 @@ import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { algorithmNames } from "../helpers/algorithms.mjs";
 import { generators } from "../../src/js/generators/generator-registry.mjs";
-import { scales } from "../../src/js/midi/scales.mjs";
+import { scales } from "../../src/js/midi/scales.ts";
 
 test("all local scales populate the menu without subcollider", async ({ page }) => {
   const errors = [];

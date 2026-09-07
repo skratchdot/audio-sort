@@ -11,7 +11,7 @@ test("application modules and directories use lowercase kebab-case names", () =>
     expect(entry.name).toMatch(
       entry.isDirectory()
         ? /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/
-        : /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*\.mjs$/,
+        : /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*\.(?:mjs|ts)$/,
     );
   }
 });

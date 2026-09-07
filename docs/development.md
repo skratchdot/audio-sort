@@ -25,9 +25,10 @@ been removed so its styles work with the CSS minifier.
 
 ## Checks
 
-`pnpm run check` runs lint, formatting checks, unit tests, and a production build.
+`pnpm run check` runs lint, formatting checks, TypeScript checking, unit tests, and a production build.
 
-- `pnpm run lint`: check first-party JavaScript with Oxlint.
+- `pnpm run lint`: check first-party JavaScript and TypeScript with Oxlint.
+- `pnpm run typecheck`: check migrated `src/js/**/*.ts` modules with strict TypeScript settings; no files are emitted.
 - `pnpm run format`: format with Oxfmt; `pnpm run format:check` checks without editing.
 - `pnpm test`: run unit tests; `pnpm run test:watch` reruns them while editing.
 
@@ -59,6 +60,8 @@ Updates to `main` publish `dist/` to GitHub Pages. The repository's Pages
 publishing source must be **GitHub Actions**.
 
 ## Reference
+
+- [Modernization plan](modernization.md)
 
 - [Architecture](architecture.md)
 - [Adding algorithms](adding-algorithms.md)

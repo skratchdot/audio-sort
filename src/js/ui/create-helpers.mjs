@@ -1,5 +1,5 @@
 import { $ } from "../vendor.mjs";
-import { scales } from "../midi/scales.mjs";
+import { scales } from "../midi/scales.ts";
 
 export function createHelpers(settings, dependencies = { $, scales }) {
   const { $, scales } = dependencies;
