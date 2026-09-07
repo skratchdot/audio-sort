@@ -4,6 +4,30 @@ import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { algorithmNames } from "../helpers/algorithms.mjs";
 import { generators } from "../../src/js/generators/generator-registry.mjs";
+import { scales } from "../../src/js/midi/scales.mjs";
+
+test("all local scales populate the menu without subcollider", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("index.html");
+  await expect(page.locator("[data-scale]")).toHaveCount(108);
+  const actual = await page
+    .locator("[data-scale]")
+    .evaluateAll((elements) =>
+      elements.map((element) => [element.getAttribute("data-scale"), element.textContent.trim()]),
+    );
+  const expected = Object.entries(scales)
+    .sort(
+      ([, a], [, b]) =>
+        a.pitchesPerOctave - b.pitchesPerOctave ||
+        a.degrees.length - b.degrees.length ||
+        a.name.localeCompare(b.name),
+    )
+    .map(([id, scale]) => [id, scale.name]);
+  expect(actual).toEqual(expected);
+  expect(await page.evaluate(() => typeof globalThis.sc)).toBe("undefined");
+  expect(errors).toEqual([]);
+});
 
 test("public assets are copied unchanged and CSS images load under the site base", async ({
   page,

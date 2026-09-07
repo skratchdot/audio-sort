@@ -21,13 +21,8 @@ test("MIDI helper reads current settings from its injected controller", () => {
   const helpers = createHelpers(
     { getSelected: (key) => selected[key] },
     {
-      sc: {
-        ScaleInfo: {
-          at: (name) => {
-            expect(name).toBe("test");
-            return { pitchesPerOctave: () => 12, degrees: () => [0, 2, 4, 5, 7, 9, 11] };
-          },
-        },
+      scales: {
+        test: { pitchesPerOctave: 12, degrees: [0, 2, 4, 5, 7, 9, 11] },
       },
     },
   );

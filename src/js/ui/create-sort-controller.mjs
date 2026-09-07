@@ -1,4 +1,5 @@
-import { $, sc, timbre } from "../vendor.mjs";
+import { $, timbre } from "../vendor.mjs";
+import { scales } from "../midi/scales.mjs";
 import { min, max } from "d3-array";
 import { scaleLinear } from "d3-scale";
 import { saveAs } from "file-saver";
@@ -529,13 +530,13 @@ export function createSortController(generators) {
   };
 
   getSortedScaleNames = function () {
-    var names = sc.ScaleInfo.names().sort(function (o1, o2) {
+    var names = Object.keys(scales).sort(function (o1, o2) {
       var ret = 0,
-        s1 = sc.ScaleInfo.at(o1),
-        s2 = sc.ScaleInfo.at(o2);
-      ret = s1.pitchesPerOctave() - s2.pitchesPerOctave();
+        s1 = scales[o1],
+        s2 = scales[o2];
+      ret = s1.pitchesPerOctave - s2.pitchesPerOctave;
       if (ret === 0) {
-        ret = s1.degrees().length - s2.degrees().length;
+        ret = s1.degrees.length - s2.degrees.length;
         if (ret === 0) {
           ret = s1.name.localeCompare(s2.name);
         }
@@ -559,9 +560,9 @@ export function createSortController(generators) {
     scaleNames = getSortedScaleNames();
     $.each(scaleNames, function (index, scaleName) {
       // loop variables
-      scale = sc.ScaleInfo.at(scaleName);
-      numPitches = scale.pitchesPerOctave();
-      numDegrees = scale.degrees().length;
+      scale = scales[scaleName];
+      numPitches = scale.pitchesPerOctave;
+      numDegrees = scale.degrees.length;
       currentKey = numPitches + "_" + numDegrees;
       if (currentKey !== lastKey) {
         lastKey = currentKey;
