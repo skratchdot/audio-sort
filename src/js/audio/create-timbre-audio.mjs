@@ -1,6 +1,6 @@
 // The legacy engine is injected here; this adapter has no DOM or store ownership.
 // Keep its synthesis, timing, and soundfont gain unchanged during UI migration.
-export function createTimbreAudio(timbre, settings, getMidiNumber, isPlaying) {
+export function createTimbreAudio(timbre, settings, getMidiNumber, isPlaying, soundfont) {
   let env;
   let generator;
   let disposed = false;
@@ -36,7 +36,7 @@ export function createTimbreAudio(timbre, settings, getMidiNumber, isPlaying) {
         if (!(midi >= 0 && midi < 128)) continue;
         if (audioType === "waveform") generator.noteOn(midi, 64);
         else if (audioType === "soundfont") {
-          timbre.soundfont.play(midi, false, { mul: settings.getSelected("volume") * 1.5 });
+          soundfont.play(midi, settings.getSelected("volume") * 1.5);
         }
       }
     },

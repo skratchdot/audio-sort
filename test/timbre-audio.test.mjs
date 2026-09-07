@@ -36,6 +36,7 @@ function setup() {
     settings,
     (value) => value,
     () => false,
+    { play: (...args) => timbre.soundfont.play(...args) },
   );
   audio.refresh();
   return { audio, timbre, nodes, selected, wave };
@@ -64,7 +65,7 @@ test("soundfont playback keeps gain and does not require the extension in wavefo
   timbre.soundfont = { play: vi.fn() };
   selected.audioType = "soundfont";
   audio.playFrame({ arr: [{ play: true, value: 72 }] });
-  expect(timbre.soundfont.play).toHaveBeenCalledExactlyOnceWith(72, false, { mul: 0.375 });
+  expect(timbre.soundfont.play).toHaveBeenCalledExactlyOnceWith(72, 0.375);
 });
 
 test("switching to an oscillator releases old nodes and selects its waveform", () => {

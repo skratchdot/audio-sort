@@ -10,7 +10,7 @@ import { playbackPreferencesAtom, toggleLoopAtom } from "../state/playback-prefe
 
 let nextPlayerId = 0;
 
-export function createPlayerFactory(settings, Helper, settingsStore) {
+export function createPlayerFactory(settings, Helper, settingsStore, soundfont) {
   return function createPlayer(containerSelector, options) {
     const player = {};
     const eventNamespace = ".audioSortPlayer" + ++nextPlayerId;
@@ -41,6 +41,7 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
       settings,
       Helper.getMidiNumber,
       () => transport?.isPlaying() || false,
+      soundfont,
     );
     let visualization;
     let selectedVisualization = "bar";

@@ -45,8 +45,9 @@ Dependencies come from pnpm package imports; application replacements live in
 Retain required attribution for adapted data/code. Package-managed assets such
 as Ace workers may be emitted by the build; they are not manually vendored files.
 
-The remaining legacy group is jQuery, Bootstrap, bootstrap-slider, Timbre,
-audio-jsonp, and Timbre's MP3/soundfont extensions. Remove unused development
+The remaining legacy group is jQuery, Bootstrap, bootstrap-slider, and Timbre.
+JSONP and the MP3/soundfont extensions have been replaced by first-party native
+sample loading. Remove unused development
 bundles, maps, and Flash fallback assets once their references are audited.
 Check external soundfont loading separately from local script packaging.
 
@@ -71,9 +72,11 @@ resume invalidation now live in a DOM-independent typed transport. A separate
 audio adapter owns existing Timbre synthesis and note dispatch. The player factory
 connects these to the legacy controls and visualizations.
 
-The [audio dependency audit](audio-dependencies.md) records packaging blockers and
-the remaining artifact/license/sample-host checks. Next is completing those checks
-and replacing the audio dependencies in a focused changeset, before the React UI.
+Soundfont samples now use controller-owned caching, fetch, and native decoding,
+while retaining the existing sample bank and Timbre mixer. The three legacy
+JSONP/MP3/soundfont scripts are removed. The [audio dependency audit](audio-dependencies.md)
+records sample-host verification and remaining Timbre artifact/license checks.
+Next is resolving Timbre packaging or synthesis replacement before the React UI.
 Keep transport state and shared vendor resources out of Jotai; retain listening checks.
 The algorithm function/metadata format and editor remain unchanged; do not add parser/build
 machinery solely to reorganize metadata.

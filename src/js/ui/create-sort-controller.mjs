@@ -1,4 +1,5 @@
 import { $, timbre } from "../vendor.mjs";
+import { createTimbreSoundfont } from "../audio/create-timbre-soundfont.mjs";
 import { scales } from "../midi/scales.ts";
 import { min, max } from "d3-array";
 import { scaleLinear } from "d3-scale";
@@ -31,7 +32,8 @@ export function createSortController(generators, settingsStore = createStore()) 
   let destroyed = false;
   let suspended = false;
   const Helper = createHelpers(Sort);
-  const createPlayer = createPlayerFactory(Sort, Helper, settingsStore);
+  const soundfont = createTimbreSoundfont(timbre);
+  const createPlayer = createPlayerFactory(Sort, Helper, settingsStore, soundfont);
   let disconnectSettings = () => {};
   let volumeSlider;
   let tempoSlider;
@@ -534,7 +536,7 @@ export function createSortController(generators, settingsStore = createStore()) 
           midiNotes.push(midi);
         }
       }
-      timbre.soundfont.preload(midiNotes);
+      void soundfont.preload(midiNotes);
     }
   };
 
@@ -700,7 +702,7 @@ export function createSortController(generators, settingsStore = createStore()) 
           players.sort.refreshWaveGenerator();
           players.base.drawWaveformCanvases();
         },
-        setInstrument: (instrument) => timbre.soundfont.setInstrument(instrument),
+        setInstrument: (instrument) => soundfont.setInstrument(instrument),
         preload: preloadSoundfonts,
       });
       try {
@@ -775,6 +777,7 @@ export function createSortController(generators, settingsStore = createStore()) 
     cancelWorker();
     players.base?.suspend();
     players.sort?.suspend();
+    soundfont.pause();
     editorRequest++;
     activeEditorModal = null;
     if (initialized) closeModals();
@@ -790,6 +793,7 @@ export function createSortController(generators, settingsStore = createStore()) 
     if (destroyed) return;
     Sort.suspend();
     destroyed = true;
+    soundfont.dispose();
     if (!initialized) return;
     // The legacy controller owns a document-wide UI, but removes only its
     // uniquely namespaced handlers, never unrelated jQuery/plugin listeners.

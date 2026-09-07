@@ -73,8 +73,10 @@ and closes dialogs while keeping data/settings. Cached `pageshow` reconnects and
 re-sorts without automatically resuming audio. Non-cached exits and Vite disposal
 destroy the controller. A new controller can mount the existing markup and store;
 simultaneous controllers sharing the same fixed DOM IDs are not supported.
-Global vendor libraries and remote soundfont caches remain library-owned, pending
-the audio dependency migration; teardown does not shut down the shared AudioContext.
+Soundfont caches are controller-owned: suspension pauses samples, while destruction
+aborts pending requests and releases sample nodes. The first-party loader fetches
+the existing MP3 samples and uses native decoding instead of JSONP. Global vendor
+libraries remain library-owned; teardown does not shut down the shared AudioContext.
 
 [`vendor.mjs`](../src/js/vendor.mjs) captures globals from the classic scripts in
 the footer, which must load before the module entry. The UI uses jQuery plugins,

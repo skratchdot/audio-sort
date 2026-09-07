@@ -741,6 +741,72 @@ test("resizing and saving a selected algorithm update sorting without reselectin
   await expect(page.locator("#sort-player .position-max")).toHaveText("2");
 });
 
+test("soundfonts decode native audio and play buffered notes without JSONP", async ({ page }) => {
+  // A tiny stereo WAV fixture served at the MP3 URL exercises native content
+  // decoding without depending on the external sample host during CI.
+  const frames = 800;
+  const wav = Buffer.alloc(44 + frames * 4);
+  wav.write("RIFF", 0);
+  wav.writeUInt32LE(wav.length - 8, 4);
+  wav.write("WAVEfmt ", 8);
+  wav.writeUInt32LE(16, 16);
+  wav.writeUInt16LE(1, 20);
+  wav.writeUInt16LE(2, 22);
+  wav.writeUInt32LE(8000, 24);
+  wav.writeUInt32LE(32000, 28);
+  wav.writeUInt16LE(4, 32);
+  wav.writeUInt16LE(16, 34);
+  wav.write("data", 36);
+  wav.writeUInt32LE(frames * 4, 40);
+  for (let i = 0; i < frames; i++) {
+    wav.writeInt16LE(Math.round(Math.sin(i * 0.2) * 10000), 44 + i * 4);
+    wav.writeInt16LE(Math.round(Math.cos(i * 0.2) * 5000), 46 + i * 4);
+  }
+  const requests = [];
+  await page.route("**/free-midi/**/*.mp3", (route) => {
+    requests.push(route.request().url());
+    return route.fulfill({
+      body: wav,
+      contentType: "audio/wav",
+      headers: { "access-control-allow-origin": "*" },
+    });
+  });
+  await page.goto("index.html");
+  await page.evaluate(() => {
+    const T = globalThis.timbre;
+    globalThis.samplePlays = [];
+    const prototype = T.fn.getClass("buffer").prototype;
+    const bang = prototype.bang;
+    prototype.bang = function (...args) {
+      globalThis.samplePlays.push({
+        channels: this._.channels,
+        length: this.buffer.buffer[0].length,
+        peak: Math.max(...this.buffer.buffer[0]),
+      });
+      return bang.apply(this, args);
+    };
+  });
+  await page.locator('[data-audio-type="soundfont"].btn').click();
+  await expect.poll(() => requests.length).toBeGreaterThan(0);
+  // Replaying retries missed first-pass notes, matching preload-only cache misses.
+  await expect(async () => {
+    await page.locator('#base-section [data-action="play"]').click();
+    await expect
+      .poll(() => page.evaluate(() => globalThis.samplePlays.length), { timeout: 2000 })
+      .toBeGreaterThan(0);
+  }).toPass();
+  const played = await page.evaluate(() => globalThis.samplePlays[0]);
+  expect(played.channels).toBe(2);
+  expect(played.length).toBeGreaterThan(0);
+  expect(played.peak).toBeGreaterThan(0);
+  expect(
+    await page
+      .locator('script[src*="free-midi"], script[src*="mp3_decode"], script[src*="audio-jsonp"]')
+      .count(),
+  ).toBe(0);
+  expect(await page.evaluate(() => globalThis.timbre.soundfont)).toBeUndefined();
+});
+
 test("audio settings render selections and survive subscription reconnection", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));

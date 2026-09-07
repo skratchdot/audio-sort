@@ -12,12 +12,30 @@ not start playback.
 ADSHR and oscillator/pluck nodes, MIDI note triggers, gain, preview plotting,
 and node disposal. It accepts the engine and settings getters as dependencies.
 The player factory now connects those modules to sliders, buttons, and D3.
-Shared soundfont caches, instrument selection, and preloading still belong to
-the legacy application boundary; they are not made per-player or placed in Jotai.
+`audio/create-soundfont.ts` now owns a controller-scoped sample cache shared by
+both players. `audio/create-timbre-soundfont.mjs` decodes fetched MP3s with the
+existing AudioContext and feeds stereo buffers into the existing Timbre mixer.
+No remote code is executed. Instrument selection is synchronized from settings;
+audio buffers and pending requests remain outside Jotai.
 
-## Audit (2026-09-07)
+Cache misses fetch without playing late (the former `play(note, false)` behavior).
+Concurrent requests are deduplicated, failed requests can retry, and fetches have
+a ten-second abort timeout. Suspension pauses cached sample nodes; destruction
+aborts pending requests, releases nodes, and ignores late decoder results.
 
-No audio dependencies or public assets are replaced in this changeset.
+The JSONP, MP3 decoder, and soundfont vendor scripts are removed. The implementation
+is first-party code, not a relocated vendor bundle. The remote GeneralUser GS bank
+and numeric instrument/note mapping are unchanged. Native decoding may differ in
+encoder-padding handling from the old JS decoder; listening review is still required.
+
+Verification includes deterministic fetch/decode/cache tests, real browser stereo
+buffer playback using a generated fixture, and a manual Chrome network/decode smoke
+check of notes 60 for instruments 0, 42, and 127. The real host returned HTTP 200,
+allowed CORS, and all three MP3s decoded as stereo at 44100 Hz on 2026-09-07.
+
+## Initial audit (2026-09-07, before native sample loading)
+
+These findings motivated the native loader above; Timbre packaging is still pending.
 
 | Component                    | Evidence and compatibility concerns                                                                                                                                                                                                                                     | Next action                                                                                                                                                                                                                   |
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -42,8 +60,9 @@ Primary references:
 
 ## Next cohesive audio changeset
 
-Complete the browser-artifact/license comparison and sample-host checks, then
-choose pinned compatible Timbre packaging or a first-party audio implementation.
+Complete the Timbre browser-artifact/license comparison, then choose pinned
+compatible packaging or a first-party synthesis implementation. Native sample
+loading no longer depends on its old decoder extensions, reducing that coupling.
 Do not change the sample bank silently: another soundfont library's defaults can
 change every instrument's sound. Keep synthesis replacement separate from React.
 Audition waveform and soundfont modes, envelope edits, instrument changes,
