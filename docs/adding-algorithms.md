@@ -10,7 +10,7 @@ stability, implementation status, and compatibility notes.
    [`algorithm-registry.mjs`](../src/js/sorting/algorithm-registry.mjs).
 3. Add a raw-source import and matching entry in
    [`algorithm-sources.mjs`](../src/js/sorting/algorithm-sources.mjs) for the editor.
-4. Run `npm run check`, then `npm run test:browser`. See
+4. Run `pnpm run check`, then `pnpm run test:browser`. See
    [Development](development.md) for browser setup.
 
 Keep the function body self-contained: use `AS` and standard JavaScript, with

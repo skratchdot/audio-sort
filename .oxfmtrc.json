@@ -3,8 +3,8 @@
   "ignorePatterns": [
     "_ignore/**",
     "dist/**",
-    "package-lock.json",
     "playwright-report/**",
+    "pnpm-lock.yaml",
     "public/**",
     "src/.11ty-vite/**",
     "test-results/**"

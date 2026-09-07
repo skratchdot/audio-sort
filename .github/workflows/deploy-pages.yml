@@ -23,23 +23,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: "lts/*"
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Lint, format, test, and build
-        run: npm run check
+        run: pnpm run check
 
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Test the built site and worker
-        run: npm run test:browser
+        run: pnpm run test:browser
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
