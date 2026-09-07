@@ -38,7 +38,7 @@ test("public assets are copied unchanged and CSS images load under the site base
   baseURL,
 }) => {
   const source = fileURLToPath(new URL("../../public/", import.meta.url));
-  const output = fileURLToPath(new URL("../../dist/", import.meta.url));
+  const output = fileURLToPath(new URL("../../dist/audio-sort/", import.meta.url));
   const files = readdirSync(source, { recursive: true, withFileTypes: true }).filter(
     (entry) => entry.isFile() && entry.name !== ".DS_Store",
   );
@@ -99,11 +99,8 @@ test("every data generator feeds valid input to the worker", async ({ page }) =>
   expect(errors).toEqual([]);
 });
 
-test("production output contains only public pages and assets", ({ baseURL }) => {
-  const output = new URL(
-    new URL(baseURL).pathname === "/audio-sort/" ? "../../.test-pages/audio-sort/" : "../../dist/",
-    import.meta.url,
-  );
+test("production output contains only public pages and assets", () => {
+  const output = new URL("../../dist/audio-sort/", import.meta.url);
   expect(readdirSync(output).sort()).toEqual([
     ".nojekyll",
     "about",

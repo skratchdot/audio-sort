@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  base: process.env.VITE_BASE_PATH || "/",
+  base: "/audio-sort/",
   plugins: [
     tanstackStart({
       router: { generatedRouteTree: "route-tree.gen.ts" },
@@ -18,7 +18,7 @@ export default defineConfig({
   // Timbre's browser CommonJS entry publishes through `global.timbre`.
   define: { global: "globalThis" },
   environments: {
-    client: { build: { outDir: process.env.SITE_OUTPUT_DIR || "dist" } },
+    client: { build: { outDir: "dist/audio-sort" } },
     ssr: { build: { outDir: ".tanstack/server" } },
   },
 });

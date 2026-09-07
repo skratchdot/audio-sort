@@ -42,16 +42,15 @@ The existing workspace, runtime, and visual design are retained.
   It renders the workspace within Start's React root; runtime lifecycle cleanup
   handles navigation away, cached pages, and remounts. Audio/editor modules never
   execute during prerendering.
-- Public routes are `/`, `/about`, and `/api`. Per the user's updated preference,
+- Public routes are `/audio-sort/`, `/audio-sort/about`, and `/audio-sort/api`. Per the user's updated preference,
   no `.html` compatibility routes or rewrites are included. Internal links use
   TanStack navigation; static hosting may append a directory trailing slash.
-- `vite.config.mjs` emits directory index HTML and client assets to `dist/`, and build-time
+- `vite.config.mjs` emits directory index HTML and client assets to `dist/audio-sort/`, and build-time
   server files to ignored `.tanstack/server/`. No server is deployed.
-- Builds use an explicit base: `/` by default; the deployment workflow sets
-  `VITE_BASE_PATH=/audio-sort/` and runs the same `build` command.
-  Browser tests build `.test-pages/audio-sort/` separately and serve both using
-  `sirv-cli`, with no custom preview configuration or SPA fallback. CI rebuilds
-  for Pages before uploading `dist/`; timeouts remain.
+- Development, production, preview, and browser tests share `/audio-sort/`.
+  There is one build and one browser suite. Preview serves `dist/` using `sirv-cli`,
+  with no custom preview configuration or SPA fallback. CI uploads the tested
+  `dist/audio-sort/` directory without rebuilding; timeouts remain.
 - Prerendering uses Start's automatic route discovery, with no manual page list or
   per-page output configuration. Link crawling stays disabled because it duplicates
   base-prefixed URLs in the Pages build.
@@ -71,6 +70,6 @@ or audio-engine rewrite is needed for this shell migration.
 
 - `pnpm run format && pnpm run check`
 - `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' pnpm run test:browser`
-- Browser suites exercise root and Pages paths. Never rebuild while they run.
+- Browser tests exercise the shared `/audio-sort/` path. Never rebuild while they run.
 - Review desktop/tablet/mobile layouts and audition waveform/soundfont playback.
 - See `docs/architecture.md` for ownership and lifecycle details.

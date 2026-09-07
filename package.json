@@ -20,12 +20,11 @@
   "type": "module",
   "scripts": {
     "build": "pnpm run clean && vite build",
-    "build:test-pages": "VITE_BASE_PATH=/audio-sort/ SITE_OUTPUT_DIR=.test-pages/audio-sort vite build",
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
     "dev": "vite dev",
     "start": "pnpm run dev",
     "preview": "sirv dist",
-    "test:browser": "pnpm run build:test-pages && playwright test",
+    "test:browser": "playwright test",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "lint": "oxlint --deny-warnings",
