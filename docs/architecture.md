@@ -31,8 +31,8 @@ generator presets stay fixed, and sustain edits retain two-decimal rounding.
 
 This is a state-storage migration, not a reactive UI rewrite: existing handlers
 still update DOM controls and audio resources. Writing directly to an injected
-store does not yet synchronize those side effects. Custom
-algorithm overrides, and player-local toggles remain for subsequent steps.
+store does not yet synchronize those side effects. Player-local toggles remain
+for subsequent steps.
 
 [`vendor.mjs`](../src/js/vendor.mjs) captures globals from the classic scripts in
 the footer, which must load before the module entry. The UI uses jQuery plugins,
@@ -77,7 +77,11 @@ JavaScript, not a security sandbox.
 ## Algorithms and editor source
 
 [`algorithm-registry.mjs`](../src/js/sorting/algorithm-registry.mjs) holds immutable built-in functions and
-metadata. The UI keeps its own mutable catalog for edits and additions.
+metadata. [`state/algorithm-overrides.ts`](../src/js/state/algorithm-overrides.ts)
+stores edits and additions per application store and derives a combined catalog.
+Built-in identities stay intact until overridden; invalid source is compiled
+before any state update. Duplicate IDs are rejected rather than replacing an
+existing entry. Function metadata and editor source format are unchanged.
 [`algorithm-sources.mjs`](../src/js/sorting/algorithm-sources.mjs) imports raw source separately so the
 editor shows readable code without including those strings in the worker bundle.
 Saving an edit creates a custom override and preserves its display metadata.

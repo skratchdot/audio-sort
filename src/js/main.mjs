@@ -12,7 +12,6 @@ const controller = createSortController(generators);
 controller.init({
   loadCodeEditor: () => import("./ui/create-code-editor.mjs"),
   createWorker: createSortWorker,
-  algorithms: { ...algorithms },
   createSortRequest,
   runSortRequest,
   getSource(id, algorithm) {
