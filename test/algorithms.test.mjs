@@ -5,6 +5,8 @@ import { algorithmNames, runAlgorithm, seededValues } from "./helpers/algorithms
 const cases = [
   { name: "empty", values: [] },
   { name: "one item", values: [7] },
+  { name: "two reversed items", values: [2, 1] },
+  { name: "two equal items", values: [1, 1] },
   { name: "sorted", values: [0, 1, 2, 3, 4] },
   { name: "reverse sorted", values: [4, 3, 2, 1, 0] },
   { name: "duplicates", values: [3, 1, 3, 2, 1, 0] },
@@ -19,6 +21,55 @@ const cases = [
 test("discovers the built-in algorithm registry", () => {
   expect(algorithmNames.length).toBeGreaterThan(0);
   expect(Object.keys(algorithms).sort()).toEqual(algorithmNames);
+});
+
+test("metadata describes the current recursive and full-prefix implementations", () => {
+  expect({ ...algorithms.quick }).toMatchObject({
+    stable: false,
+    best: "nlogn",
+    average: "nlogn",
+    worst: "n^2",
+    memory: "n",
+  });
+  expect(algorithms.heap.memory).toBe("logn");
+  expect(algorithms.insertion.best).toBe("n^2");
+});
+
+test("Quick's equal-key swaps demonstrate why it is not stable", () => {
+  const input = ["a", "b", "c"].map((id) => ({ id, value: 1 }));
+  const output = runAlgorithm("quick", input).at(-1).arr;
+  expect(output.map((item) => item.id)).not.toEqual(input.map((item) => item.id));
+});
+
+describe.each(["cocktail-shaker", "gnome", "comb"])("%s small-input coverage", (name) => {
+  test("sorts every five-item array over three keys, preserving identities", () => {
+    for (let code = 0; code < 3 ** 5; code++) {
+      const input = Array.from({ length: 5 }, (_, i) => ({
+        id: `item-${i}`,
+        value: Math.floor(code / 3 ** i) % 3,
+      }));
+      const output = runAlgorithm(name, input).at(-1).arr;
+      const expected = [...input].sort((a, b) => a.value - b.value);
+      expect(output.map((item) => item.value)).toEqual(expected.map((item) => item.value));
+      expect(output.map((item) => item.id).sort()).toEqual(input.map((item) => item.id).sort());
+      const ids = output.map((item) => item.id);
+      const expectedOrder = expected.map((item) => item.id);
+      expect(algorithms[name].stable ? ids : ids.sort()).toEqual(
+        algorithms[name].stable ? expectedOrder : expectedOrder.sort(),
+      );
+    }
+  });
+});
+
+describe.each(["cocktail-shaker", "gnome"])("%s early exit", (name) => {
+  test.each([
+    [0, 1, 2, 3, 4],
+    [1, 1, 1, 1, 1],
+  ])("uses a single scan on ordered input %j", (...values) => {
+    const final = runAlgorithm(name, values).at(-1);
+    expect(final.compareCount).toBe(values.length - 1);
+    expect(final.swapCount).toBe(0);
+  });
 });
 
 describe.each(algorithmNames)("%s", (name) => {
@@ -61,9 +112,7 @@ describe("stable algorithms", () => {
   for (const name of algorithmNames) {
     if (!algorithms[name].stable) continue;
 
-    // Quick currently advertises stability but exchanges equal-valued items.
-    // Keep this executable regression visible until its metadata is corrected.
-    test(`${name} preserves equal-item order as advertised`, { fails: name === "quick" }, () => {
+    test(`${name} preserves equal-item order as advertised`, () => {
       const input = [2, 1, 2, 1, 2, 1].map((value, i) => ({ id: `item-${i}`, value }));
       const expected = [...input].sort((a, b) => a.value - b.value);
       const final = runAlgorithm(name, input).at(-1).arr;

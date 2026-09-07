@@ -21,7 +21,8 @@ export default function insertion(AS) {
 
 insertion.display = "Insertion";
 insertion.stable = true;
-insertion.best = "n";
+// This version scans the entire prefix even when it is already sorted.
+insertion.best = "n^2";
 insertion.average = "n^2";
 insertion.worst = "n^2";
 insertion.memory = "1";
