@@ -55,7 +55,10 @@ AutoPlay and each player's
 loop preference live in `state/playback-preferences.ts`; their handlers render
 button state from the store instead of reading CSS classes. AutoPlay no longer
 uses Bootstrap's button toggle. Playing/stopped state, direction, position,
-timers, and audio nodes remain owned by the player.
+timers, and audio nodes remain outside the store. The player delegates position,
+direction, looping, and clock lifetime to `audio/create-transport.ts`, and synthesis
+and note dispatch to `audio/create-timbre-audio.mjs`. These modules do not own DOM
+elements. See the [audio boundary and dependency audit](audio-dependencies.md).
 
 Controllers are single-use: `init()` rejects repeated initialization; `destroy()`
 is idempotent. Destruction disconnects subscriptions, cancels the sort worker and

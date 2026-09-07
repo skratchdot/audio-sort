@@ -66,8 +66,14 @@ Controllers/players now have explicit suspension and teardown for subscriptions,
 workers, timers, editors, owned audio nodes, sliders, and event handlers. Cached
 pages preserve data/settings; remounting does not duplicate controls or listeners.
 
-Next is phase 5: separate playback/scheduling from DOM controls and audit/package
-the remaining audio dependencies as a larger cohesive changeset. Keep transport
-state and shared vendor resources out of Jotai; retain manual listening checks.
+Phase 5 is in progress: playback position, direction, looping, scheduling, and
+resume invalidation now live in a DOM-independent typed transport. A separate
+audio adapter owns existing Timbre synthesis and note dispatch. The player factory
+connects these to the legacy controls and visualizations.
+
+The [audio dependency audit](audio-dependencies.md) records packaging blockers and
+the remaining artifact/license/sample-host checks. Next is completing those checks
+and replacing the audio dependencies in a focused changeset, before the React UI.
+Keep transport state and shared vendor resources out of Jotai; retain listening checks.
 The algorithm function/metadata format and editor remain unchanged; do not add parser/build
 machinery solely to reorganize metadata.
