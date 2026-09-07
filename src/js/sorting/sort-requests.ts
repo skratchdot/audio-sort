@@ -10,7 +10,7 @@ import type {
 
 const builtins: Readonly<Record<string, SortAlgorithm>> = algorithms;
 
-export function getFunctionBody(fn: SortAlgorithm) {
+export function getFunctionBody(fn: SortAlgorithm | string) {
   const source = String(fn).trim();
   const start = source.indexOf("{");
   const end = source.lastIndexOf("}");

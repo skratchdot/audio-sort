@@ -17,13 +17,16 @@
     "type": "git",
     "url": "git://github.com/skratchdot/audio-sort.git"
   },
+  "type": "module",
   "scripts": {
-    "build": "pnpm run clean && eleventy",
+    "build": "pnpm run clean && vite build",
+    "build:pages": "VITE_BASE_PATH=/audio-sort/ pnpm run build",
+    "build:test-pages": "VITE_BASE_PATH=/audio-sort/ SITE_OUTPUT_DIR=.test-pages/audio-sort vite build",
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
-    "serve": "pnpm run clean && eleventy --serve",
+    "serve": "vite dev",
     "start": "pnpm run serve",
-    "preview": "vite preview --outDir dist",
-    "test:browser": "playwright test",
+    "preview": "sirv dist",
+    "test:browser": "pnpm run build:test-pages && playwright test",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "lint": "oxlint --deny-warnings",
@@ -34,6 +37,8 @@
     "watch": "pnpm run serve"
   },
   "dependencies": {
+    "@tanstack/react-router": "^1.170.33",
+    "@tanstack/react-start": "^1.168.50",
     "ace-builds": "1.44.0",
     "d3-array": "3.2.4",
     "d3-color": "3.1.0",
@@ -49,15 +54,15 @@
     "timbre": "14.11.25"
   },
   "devDependencies": {
-    "@11ty/eleventy": "^3.1.6",
-    "@11ty/eleventy-plugin-vite": "^8.0.0",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^26.4.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
     "oxfmt": "^0.66.0",
     "oxlint": "^1.81.0",
+    "sirv-cli": "^3.0.1",
     "tailwindcss": "^4.3.3",
     "typescript": "7.0.2",
     "vite": "^8.2.2",

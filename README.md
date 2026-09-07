@@ -36,6 +36,7 @@ See [development documentation](docs/development.md) for browser tests and deplo
 - [D3](https://d3js.org/) — Draws SVG bars, markers, and paths using modular selection, scale, color, shape, and array utilities.
 - [Jotai](https://jotai.org/) — Stores selected audio and sorting settings independently of the UI.
 - [React](https://react.dev/) — Renders settings, playback controls, and editing/export dialogs.
+- [TanStack Start](https://tanstack.com/start) — Prerenders the React pages for static hosting.
 - [Tailwind CSS](https://tailwindcss.com/) — Styles the workspace alongside first-party CSS.
 - [Lucide](https://lucide.dev/) — Provides consistent SVG icons for playback and other controls.
 - [Ace](https://ace.c9.io/) — Powers the algorithm editor with syntax highlighting and JavaScript diagnostics.

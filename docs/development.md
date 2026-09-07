@@ -11,9 +11,24 @@ the resulting `pnpm-lock.yaml`. Do not generate an npm lockfile.
 `pnpm start` serves the site with live updates. `pnpm run build` creates `dist/`;
 `pnpm run preview` serves that production build.
 
-Eleventy renders the HTML and Vite bundles JavaScript and CSS. Site files live in
-`src/`; tests and tool configuration stay at the root. `dist/` and temporary
-`src/.11ty-vite/` output are ignored by Git.
+TanStack Start prerenders the React pages and Vite bundles JavaScript and CSS.
+Site files live in `src/`; tests and tool configuration stay at the root.
+Only `dist/` is deployed. Build-time server files live in ignored `.tanstack/`;
+GitHub Pages needs no Node server.
+
+Routes are `/`, `/about`, and `/api`; the latter two are deployed as directory
+index files. A static host may append a trailing slash on direct visits.
+
+The default build targets `/`. `pnpm run build:pages` targets `/audio-sort/`.
+For another hosting path, set `VITE_BASE_PATH` when building. Preview uses `sirv-cli`
+to serve static files only, with no server rendering or SPA fallback.
+To preview the Pages path locally, run `pnpm run build:test-pages`, then
+`pnpm exec sirv .test-pages` and open `http://localhost:8080/audio-sort/`.
+
+Prerendering automatically discovers static routes; new static pages need no extra
+build configuration. Link crawling is disabled because Start currently duplicates
+base-prefixed URLs in the Pages build. Dynamic routes would need concrete URLs
+supplied explicitly.
 
 Static files live in root-level `public/`: images in `public/img/` and the
 `.nojekyll` marker. There are no vendored JavaScript files. Files are copied unchanged
@@ -28,16 +43,17 @@ first-party styles preserve the existing design. No Bootstrap overrides are need
 `pnpm run check` runs lint, formatting checks, TypeScript checking, unit tests, and a production build.
 
 - `pnpm run lint`: check first-party JavaScript and TypeScript with Oxlint.
-- `pnpm run typecheck`: check migrated `src/js/**/*.ts` modules with strict TypeScript settings; no files are emitted.
+- `pnpm run typecheck`: check TypeScript modules and React pages with strict settings; no files are emitted.
 - `pnpm run format`: format with Oxfmt; `pnpm run format:check` checks without editing.
 - `pnpm test`: run unit tests; `pnpm run test:watch` reruns them while editing.
 
 TypeScript can infer imported JavaScript modules (`allowJs`), but `checkJs` stays
 off until those modules are migrated. Worker payloads are still checked at runtime.
 
-Vendor and generated files are excluded from linting and formatting. Source CSS
-and HTML are formatted by Oxfmt. Pages use `src/_includes/layout.html` for the
-document wrapper so header/footer fragments can be formatted independently.
+Vendor and generated files are excluded from linting and formatting. Oxfmt formats
+source CSS and TSX alongside JavaScript. `src/pages/site-document.tsx` owns the
+shared document, header, and footer. Start generates `src/route-tree.gen.ts` from
+`src/routes/`; commit that file but do not edit it manually.
 
 Run browser tests against a completed production build:
 
@@ -50,8 +66,9 @@ pnpm run test:browser
 Do not rebuild `dist/` while browser tests are running. To use an existing Chrome
 installation, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its executable path.
 
-Browser tests cover root and `/audio-sort/` URLs, workers, editor behavior, and UI
-controls. External services are stubbed; audible output and remote soundfonts
+Browser tests build a separate Pages variant in ignored `.test-pages/audio-sort/` and serve
+it alongside `dist/`. They cover root and `/audio-sort/` URLs, workers, editor behavior,
+and UI controls. External services are stubbed; audible output and remote soundfonts
 need manual testing. Known bugs are tracked in [TODO](todo.md).
 
 ## Deployment
@@ -59,7 +76,8 @@ need manual testing. Known bugs are tracked in [TODO](todo.md).
 GitHub Actions runs checks and browser tests for PRs and before deployment.
 CI uses the latest Node.js LTS release. Check/build jobs have a 10-minute timeout;
 the deployment job has a 5-minute timeout.
-Updates to `main` publish `dist/` to GitHub Pages. The repository's Pages
+After checks, CI rebuilds `dist/` with the `/audio-sort/` base and publishes it.
+The repository's Pages
 publishing source must be **GitHub Actions**.
 
 ## Reference

@@ -9,11 +9,11 @@
 - TanStack Start follows in a separate PR. Redesign and license reporting are deferred.
 - `ui-design.md` and `ui-prototype.html` are exploratory reference, not implementation targets.
 
-## Current branch: react-tailwind-foundation
+## Completed UI migration
 
-PR #47 has been expanded from the initial waveform island to the whole workspace:
+PR #47 migrated the whole workspace; PR #48 polished icons, hover states, and typography:
 
-- `main.mjs` mounts React with a reusable vanilla Jotai store.
+- The workspace uses a reusable vanilla Jotai store.
 - `ui/workspace.tsx` assembles settings, playback controls, and native dialogs.
 - `ui/create-workspace.mjs` owns worker/data coordination and audio subscriptions.
 - `ui/create-workspace-player.mjs` bridges the existing transport/audio modules and D3.
@@ -31,20 +31,40 @@ All third-party JavaScript is imported from pnpm packages. Timbre remains pinned
 `14.11.25`, with Node-only dependencies excluded. Native sample loading replaces
 the old JSONP/MP3 extensions. No new license-output logic is included.
 
-## Next: TanStack Start
+## Current branch: tanstack-start-shell
 
-Replace the Eleventy/Liquid shell with React Home/About/API routes and a static
-build, preserving the current layout. Keep browser-only audio/editor dependencies
-out of server prerendering. Do not rewrite the runtime or redesign the workspace.
+Eleventy and Liquid are replaced by TanStack Start file routes and React pages.
+The existing workspace, runtime, and visual design are retained.
 
-Prove static `.html` URLs/direct reloads, root and `/audio-sort/`, worker/Ace URLs,
-public assets, hydration/unmount, and GitHub Pages without a server. Update exact
-production-output assertions deliberately. Preserve workflow timeouts.
+- `src/routes/` defines the three pages; Start generates `src/route-tree.gen.ts`.
+- `src/pages/site-document.tsx` renders the shared header/footer and document.
+- `src/pages/home.tsx` dynamically imports `src/js/main.tsx` after hydration.
+  It renders the workspace within Start's React root; runtime lifecycle cleanup
+  handles navigation away, cached pages, and remounts. Audio/editor modules never
+  execute during prerendering.
+- Public routes are `/`, `/about`, and `/api`. Per the user's updated preference,
+  no `.html` compatibility routes or rewrites are included. Internal links use
+  TanStack navigation; static hosting may append a directory trailing slash.
+- `vite.config.mjs` emits directory index HTML and client assets to `dist/`, and build-time
+  server files to ignored `.tanstack/server/`. No server is deployed.
+- Builds use an explicit base: `/` by default, `/audio-sort/` via `build:pages`.
+  Browser tests build `.test-pages/audio-sort/` separately and serve both using
+  `sirv-cli`, with no custom preview configuration or SPA fallback. CI rebuilds
+  for Pages before uploading `dist/`; timeouts remain.
+- Prerendering uses Start's automatic route discovery, with no manual page list or
+  per-page output configuration. Link crawling stays disabled because it duplicates
+  base-prefixed URLs in the Pages build.
+- Tests cover clean URLs/reloads, client navigation, no-JavaScript content,
+  hydration errors, lazy-load recovery, and the existing workspace regressions.
+- Adding Vite's raw-import types exposed an existing `getFunctionBody` signature
+  mismatch; it now explicitly accepts the source strings it already handled.
 
-Start is not installed yet. The official
-[static prerendering guide](https://tanstack.com/start/latest/docs/framework/react/guide/static-prerendering)
-and [setup guide](https://tanstack.com/start/latest/docs/framework/react/build-from-scratch)
-were reviewed for the approach; recheck installed APIs during implementation.
+## Next
+
+Review this migration before starting phase 8 (recorded writes/auxiliary buffers
+and Merge sort). Keep redesign and license reporting deferred. See
+`modernization.md` for the overall sequence; no algorithm metadata-format change
+or audio-engine rewrite is needed for this shell migration.
 
 ## Verification
 
