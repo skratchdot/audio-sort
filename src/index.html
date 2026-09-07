@@ -1,138 +1,160 @@
-{% include "header.html" %}
+---
+layout: layout.html
+init_audio_sort: true
+---
+
 <section class="container" id="base-section">
-	<div class="page-header">
-		<h4>
-			Audio Data
-			<small>
-				modify the data set you will be sorting.
-				preview how the data sounds and set playback options.
-			</small>
-			<span data-midi-export="base" class="btn btn-mini btn-info pull-right">Export As Midi <i class="icon-white icon-download-alt"></i></span>
-			<div class="clearfix"></div>
-		</h4>
-	</div>
-	<div class="row">
-		<div class="span4">
-			<ul id="settings" class="nav nav-tabs">
-				<li class="active"><a href="#audio" data-toggle="tab">Audio</a></li>
-				<li data-audio-type="waveform"><a href="#waveform" data-toggle="tab">Waveform</a></li>
-				<li data-audio-type="soundfont" class="hidden"><a href="#soundfont" data-toggle="tab">SoundFont</a></li>
-				<li><a href="#scale" data-toggle="tab">Scale</a></li>
-				<li class="hide"><a href="#save" data-toggle="tab">Save</a></li>
-			</ul>
-			<div id="settings-content" class="tab-content">
-				{% include "pane-audio.html" %}
-				{% include "pane-waveform.html" %}
-				{% include "pane-soundfont.html" %}
-				{% include "pane-scale.html" %}
-				{% include "pane-save.html" %}
-			</div>
-		</div>
-		<div class="span8">
-			<div id="base-player" class="player-buttons">
-				{% include "player-buttons.html" %}
-				<div class="mobile-break">&nbsp;</div>
-				<span data-action="loop" class="btn btn-mini active"><i class="icon-repeat"></i> Loop?</span>
-				<div class="mobile-break">&nbsp;</div>
-				<div class="pull-right">
-					<span class="position-current"></span>
-					/
-					<span class="position-max"></span>
-				</div>
-			</div>
-			<div id="base-chart"><svg id="base-svg"></svg></div>
-			<div class="position-container"></div>
-			<div id="base-buttons">
-				<span class="btn btn-mini btn-primary" data-action="sorted">Sorted</span>
-				<span class="btn btn-mini btn-primary" data-action="reverse">Reverse</span>
-				<span class="btn btn-mini btn-primary" data-action="randomUnique">Random (Unique)</span>
-				<span class="btn btn-mini btn-primary" data-action="randomDupes">Random (Dupes)</span>
-				<span class="btn btn-mini btn-primary" data-action="almostSorted">Almost Sorted</span>
-				<span class="btn btn-mini btn-primary" data-action="fewUnique">Few Unique</span>
-			</div>
-		</div>
-	</div>
+  <div class="page-header">
+    <h4>
+      Audio Data
+      <small>
+        modify the data set you will be sorting. preview how the data sounds and set playback
+        options.
+      </small>
+      <span data-midi-export="base" class="btn btn-mini btn-info pull-right"
+        >Export As Midi <i class="icon-white icon-download-alt"></i
+      ></span>
+      <div class="clearfix"></div>
+    </h4>
+  </div>
+  <div class="row">
+    <div class="span4">
+      <ul id="settings" class="nav nav-tabs">
+        <li class="active"><a href="#audio" data-toggle="tab">Audio</a></li>
+        <li data-audio-type="waveform">
+          <a href="#waveform" data-toggle="tab">Waveform</a>
+        </li>
+        <li data-audio-type="soundfont" class="hidden">
+          <a href="#soundfont" data-toggle="tab">SoundFont</a>
+        </li>
+        <li><a href="#scale" data-toggle="tab">Scale</a></li>
+        <li class="hide"><a href="#save" data-toggle="tab">Save</a></li>
+      </ul>
+      <div id="settings-content" class="tab-content">
+        {% include "pane-audio.html" %} {% include "pane-waveform.html" %} {% include
+        "pane-soundfont.html" %} {% include "pane-scale.html" %} {% include "pane-save.html" %}
+      </div>
+    </div>
+    <div class="span8">
+      <div id="base-player" class="player-buttons">
+        {% include "player-buttons.html" %}
+        <div class="mobile-break">&nbsp;</div>
+        <span data-action="loop" class="btn btn-mini active"
+          ><i class="icon-repeat"></i> Loop?</span
+        >
+        <div class="mobile-break">&nbsp;</div>
+        <div class="pull-right">
+          <span class="position-current"></span>
+          /
+          <span class="position-max"></span>
+        </div>
+      </div>
+      <div id="base-chart"><svg id="base-svg"></svg></div>
+      <div class="position-container"></div>
+      <div id="base-buttons">
+        <span class="btn btn-mini btn-primary" data-action="sorted">Sorted</span>
+        <span class="btn btn-mini btn-primary" data-action="reverse">Reverse</span>
+        <span class="btn btn-mini btn-primary" data-action="randomUnique">Random (Unique)</span>
+        <span class="btn btn-mini btn-primary" data-action="randomDupes">Random (Dupes)</span>
+        <span class="btn btn-mini btn-primary" data-action="almostSorted">Almost Sorted</span>
+        <span class="btn btn-mini btn-primary" data-action="fewUnique">Few Unique</span>
+      </div>
+    </div>
+  </div>
 </section>
 <section class="container" id="sort-section">
-	<div class="page-header">
-		<h4>
-			Sorting
-			<small>
-				choose a sorting algorithm to visualize and
-				audibilize how the algorithm works.
-			</small>
-			<span data-midi-export="sort" class="btn btn-mini btn-info pull-right">Export As Midi <i class="icon-white icon-download-alt"></i></span>
-			<div class="clearfix"></div>
-		</h4>
-	</div>
-	<div class="row">
-		<div class="span3">
-			<div id="sort-options-header" class="clearfix">
-				<strong>Sort:</strong>
-				<div id="modal-sort-open" class="pull-right btn btn-info btn-mini pull-right">
-					<em id="sort-display">&nbsp;</em>
-					<i class="icon-white icon-info-sign"></i>
-				</div>
-				<div class="clearfix" style="height:1px;overflow:hidden;float:none;">&nbsp;</div>
-			</div>
-			<ul id="sort-options" class="nav nav-pills nav-stacked"></ul>
-			<div>
-				<div id="sort-autoplay" data-toggle="button" class="btn btn-mini">AutoPlay?</div>
-				<div id="add-algorithm-btn" class="pull-right btn btn-mini btn-info">
-					Add Algorithm
-					<i class="icon-white icon-plus-sign"></i>
-				</div>
-			</div>
-			<div class="clearfix"></div>
-		</div>
-		<div class="span1 text-center">
-			<div class="btn-group" data-toggle="buttons-radio" style="margin-bottom:10px;">
-				<button type="button" class="btn btn-mini sort-visualization active" data-visualization="bar"><i class="icon-signal"></i></button>
-				<button type="button" class="btn btn-mini sort-visualization"  data-visualization="flat"><i class="icon-list"></i></button>
-			</div>
+  <div class="page-header">
+    <h4>
+      Sorting
+      <small>
+        choose a sorting algorithm to visualize and audibilize how the algorithm works.
+      </small>
+      <span data-midi-export="sort" class="btn btn-mini btn-info pull-right"
+        >Export As Midi <i class="icon-white icon-download-alt"></i
+      ></span>
+      <div class="clearfix"></div>
+    </h4>
+  </div>
+  <div class="row">
+    <div class="span3">
+      <div id="sort-options-header" class="clearfix">
+        <strong>Sort:</strong>
+        <div id="modal-sort-open" class="pull-right btn btn-info btn-mini pull-right">
+          <em id="sort-display">&nbsp;</em>
+          <i class="icon-white icon-info-sign"></i>
+        </div>
+        <div class="clearfix" style="height: 1px; overflow: hidden; float: none">&nbsp;</div>
+      </div>
+      <ul id="sort-options" class="nav nav-pills nav-stacked"></ul>
+      <div>
+        <div id="sort-autoplay" data-toggle="button" class="btn btn-mini">AutoPlay?</div>
+        <div id="add-algorithm-btn" class="pull-right btn btn-mini btn-info">
+          Add Algorithm
+          <i class="icon-white icon-plus-sign"></i>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+    <div class="span1 text-center">
+      <div class="btn-group" data-toggle="buttons-radio" style="margin-bottom: 10px">
+        <button
+          type="button"
+          class="btn btn-mini sort-visualization active"
+          data-visualization="bar"
+          aria-label="Bar visualization"
+        >
+          <i class="icon-signal"></i>
+        </button>
+        <button
+          type="button"
+          class="btn btn-mini sort-visualization"
+          data-visualization="flat"
+          aria-label="Flat visualization"
+        >
+          <i class="icon-list"></i>
+        </button>
+      </div>
 
-			<div><strong>Position:</strong></div>
-			<span class="position-current">&nbsp;</span>
-			<br />
-			<span class="position-max max-divider">&nbsp;</span>
+      <div><strong>Position:</strong></div>
+      <span class="position-current">&nbsp;</span>
+      <br />
+      <span class="position-max max-divider">&nbsp;</span>
 
-			<div><strong>Compares:</strong></div>
-			<span class="compare-current">&nbsp;</span>
-			<br />
-			<span class="compare-max max-divider">&nbsp;</span>
+      <div><strong>Compares:</strong></div>
+      <span class="compare-current">&nbsp;</span>
+      <br />
+      <span class="compare-max max-divider">&nbsp;</span>
 
-			<div><strong>Swaps:</strong></div>
-			<span class="swap-current">&nbsp;</span>
-			<br />
-			<span class="swap-max max-divider">&nbsp;</span>
-		</div>
-		<div class="span8">
-			<div id="sort-player" class="player-buttons">
-				<div class="pull-left">
-					c:
-					<span class="compare-current"></span>
-					/
-					s:
-					<span class="swap-current"></span>
-				</div>
-				<div class="mobile-break">&nbsp;</div>
-				{% include "player-buttons.html" %}
-				<div class="mobile-break">&nbsp;</div>
-				<span data-action="loop" class="btn btn-mini active"><i class="icon-repeat"></i> Loop?</span>
-				<div class="mobile-break">&nbsp;</div>
-				<div class="pull-right">
-					<span class="position-current"></span>
-					/
-					<span class="position-max"></span>
-				</div>
-			</div>
-			<div id="sort-chart"><svg id="sort-svg"></svg></div>
-			<div class="position-container"></div>
-		</div>
-	</div>
+      <div><strong>Swaps:</strong></div>
+      <span class="swap-current">&nbsp;</span>
+      <br />
+      <span class="swap-max max-divider">&nbsp;</span>
+    </div>
+    <div class="span8">
+      <div id="sort-player" class="player-buttons">
+        <div class="pull-left">
+          c:
+          <span class="compare-current"></span>
+          / s:
+          <span class="swap-current"></span>
+        </div>
+        <div class="mobile-break">&nbsp;</div>
+        {% include "player-buttons.html" %}
+        <div class="mobile-break">&nbsp;</div>
+        <span data-action="loop" class="btn btn-mini active"
+          ><i class="icon-repeat"></i> Loop?</span
+        >
+        <div class="mobile-break">&nbsp;</div>
+        <div class="pull-right">
+          <span class="position-current"></span>
+          /
+          <span class="position-max"></span>
+        </div>
+      </div>
+      <div id="sort-chart"><svg id="sort-svg"></svg></div>
+      <div class="position-container"></div>
+    </div>
+  </div>
 </section>
-{% include "modal-add-algorithm.html" %}
-{% include "modal-midi-export.html" %}
-{% include "modal-sort.html" %}
-{% assign init_audio_sort = true %}
-{% include "footer.html" %}
+{% include "modal-add-algorithm.html" %} {% include "modal-midi-export.html" %} {% include
+"modal-sort.html" %}

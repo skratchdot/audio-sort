@@ -6,7 +6,6 @@
   "ignorePatterns": [
     "public/**",
     "dist/**",
-    "_site/**",
     "_ignore/**",
     "src/.11ty-vite/**",
     "test-results/**",

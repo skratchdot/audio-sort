@@ -19,10 +19,10 @@
   },
   "scripts": {
     "build": "npm run clean && eleventy",
-    "clean": "node -e \"require('node:fs').rmSync('_site', { recursive: true, force: true })\"",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
     "serve": "npm run clean && eleventy --serve",
     "start": "npm run serve",
-    "preview": "vite preview --outDir _site",
+    "preview": "vite preview --outDir dist",
     "test:browser": "playwright test",
     "test": "vitest run",
     "test:watch": "vitest --watch",

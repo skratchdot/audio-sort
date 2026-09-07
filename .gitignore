@@ -1,6 +1,5 @@
 /node_modules/
 /_ignore/
-/_site/
 /dist/
 /src/.11ty-vite/
 /test-results/
