@@ -19,7 +19,10 @@ factories. Visualizations are registered in
 
 [`vendor.mjs`](../src/js/vendor.mjs) captures globals from the classic scripts in
 the footer, which must load before the module entry. The UI uses jQuery plugins,
-timbre, D3 v3, and Ace. It targets fixed DOM IDs and has no multi-mount or teardown
+timbre and D3 v3. Ace is imported from the pinned `ace-builds` npm package, with its
+JavaScript mode, Monokai theme, and diagnostics worker bundled by Vite. The editor uses
+two-space soft tabs and preserves source text without a separate beautifier.
+It targets fixed DOM IDs and has no multi-mount or teardown
 lifecycle. Data generators and utilities are modules with explicit imports;
 [`generator-registry.mjs`](../src/js/generators/generator-registry.mjs) supplies the controller's generator catalog.
 

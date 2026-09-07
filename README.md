@@ -44,7 +44,7 @@ See [development documentation](docs/development.md) for browser tests and deplo
 
 - [bootstrap-slider](http://www.eyecon.ro/bootstrap-slider/)
 
-- [JS Beautifier](http://jsbeautifier.org/)
+- [Ace](https://ace.c9.io/)
 
 - [JsMidGen](https://github.com/dingram/jsmidgen)
 

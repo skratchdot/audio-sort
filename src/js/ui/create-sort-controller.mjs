@@ -1,4 +1,4 @@
-import { $, sc, ace, d3, js_beautify, timbre, saveAs } from "../vendor.mjs";
+import { $, sc, d3, timbre, saveAs } from "../vendor.mjs";
 import { createHelpers } from "./create-helpers.mjs";
 import { createPlayerFactory } from "./create-player-factory.mjs";
 import { MidiExport } from "../midi/midi-export.mjs";
@@ -78,6 +78,7 @@ export function createSortController(generators) {
     createSortRequest,
     runSortRequest,
     getSource,
+    createCodeEditor,
     workerOnMessage,
     workerOnError,
     // Functions
@@ -370,28 +371,12 @@ export function createSortController(generators) {
   addAceEditor = function (container) {
     var $container = $(container),
       id = "id_" + new Date().getTime();
+    if (aceEditor) {
+      aceEditor.destroy();
+      aceEditor.getSession().destroy();
+    }
     $container.empty().append('<div class="js-editor" id="' + id + '"></div>');
-    aceEditor = ace.edit(id);
-    aceEditor.setTheme("ace/theme/monokai");
-    aceEditor.getSession().setMode("ace/mode/javascript");
-    aceEditor.getSession().on("changeAnnotation", function () {
-      var i,
-        annotation,
-        annotationsOld = aceEditor.getSession().getAnnotations(),
-        annotationsNew = [],
-        changed = false;
-      for (i = 0; i < annotationsOld.length; i++) {
-        annotation = annotationsOld[i];
-        if (annotation.text === "'AS' is not defined.") {
-          changed = true;
-        } else {
-          annotationsNew.push(annotation);
-        }
-      }
-      if (changed) {
-        aceEditor.getSession().setAnnotations(annotationsNew);
-      }
-    });
+    aceEditor = createCodeEditor(id);
   };
 
   onMidiExportClick = function () {
@@ -464,10 +449,6 @@ export function createSortController(generators) {
     $modal.find("#sort-info-method").html(selectedSort.method || "&nbsp;");
     addAceEditor("#sort-algorithm");
     fnText = getSource(selected.sort, selectedSort);
-    fnText = js_beautify(fnText, {
-      indent_size: 1,
-      indent_char: "\t",
-    });
     aceEditor.setValue(fnText);
     aceEditor.clearSelection();
     $modal.modal();
@@ -757,6 +738,7 @@ export function createSortController(generators) {
     createSortRequest = options.createSortRequest;
     runSortRequest = options.runSortRequest;
     getSource = options.getSource;
+    createCodeEditor = options.createCodeEditor;
     // when using a mobile device, decrease samplerate.
     // idea taken from: http://mohayonao.github.io/timbre.js/misc/js/common.js
     if (timbre.envmobile) {
