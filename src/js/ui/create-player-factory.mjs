@@ -1,3 +1,5 @@
+import { createTimbreAudio } from "../audio/create-timbre-audio.mjs";
+import { createTransport } from "../audio/create-transport.ts";
 import { $, timbre } from "../vendor.mjs";
 import { drawEnvelopeDiagram } from "./envelope-diagram.ts";
 import { drawStringPreview } from "./string-preview.ts";
@@ -13,15 +15,12 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
     const player = {};
     const eventNamespace = ".audioSortPlayer" + ++nextPlayerId;
     let destroyed = false;
-    let playbackGeneration = 0;
     let $container;
     // Config Values
     const canvasBackground = "rgba(255, 255, 255, 0)";
     // State Variables
     const isLooping = () => settingsStore.get(playbackPreferencesAtom).loop[options.id];
-    let isPlaying;
-    let isReverse;
-    let intervalIndex;
+    let transport;
     let hasMarkers;
     let onClick;
     // Cached jQuery items
@@ -37,9 +36,12 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
     let svg;
     // Data
     let data;
-    let interval;
-    let env;
-    let waveGenerator;
+    const audio = createTimbreAudio(
+      timbre,
+      settings,
+      Helper.getMidiNumber,
+      () => transport?.isPlaying() || false,
+    );
     let visualization;
     let selectedVisualization = "bar";
 
@@ -50,8 +52,6 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
       options = options || {};
 
       // setup some more variables
-      isPlaying = options.isPlaying || false;
-      isReverse = options.isReverse || false;
       hasMarkers = options.hasMarkers || false;
       const allowHover = options.allowHover || false;
       const allowClick = options.allowClick || false;
@@ -59,7 +59,6 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
       if (typeof onClick !== "function") {
         onClick = $.noop;
       }
-      intervalIndex = 0;
       $container = $(containerSelector || null);
       $compareCurrent = $container.find(".compare-current");
       $compareMax = $container.find(".compare-max");
@@ -73,7 +72,13 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
 
       // setup audio envelopes/generators and interval
       player.refreshWaveGenerator();
-      interval = timbre("interval", { interval: settings.getTempoString() }, intervalCallback);
+      transport = createTransport({
+        createClock: audio.createClock,
+        isLooping,
+        onFrame: playFrame,
+        onStart: audio.start,
+        onSuspend: audio.suspend,
+      });
 
       // listen for player button clicks
       $container.find(".player-buttons").on("click" + eventNamespace, ".btn", onPlayerButtonClick);
@@ -117,7 +122,7 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
       const last = len - 1;
 
       // make sure we have a valid index
-      ensureIntervalIndex();
+      const intervalIndex = transport.getPosition();
 
       // draw our visualization
       const info = visualization.draw(intervalIndex);
@@ -152,69 +157,20 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
 
     const refreshSliderPosition = function () {
       if ($slider.length) {
-        $slider.slider("setValue", intervalIndex);
+        $slider.slider("setValue", transport.getPosition());
       }
     };
 
-    const ensureIntervalIndex = function () {
-      // ensure current index is safe
-      intervalIndex = Math.min(intervalIndex, data.length - 1);
-      intervalIndex = Math.max(intervalIndex, 0);
-    };
-
-    const intervalCallback = function () {
-      if (destroyed) return;
-      if (isPlaying) {
-        ensureIntervalIndex();
-        refreshSliderPosition();
-
-        // play if possible
-        if (data.length > 0) {
-          const info = data[intervalIndex];
-          const selectedAudioType = settings.getSelected("audioType");
-          for (let i = 0; i < info.arr.length; i++) {
-            const currentItem = info.arr[i];
-            if (currentItem.play) {
-              const midi = Helper.getMidiNumber(currentItem.value);
-              if (midi >= 0 && midi < 128) {
-                if (selectedAudioType === "waveform") {
-                  waveGenerator.noteOn(midi, 64);
-                } else if (selectedAudioType === "soundfont") {
-                  timbre.soundfont.play(midi, false, {
-                    mul: settings.getSelected("volume") * 1.5,
-                  });
-                }
-              }
-            }
-          }
-          drawSvg();
-        }
-
-        // we can advance now
-        intervalIndex = isReverse ? intervalIndex - 1 : intervalIndex + 1;
-
-        // we can stop if we are not looping
-        if (!isLooping() && (intervalIndex < 0 || intervalIndex >= data.length)) {
-          player.stop();
-        }
-
-        // we need to loop
-        if (isLooping() && intervalIndex < 0) {
-          intervalIndex = data.length - 1;
-        } else if (isLooping() && intervalIndex >= data.length) {
-          intervalIndex = 0;
-        }
-      } else {
-        player.stop();
-      }
+    const playFrame = function (index) {
+      refreshSliderPosition();
+      audio.playFrame(data[index]);
+      drawSvg();
     };
 
     const onPlayerButtonClick = function () {
-      const generation = playbackGeneration;
       const $item = $(this);
       const action = $item.data("action");
-      timbre.fn._audioContext.resume().then(function () {
-        if (destroyed || generation !== playbackGeneration) return;
+      transport.whenReady(audio.resume(), function () {
         if (action === "stop") {
           player.stop();
         } else if (action === "play") {
@@ -239,8 +195,7 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
     };
 
     const onSliderPositionChange = function (e) {
-      intervalIndex = parseInt(e.value, 10);
-      ensureIntervalIndex();
+      transport.seek(Number(e.value));
       drawSvg();
     };
 
@@ -248,6 +203,7 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
       if (destroyed) return;
       const selector = containerSelector + " .position-container";
       data = d;
+      transport.setLength(data.length);
       $slider = Helper.createSlider(
         selector,
         {
@@ -291,77 +247,41 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
     };
 
     player.setTempo = function (tempo) {
-      interval.set({ interval: tempo });
+      transport.setTempo(tempo);
     };
 
     player.setVolume = function (volume) {
-      waveGenerator.set({ mul: volume });
+      audio.setVolume(volume);
     };
 
-    player.play = function (reverse) {
-      if (destroyed) return;
-      interval.stop();
-      isPlaying = true;
-      if (reverse === true) {
-        isReverse = true;
-        if (intervalIndex <= 0) {
-          intervalIndex = data.length - 1;
-        }
-      } else {
-        isReverse = false;
-        if (intervalIndex >= data.length - 1) {
-          intervalIndex = 0;
-        }
-      }
-      isReverse = reverse === true ? true : false;
-      if (settings.getSelected("audioType") === "waveform") {
-        waveGenerator.play();
-      }
-      interval.start();
-    };
-
-    player.stop = function () {
-      isPlaying = false;
-      interval?.stop();
-    };
-
-    player.suspend = function () {
-      playbackGeneration++;
-      player.stop();
-      waveGenerator?.pause();
-      env?.pause();
-    };
+    player.play = (reverse) => transport?.play(reverse === true);
+    player.stop = () => transport?.stop();
+    player.suspend = () => transport?.suspend();
 
     player.destroy = function () {
       if (destroyed) return;
       destroyed = true;
-      player.suspend();
-      for (const node of [interval, waveGenerator, env]) {
-        node?.removeAllListeners?.();
-        node?.removeAll?.();
-      }
+      transport?.dispose();
+      audio.dispose();
       $container?.find(".player-buttons").off(eventNamespace);
       $svg?.off(eventNamespace).empty();
       $("body").off(eventNamespace);
       Helper.destroySlider($slider);
       data = [];
       visualization = null;
-      interval = waveGenerator = env = null;
     };
 
     player.isPlaying = function () {
-      return isPlaying;
+      return transport?.isPlaying() || false;
     };
 
     player.goToFirst = function () {
-      intervalIndex = 0;
-      ensureIntervalIndex();
+      transport.seek(0);
       drawSvg();
     };
 
     player.goToLast = function () {
-      intervalIndex = data.length - 1;
-      ensureIntervalIndex();
+      transport.seek(data.length - 1);
       drawSvg();
     };
 
@@ -369,39 +289,7 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
       return createMidiBytes(data, Helper.getMidiNumber, tempo, channel, instrument);
     };
 
-    player.refreshWaveGenerator = function () {
-      if (destroyed) return;
-      const waveInfo = settings.getSelectedWaveformInfo();
-      $.each([env, waveGenerator], function (index, obj) {
-        $.each(["pause", "removeAllListeners"], function (index, key) {
-          if (obj && typeof obj[key] === "function") {
-            obj[key]();
-          }
-        });
-      });
-      env = timbre("adshr", {
-        a: waveInfo.a,
-        d: waveInfo.d,
-        s: waveInfo.s,
-        h: waveInfo.h,
-        r: waveInfo.r,
-      });
-      waveGenerator = timbre(waveInfo.gen, {
-        env: env,
-        mul: settings.getSelected("volume") * waveInfo.mul,
-        poly: waveInfo.poly || 10,
-      }).on("ended", function () {
-        if (!isPlaying) {
-          this.pause();
-        }
-      });
-      if (waveInfo.gen === "OscGen") {
-        waveGenerator.set("osc", timbre(settings.getSelected("waveform")));
-      }
-      if (isPlaying && settings.getSelected("audioType") === "waveform") {
-        waveGenerator.play();
-      }
-    };
+    player.refreshWaveGenerator = audio.refresh;
 
     player.drawEnvelope = function () {
       const svg = $("#envelope-diagram").get(0);
@@ -425,12 +313,7 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
         drawStringPreview(canvas);
         return;
       }
-      if (waveGenerator && waveGenerator.osc) {
-        waveGenerator.osc.plot({
-          target: canvas,
-          background: canvasBackground,
-        });
-      }
+      audio.plot({ target: canvas, background: canvasBackground });
     };
 
     // initialize player
