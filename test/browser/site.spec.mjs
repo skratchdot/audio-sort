@@ -561,6 +561,43 @@ test("settings subscriptions reconnect after a cached-page lifecycle", async ({ 
   await expect(autoPlay).toHaveAttribute("aria-pressed", "false");
 });
 
+test("audio settings render selections and survive subscription reconnection", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("index.html");
+  await page.locator('#settings a[href="#waveform"]').click();
+  await expect(page.locator("#waveform-adshr-attack-display")).toHaveText("50");
+  await page.locator('#waveform button[data-waveform="sin"]').click();
+  await expect(page.locator('#waveform button[data-waveform="sin"]')).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await page.locator('#settings a[href="#audio"]').click();
+  await expect(page.locator("#audio-type-display")).toHaveText("waveform: sin");
+  await page.locator('[data-audio-type="soundfont"].btn').click();
+  await expect(page.locator('#settings a[href="#soundfont"]')).toBeVisible();
+  await expect(page.locator('#settings a[href="#waveform"]')).toBeHidden();
+  await page.locator('#settings a[href="#soundfont"]').click();
+  const instrument = page.locator('#soundfont-options li[data-soundfont="42"]');
+  await instrument.click();
+  await expect(page.locator("#soundfont-display")).toHaveText(await instrument.textContent());
+  await page.locator('#settings a[href="#scale"]').click();
+  const scale = page.locator('#scale-options li[data-scale="major"]');
+  await scale.click();
+  await expect(page.locator("#scale-display")).toHaveText(await scale.textContent());
+  await page.evaluate(() => {
+    globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pagehide", { persisted: true }));
+    globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pageshow", { persisted: true }));
+  });
+  await expect(scale).toHaveClass(/active/);
+  await expect(instrument).toHaveClass(/active/);
+  await page.locator('#settings a[href="#audio"]').click();
+  await page.locator('[data-audio-type="waveform"].btn').click();
+  await expect(page.locator("#audio-type-display")).toHaveText("waveform: sin");
+  await expect(page.locator('#settings a[href="#waveform"]')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test("waveform envelope edits survive switching presets", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));

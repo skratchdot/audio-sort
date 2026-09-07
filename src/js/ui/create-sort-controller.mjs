@@ -5,6 +5,7 @@ import { scaleLinear } from "d3-scale";
 import { saveAs } from "file-saver";
 import { createHelpers } from "./create-helpers.mjs";
 import { connectPlaybackSettings } from "./connect-playback-settings.ts";
+import { connectAudioSettings } from "./connect-audio-settings.ts";
 import { createPlayerFactory } from "./create-player-factory.mjs";
 import { MidiExport } from "../midi/midi-export.mjs";
 import { instruments } from "../midi/instruments.ts";
@@ -25,6 +26,7 @@ export function createSortController(generators, settingsStore = createStore()) 
   let disconnectSettings = () => {};
   let volumeSlider;
   let tempoSlider;
+  let centerNoteSlider;
   // Read the current atom value on demand; do not keep a second settings cache.
   const getSelected = () => settingsStore.get(settingsAtom);
   const setSelected = (key, value) => settingsStore.set(updateSettingAtom, { key, value });
@@ -95,14 +97,6 @@ export function createSortController(generators, settingsStore = createStore()) 
   const onWaveformButtonClick = function () {
     const $this = $(this);
     setSelected("waveform", $this.attr("data-waveform"));
-    // update slider values
-    setSliderWaveformFromSelected();
-    // update text on audio tab
-    updateDisplayCache("#audio-type-display", "waveform: " + getSelected().waveform);
-    // start using new selection
-    players.base.refreshWaveGenerator();
-    players.sort.refreshWaveGenerator();
-    players.base.drawWaveformCanvases();
   };
 
   const getBaseDataAsPlayableObjects = function (playIndex) {
@@ -160,29 +154,7 @@ export function createSortController(generators, settingsStore = createStore()) 
   };
 
   const onAudioTypeButtonClick = function () {
-    const $this = $(this);
-    const $tabs = $("#settings li[data-audio-type]");
-    const $tabLink = $("#audio-type-tab-link");
-    const audioType = $this.attr("data-audio-type");
-    const audioTypeName = $this.text();
-
-    // set selected type
-    setSelected("audioType", audioType);
-    let displayName = audioType;
-    if (getSelected().audioType === "waveform") {
-      displayName += ": " + getSelected().waveform;
-      players.base.refreshWaveGenerator();
-      players.sort.refreshWaveGenerator();
-    } else if (getSelected().audioType === "soundfont") {
-      displayName = $("#soundfont-options li.active").text();
-    }
-    updateDisplayCache("#audio-type-display", displayName);
-    // update settings link
-    $tabLink.text(audioTypeName.toLowerCase() + " settings");
-    // show correct tab
-    $tabs.removeClass("hidden");
-    $tabs.filter('[data-audio-type!="' + audioType + '"]').addClass("hidden");
-    preloadSoundfonts();
+    setSelected("audioType", $(this).attr("data-audio-type"));
   };
 
   const onAudioTypeTabLinkClick = function () {
@@ -205,8 +177,7 @@ export function createSortController(generators, settingsStore = createStore()) 
   };
 
   const onSliderCenterNote = function (e) {
-    onSlider("centerNote", "#center-note-display", e, getNoteName);
-    preloadSoundfonts();
+    setSelected("centerNote", e.value);
   };
 
   const onSliderDataSize = function (e) {
@@ -224,10 +195,6 @@ export function createSortController(generators, settingsStore = createStore()) 
       key: adshr,
       value: e.value,
     });
-    updateWaveformDisplays();
-    players.base.refreshWaveGenerator();
-    players.sort.refreshWaveGenerator();
-    players.base.drawEnvelopeCanvas();
   };
 
   const onAudioDataButton = function () {
@@ -519,11 +486,7 @@ export function createSortController(generators, settingsStore = createStore()) 
     $ul.on("click", "li", function () {
       const $this = $(this);
       if (!$this.hasClass("disabled")) {
-        $ul.find("li").removeClass("active");
-        $this.addClass("active");
         setSelected("scale", $this.data("scale"));
-        updateDisplayCache("#scale-display", $this.text());
-        preloadSoundfonts();
       }
     });
   };
@@ -555,13 +518,7 @@ export function createSortController(generators, settingsStore = createStore()) 
     $ul.on("click", "li", function () {
       const $this = $(this);
       if (!$this.hasClass("disabled")) {
-        $ul.find("li").removeClass("active");
-        $this.addClass("active");
         setSelected("soundfont", $this.data("soundfont"));
-        timbre.soundfont.setInstrument(getSelected().soundfont);
-        updateDisplayCache("#soundfont-display", $this.text());
-        updateDisplayCache("#audio-type-display", $this.text());
-        preloadSoundfonts();
       }
     });
   };
@@ -679,7 +636,7 @@ export function createSortController(generators, settingsStore = createStore()) 
 
   Sort.connectSettings = function () {
     Sort.disconnectSettings();
-    disconnectSettings = connectPlaybackSettings(settingsStore, {
+    const disconnectPlayback = connectPlaybackSettings(settingsStore, {
       volume(value, gain) {
         volumeSlider.slider("setValue", value);
         updateDisplayCache("#volume-display", value.toFixed(2));
@@ -703,6 +660,53 @@ export function createSortController(generators, settingsStore = createStore()) 
         }
       },
     });
+    try {
+      const disconnectAudio = connectAudioSettings(settingsStore, {
+        render(value) {
+          centerNoteSlider.slider("setValue", value.centerNote);
+          updateDisplayCache("#center-note-display", value.centerNote, getNoteName);
+          const $scale = $('#scale-options li[data-scale="' + value.scale + '"]');
+          $("#scale-options li").removeClass("active");
+          $scale.addClass("active");
+          updateDisplayCache("#scale-display", $scale.text());
+          const $instrument = $('#soundfont-options li[data-soundfont="' + value.soundfont + '"]');
+          $("#soundfont-options li").removeClass("active");
+          $instrument.addClass("active");
+          updateDisplayCache("#soundfont-display", $instrument.text());
+          $("#audio-type-container .btn").each(function () {
+            const active = $(this).attr("data-audio-type") === value.audioType;
+            $(this).toggleClass("active", active).attr("aria-pressed", String(active));
+          });
+          $("#waveform .btn-group .btn").each(function () {
+            const active = $(this).attr("data-waveform") === value.waveform;
+            $(this).toggleClass("active", active).attr("aria-pressed", String(active));
+          });
+          setSliderWaveformFromSelected();
+          updateDisplayCache(
+            "#audio-type-display",
+            value.audioType === "waveform" ? "waveform: " + value.waveform : $instrument.text(),
+          );
+          $("#audio-type-tab-link").text(value.audioType + " settings");
+          $("#settings li[data-audio-type]").each(function () {
+            $(this).toggleClass("hidden", $(this).attr("data-audio-type") !== value.audioType);
+          });
+        },
+        refreshWaveform() {
+          players.base.refreshWaveGenerator();
+          players.sort.refreshWaveGenerator();
+          players.base.drawWaveformCanvases();
+        },
+        setInstrument: (instrument) => timbre.soundfont.setInstrument(instrument),
+        preload: preloadSoundfonts,
+      });
+      disconnectSettings = () => {
+        disconnectAudio();
+        disconnectPlayback();
+      };
+    } catch (error) {
+      disconnectPlayback();
+      throw error;
+    }
   };
 
   Sort.init = function (options) {
@@ -751,7 +755,11 @@ export function createSortController(generators, settingsStore = createStore()) 
     // create some of our sliders
     volumeSlider = Helper.createSlider("#volume-container", defaults.volume, onSliderVolume);
     tempoSlider = Helper.createSlider("#tempo-container", defaults.tempo, onSliderTempo);
-    Helper.createSlider("#center-note-container", defaults.centerNote, onSliderCenterNote);
+    centerNoteSlider = Helper.createSlider(
+      "#center-note-container",
+      defaults.centerNote,
+      onSliderCenterNote,
+    );
     Helper.createSlider("#data-size-container", defaults.dataSize, onSliderDataSize);
     // create our waveform sliders
     waveformSliders.a = Helper.createSlider(
@@ -817,7 +825,6 @@ export function createSortController(generators, settingsStore = createStore()) 
     // handle button clicks
     $("#audio-type-container .btn").on("click", onAudioTypeButtonClick);
     $("#audio-type-tab-link").on("click", onAudioTypeTabLinkClick);
-    $('#audio-type-container .btn[data-audio-type="' + getSelected().audioType + '"]').click();
     $("#waveform .btn-group .btn").on("click", onWaveformButtonClick);
     $("span[data-midi-export]").on("click", onMidiExportClick);
     $("#midi-export-btn").on("click", onMidiSave);
@@ -832,7 +839,6 @@ export function createSortController(generators, settingsStore = createStore()) 
     // draw envelope canvas
     players.base.drawWaveformCanvases();
     // update slider selction text
-    updateDisplayCache("#center-note-display", getSelected().centerNote, getNoteName);
     updateDisplayCache("#data-size-display", getSelected().dataSize);
     Sort.connectSettings();
   };

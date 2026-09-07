@@ -34,8 +34,13 @@ volume, tempo, AutoPlay, and loop preferences to UI/audio effects. It applies
 current values immediately, observes relevant changes, and returns a disconnect
 function. The controller replaces its old connection before reconnecting; pagehide
 disconnects subscriptions and a cached pageshow reconnects them. This is subscription
-cleanup, not full player/worker/editor teardown. Other settings still rely on their
-existing event handlers for DOM/audio side effects. AutoPlay and each player's
+cleanup, not full player/worker/editor teardown.
+[`connect-audio-settings.ts`](../src/js/ui/connect-audio-settings.ts) shares that
+lifecycle and synchronizes audio type, waveform/envelopes, center note, scale,
+and instrument. It sets the instrument before soundfont preloading and avoids
+rebuilding generators for unrelated settings or unselected envelope edits.
+Envelope labels now populate on initial connection. Algorithm selection/catalog
+and data-size side effects still rely on their existing handlers. AutoPlay and each player's
 loop preference live in `state/playback-preferences.ts`; their handlers render
 button state from the store instead of reading CSS classes. AutoPlay no longer
 uses Bootstrap's button toggle. Playing/stopped state, direction, position,
