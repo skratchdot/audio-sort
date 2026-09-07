@@ -45,10 +45,11 @@ Dependencies come from pnpm package imports; application replacements live in
 Retain required attribution for adapted data/code. Package-managed assets such
 as Ace workers may be emitted by the build; they are not manually vendored files.
 
-The remaining legacy group is jQuery, Bootstrap, bootstrap-slider, and Timbre.
+The remaining vendored JavaScript is jQuery, Bootstrap, and bootstrap-slider.
+Timbre is imported from its pinned package browser entry.
 JSONP and the MP3/soundfont extensions have been replaced by first-party native
-sample loading. Remove unused development
-bundles, maps, and Flash fallback assets once their references are audited.
+sample loading. The obsolete Timbre development bundle, source map, and Flash
+fallback asset have also been removed.
 Check external soundfont loading separately from local script packaging.
 
 Completion requires no legacy script tags/vendor bridge, reproducible package
@@ -67,7 +68,7 @@ Controllers/players now have explicit suspension and teardown for subscriptions,
 workers, timers, editors, owned audio nodes, sliders, and event handlers. Cached
 pages preserve data/settings; remounting does not duplicate controls or listeners.
 
-Phase 5 is in progress: playback position, direction, looping, scheduling, and
+Phase 5 implementation is complete, pending listening review: playback position, direction, looping, scheduling, and
 resume invalidation now live in a DOM-independent typed transport. A separate
 audio adapter owns existing Timbre synthesis and note dispatch. The player factory
 connects these to the legacy controls and visualizations.
@@ -75,8 +76,11 @@ connects these to the legacy controls and visualizations.
 Soundfont samples now use controller-owned caching, fetch, and native decoding,
 while retaining the existing sample bank and Timbre mixer. The three legacy
 JSONP/MP3/soundfont scripts are removed. The [audio dependency audit](audio-dependencies.md)
-records sample-host verification and remaining Timbre artifact/license checks.
-Next is resolving Timbre packaging or synthesis replacement before the React UI.
+records sample-host verification and the Timbre package compatibility checks.
+Timbre now uses the pinned `14.11.25` browser entry with its Node-only dependencies
+excluded. The obsolete local bundles, map, and Flash asset are removed.
+Next is phase 6: agree on the desired features and desktop/mobile layout before
+implementing the React UI, retaining the existing sorting, state, and audio modules.
 Keep transport state and shared vendor resources out of Jotai; retain listening checks.
 The algorithm function/metadata format and editor remain unchanged; do not add parser/build
 machinery solely to reorganize metadata.

@@ -203,6 +203,8 @@ test("built UI loads and algorithm IDs execute in the bundled worker", async ({
   const workerURL = sortWorker.url();
   expect(await sortWorker.evaluate(() => Object.hasOwn(globalThis, "AS"))).toBe(false);
   expect(await page.evaluate(() => Object.hasOwn(globalThis, "AS"))).toBe(false);
+  expect(await page.evaluate(() => globalThis.timbre.version)).toBe("14.11.25");
+  await expect(page.locator('script[src*="/js/timbre"]')).toHaveCount(0);
   expect(
     await page.evaluate(() =>
       ["A", "visualization", "fn"].filter((name) => Object.hasOwn(globalThis, name)),

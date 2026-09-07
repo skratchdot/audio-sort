@@ -11,6 +11,8 @@ module.exports = async function (eleventyConfig) {
     viteOptions: {
       // Relative generated URLs work at both / and the /audio-sort/ Pages path.
       base: "./",
+      // Timbre's browser CommonJS entry publishes through `global.timbre`.
+      define: { global: "globalThis" },
       resolve: {
         alias: {
           "/js": resolve("src/js"),
