@@ -4,7 +4,7 @@
 
 - Add waveform visualization in header while audio is playing
 
-- Add more sorting algorithms
+- Add more sorting algorithms; see the [catalog](sorting-algorithms.md).
 
 - Improve visualizations / transitions. Allow filtering of what to show / play.
 
