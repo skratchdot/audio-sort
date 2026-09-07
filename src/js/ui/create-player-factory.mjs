@@ -2,14 +2,7 @@ import { $, timbre } from "../vendor.mjs";
 import { select } from "d3-selection";
 import { createMidiBytes } from "../midi/create-midi-bytes.mjs";
 import { visualizations } from "../visualizations/visualization-registry.mjs";
-/*!
- * Project: Audio Sort
- *    File: create-player-factory.mjs
- *  Source: https://github.com/skratchdot/audio-sort/
- *
- * Copyright (c) 2013 skratchdot
- * Licensed under the MIT license.
- */
+
 export function createPlayerFactory(settings, Helper) {
   return function createPlayer(containerSelector, options) {
     const player = {};

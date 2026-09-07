@@ -1,12 +1,3 @@
-/*!
- * Project: Audio Sort
- *    File: instruments.mjs
- *  Source: https://github.com/skratchdot/audio-sort/
- *
- * Copyright (c) 2013 skratchdot
- * Licensed under the MIT license.
- */
-
 export const instruments = [
   { val: 0, name: "Acoustic Grand Piano", group: "Piano" },
   { val: 1, name: "Bright Acoustic Piano", group: "Piano" },

@@ -1,13 +1,5 @@
 import { $ } from "../vendor.mjs";
 import { instruments } from "./instruments.mjs";
-/*!
- * Project: Audio Sort
- *    File: midi-export.mjs
- *  Source: https://github.com/skratchdot/audio-sort/
- *
- * Copyright (c) 2013 skratchdot
- * Licensed under the MIT license.
- */
 
 export const MidiExport = {};
 

@@ -7,20 +7,11 @@ import { createHelpers } from "./create-helpers.mjs";
 import { createPlayerFactory } from "./create-player-factory.mjs";
 import { MidiExport } from "../midi/midi-export.mjs";
 import { instruments } from "../midi/instruments.mjs";
-/*!
- * Project: Audio Sort
- *    File: create-sort-controller.mjs
- *  Source: https://github.com/skratchdot/audio-sort/
- *
- * Copyright (c) 2013 skratchdot
- * Licensed under the MIT license.
- */
+
 export function createSortController(generators) {
   const Sort = {};
   const Helper = createHelpers(Sort);
   const createPlayer = createPlayerFactory(Sort, Helper);
-  // Pass jshint
-  const Fn = Function;
   // Default Settings
   const defaults = {
     volume: { value: 0.25, min: 0, max: 1, step: 0.01 },
@@ -418,7 +409,7 @@ export function createSortController(generators) {
 
   const onSaveAlgorithmEdit = function () {
     algorithms[selected.sort] = Object.assign(
-      new Fn("AS", aceEditor.getValue()),
+      new Function("AS", aceEditor.getValue()),
       algorithms[selected.sort],
     );
     $("#modal-sort").modal("hide");
@@ -429,7 +420,7 @@ export function createSortController(generators) {
     const nameSafe = name.replace(/[^a-zA-Z]/gi, "");
     const id = nameSafe + "_id_" + new Date().getTime();
     if ($.trim(name).length) {
-      algorithms[id] = new Fn("AS", aceEditor.getValue());
+      algorithms[id] = new Function("AS", aceEditor.getValue());
       algorithms[id].display = name;
       algorithms[id].stable = true;
       algorithms[id].best = "";
