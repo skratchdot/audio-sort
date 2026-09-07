@@ -9,22 +9,22 @@ the resulting `pnpm-lock.yaml`. Do not generate an npm lockfile.
 ## Build and preview
 
 `pnpm dev` serves the site with live updates (`pnpm start` is an alias).
-`pnpm build` creates `dist/`; `pnpm preview` serves that production build.
+`pnpm build` creates `dist/audio-sort/`; `pnpm preview` serves that production build.
+Development uses `http://localhost:5173/audio-sort/`; preview uses
+`http://localhost:8080/audio-sort/` by default.
 
 TanStack Start prerenders the React pages and Vite bundles JavaScript and CSS.
 Site files live in `src/`; tests and tool configuration stay at the root.
-Only `dist/` is deployed. Build-time server files live in ignored `.tanstack/`;
+Only the contents of `dist/audio-sort/` are deployed. Build-time server files live in ignored `.tanstack/`;
 GitHub Pages needs no Node server.
 
-Routes are `/`, `/about`, and `/api`; the latter two are deployed as directory
+The shared base is `/audio-sort/` in development, preview, tests, and production.
+Routes are `/audio-sort/`, `/audio-sort/about`, and `/audio-sort/api`; the latter two are deployed as directory
 index files. A static host may append a trailing slash on direct visits.
 
-The default build targets `/`. The deployment workflow sets
-`VITE_BASE_PATH=/audio-sort/` and runs the same build command.
-For another hosting path, set `VITE_BASE_PATH` when building. Preview uses `sirv-cli`
-to serve static files only, with no server rendering or SPA fallback.
-To preview the Pages path locally, run `pnpm run build:test-pages`, then
-`pnpm exec sirv .test-pages` and open `http://localhost:8080/audio-sort/`.
+Preview uses `sirv-cli` to serve `dist/` as static files only, with no server
+rendering or SPA fallback. There are no deployment-specific build commands or
+base-path environment variables.
 
 Prerendering automatically discovers static routes; new static pages need no extra
 build configuration. Link crawling is disabled because Start currently duplicates
@@ -33,7 +33,7 @@ supplied explicitly.
 
 Static files live in root-level `public/`: images in `public/img/` and the
 `.nojekyll` marker. There are no vendored JavaScript files. Files are copied unchanged
-to `dist/` without a `public/` URL prefix. Use `/img/...` in source CSS; Vite
+to `dist/audio-sort/` without a `public/` URL prefix. Use `/img/...` in source CSS; Vite
 adjusts these URLs for the deployment path. Application modules and CSS stay in `src/`.
 
 CSS is bundled and minified by Vite. Tailwind supplies Preflight and utilities;
@@ -67,8 +67,8 @@ pnpm run test:browser
 Do not rebuild `dist/` while browser tests are running. To use an existing Chrome
 installation, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its executable path.
 
-Browser tests build a separate Pages variant in ignored `.test-pages/audio-sort/` and serve
-it alongside `dist/`. They cover root and `/audio-sort/` URLs, workers, editor behavior,
+Browser tests serve the completed production build at `/audio-sort/`.
+They cover page URLs, workers, editor behavior,
 and UI controls. External services are stubbed; audible output and remote soundfonts
 need manual testing. Known bugs are tracked in [TODO](todo.md).
 
@@ -77,7 +77,7 @@ need manual testing. Known bugs are tracked in [TODO](todo.md).
 GitHub Actions runs checks and browser tests for PRs and before deployment.
 CI uses the latest Node.js LTS release. Check/build jobs have a 10-minute timeout;
 the deployment job has a 5-minute timeout.
-After checks, CI rebuilds `dist/` with the `/audio-sort/` base and publishes it.
+CI builds once, tests that build, and uploads `dist/audio-sort/` without rebuilding.
 The repository's Pages
 publishing source must be **GitHub Actions**.
 

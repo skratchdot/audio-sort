@@ -37,7 +37,7 @@ prototype is deferred and is not the implementation target.
 7. **TanStack Start shell.** Replace Eleventy/Liquid
    with React routes and a static build, preserving the current page structure.
    Prove static deployment early; do not wait for or bundle this with a redesign.
-   Use clean page URLs, preserving root and /audio-sort/ hosting, worker/assets, and
+   Use clean page URLs under the shared /audio-sort/ base, preserving worker/assets and
    GitHub Pages deployment. Browser-only dependencies must not run during
    prerendering. Keep existing workflow timeouts and checks. Do not combine the
    static-builder replacement with the UI migration or a redesign.
@@ -96,10 +96,10 @@ jQuery, and temporary overrides are removed together. The existing two sections
 remain, with 40px taller charts only on sufficiently tall desktop viewports.
 
 Phase 7 replaces Eleventy/Liquid with TanStack Start routes and React documents.
-Public routes are `/`, `/about`, and `/api`, with no legacy `.html` aliases.
-Static prerendering emits directory index files into `dist/`;
-build-time server files remain in `.tanstack/` and are not deployed. Root and Pages
-builds use explicit base paths and are tested against static-only previews.
+Public routes are `/audio-sort/`, `/audio-sort/about`, and `/audio-sort/api`, with no legacy `.html` aliases.
+Static prerendering emits directory index files into `dist/audio-sort/`;
+build-time server files remain in `.tanstack/` and are not deployed. Development,
+production, preview, and browser tests share the same base and build configuration.
 Home imports the existing workspace after hydration; About/API need no audio or
 editor runtime. Client navigation unmounts the workspace when leaving Home.
 

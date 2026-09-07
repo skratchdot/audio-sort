@@ -16,7 +16,8 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Build with `pnpm run build` (output: `dist/`). Run checks with `pnpm run check`.
+Open `/audio-sort/` on the development server. Build with `pnpm run build`
+(output: `dist/audio-sort/`). Run checks with `pnpm run check`.
 
 See [development documentation](docs/development.md) for browser tests and deployment.
 

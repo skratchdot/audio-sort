@@ -17,7 +17,7 @@ one level above, separate from the implementations they register.
 ## UI
 
 TanStack Start routes in `src/routes/` render Home, About, and API through the
-shared document in `src/pages/`. Public URLs are `/`, `/about`, and `/api`;
+shared document in `src/pages/`. Public URLs are `/audio-sort/`, `/audio-sort/about`, and `/audio-sort/api`;
 prerendering emits `index.html`, `about/index.html`, and `api/index.html`.
 TanStack links provide client navigation and ordinary anchor fallbacks without
 JavaScript. Audio and editor dependencies are dynamically imported by
