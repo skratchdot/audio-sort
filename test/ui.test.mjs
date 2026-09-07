@@ -32,3 +32,12 @@ test("MIDI helper reads current settings from its injected controller", () => {
   selected.centerNote = 72;
   expect(helpers.getMidiNumber(4)).toBe(72);
 });
+
+test("destroying an unmounted controller is safe and prevents reuse", () => {
+  const controller = createSortController({});
+  controller.destroy();
+  controller.destroy();
+  controller.connectSettings();
+  controller.resume();
+  expect(() => controller.init({})).toThrow("destroyed controller");
+});

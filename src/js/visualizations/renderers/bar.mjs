@@ -1,12 +1,11 @@
 import { $ } from "../../vendor.mjs";
 
-let hoverIndex = -1;
-let hoverValue = -1;
-let clickIndex = -1;
-let clickValue = -1;
-let isClicking = false;
-
 export default function bar(settings) {
+  let hoverIndex = -1;
+  let hoverValue = -1;
+  let clickIndex = -1;
+  let clickValue = -1;
+  let isClicking = false;
   const bar = {};
   // settings
   let data;
@@ -14,6 +13,10 @@ export default function bar(settings) {
   let svg;
   let hasMarkers;
   let onClick;
+  // Keep pointer state when the base editor updates data during a drag.
+  bar.setData = (nextData) => {
+    data = nextData;
+  };
 
   const _init = function (settings) {
     data = settings.data;

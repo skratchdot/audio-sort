@@ -6,6 +6,7 @@ import { saveAs } from "file-saver";
 import { createHelpers } from "./create-helpers.mjs";
 import { connectPlaybackSettings } from "./connect-playback-settings.ts";
 import { connectAudioSettings } from "./connect-audio-settings.ts";
+import { connectSortSettings } from "./connect-sort-settings.ts";
 import { createPlayerFactory } from "./create-player-factory.mjs";
 import { MidiExport } from "../midi/midi-export.mjs";
 import { instruments } from "../midi/instruments.ts";
@@ -19,14 +20,21 @@ import {
   addAlgorithmAtom,
 } from "../state/algorithm-overrides.ts";
 
+let nextControllerId = 0;
+
 export function createSortController(generators, settingsStore = createStore()) {
   const Sort = {};
+  const eventNamespace = ".audioSortController" + ++nextControllerId;
+  let initialized = false;
+  let destroyed = false;
+  let suspended = false;
   const Helper = createHelpers(Sort);
   const createPlayer = createPlayerFactory(Sort, Helper, settingsStore);
   let disconnectSettings = () => {};
   let volumeSlider;
   let tempoSlider;
   let centerNoteSlider;
+  let dataSizeSlider;
   // Read the current atom value on demand; do not keep a second settings cache.
   const getSelected = () => settingsStore.get(settingsAtom);
   const setSelected = (key, value) => settingsStore.set(updateSettingAtom, { key, value });
@@ -161,13 +169,6 @@ export function createSortController(generators, settingsStore = createStore()) 
     $("#settings li[data-audio-type]:visible a").click();
   };
 
-  const onSlider = function (key, selector, event, fnFormat) {
-    if (event) {
-      setSelected(key, event.value);
-    }
-    updateDisplayCache(selector, getSelected()[key], fnFormat);
-  };
-
   const onSliderVolume = function (e) {
     setSelected("volume", e.value);
   };
@@ -181,9 +182,7 @@ export function createSortController(generators, settingsStore = createStore()) 
   };
 
   const onSliderDataSize = function (e) {
-    onSlider("dataSize", "#data-size-display", e);
-    generateData(false);
-    doSort();
+    setSelected("dataSize", e.value);
   };
 
   const onSliderWaveform = function (e) {
@@ -207,18 +206,14 @@ export function createSortController(generators, settingsStore = createStore()) 
 
   const onSortOptionSelected = function () {
     const $item = $(this);
-    const $parent = $item.parent();
     if ($item.hasClass("disabled")) {
       return;
     }
-    $parent.find("li").removeClass("active");
-    $item.addClass("active");
-    updateDisplayCache("#sort-display", $item.text());
-    setSelected("sort", $item.find("a").data("sort"));
-    if (settingsStore.get(playbackPreferencesAtom).autoPlay) {
-      triggerAutoPlay = true;
-    }
-    doSort();
+    const id = $item.find("a").data("sort");
+    if (id === getSelected().sort) {
+      triggerAutoPlay = settingsStore.get(playbackPreferencesAtom).autoPlay;
+      doSort();
+    } else setSelected("sort", id);
   };
 
   const updateWaveformDisplays = function () {
@@ -265,6 +260,7 @@ export function createSortController(generators, settingsStore = createStore()) 
   };
 
   const addAceEditor = async function (container, modal, source = "") {
+    if (destroyed || suspended) return;
     const request = ++editorRequest;
     activeEditorModal = modal;
     const $modal = $(modal);
@@ -294,7 +290,7 @@ export function createSortController(generators, settingsStore = createStore()) 
       if (request !== editorRequest) return;
       $status.attr("role", "alert").text("The editor could not load. ");
       $('<button type="button" class="btn btn-small">Reload page</button>')
-        .on("click", () => window.location.reload())
+        .on("click" + eventNamespace, () => window.location.reload())
         .appendTo($status);
     }
   };
@@ -394,7 +390,6 @@ export function createSortController(generators, settingsStore = createStore()) 
       settingsStore.set(addAlgorithmAtom, { id, name, source: aceEditor.getValue() });
     }
     $("#modal-add-algorithm").modal("hide");
-    buildSortOptions("#sort-options");
   };
 
   const onAddAlgorithmModalClick = function () {
@@ -482,8 +477,8 @@ export function createSortController(generators, settingsStore = createStore()) 
         .wrapInner($('<a href="javascript:void(0);"></a>').text(scale.name));
       htmlString += $li.wrap("<div />").parent().html();
     });
-    $ul.append(htmlString);
-    $ul.on("click", "li", function () {
+    $ul.empty().append(htmlString);
+    $ul.on("click" + eventNamespace, "li", function () {
       const $this = $(this);
       if (!$this.hasClass("disabled")) {
         setSelected("scale", $this.data("scale"));
@@ -514,8 +509,8 @@ export function createSortController(generators, settingsStore = createStore()) 
       }
       htmlString += $li.wrap("<div />").parent().html();
     }
-    $ul.append(htmlString);
-    $ul.on("click", "li", function () {
+    $ul.empty().append(htmlString);
+    $ul.on("click" + eventNamespace, "li", function () {
       const $this = $(this);
       if (!$this.hasClass("disabled")) {
         setSelected("soundfont", $this.data("soundfont"));
@@ -565,6 +560,7 @@ export function createSortController(generators, settingsStore = createStore()) 
   };
 
   const workerOnMessage = function (event) {
+    if (destroyed || suspended) return;
     if (event.data.key !== workerKey) return;
     const isSortPlaying = players.sort.isPlaying();
     if (Object.hasOwn(event.data, "error")) {
@@ -585,6 +581,7 @@ export function createSortController(generators, settingsStore = createStore()) 
   };
 
   const doSort = function () {
+    if (destroyed || suspended) return;
     workerKey = (workerKey || 0) + 1;
     const request = createSortRequest(
       workerKey,
@@ -635,6 +632,7 @@ export function createSortController(generators, settingsStore = createStore()) 
   };
 
   Sort.connectSettings = function () {
+    if (destroyed || suspended || !initialized) return;
     Sort.disconnectSettings();
     const disconnectPlayback = connectPlaybackSettings(settingsStore, {
       volume(value, gain) {
@@ -699,148 +697,262 @@ export function createSortController(generators, settingsStore = createStore()) 
         setInstrument: (instrument) => timbre.soundfont.setInstrument(instrument),
         preload: preloadSoundfonts,
       });
-      disconnectSettings = () => {
+      try {
+        const disconnectSort = connectSortSettings(settingsStore, {
+          catalog() {
+            buildSortOptions("#sort-options");
+          },
+          selection(id) {
+            const $options = $("#sort-options li").removeClass("active");
+            const $selected = $options.filter(function () {
+              return $(this).find("a").data("sort") === id;
+            });
+            $selected.addClass("active");
+            updateDisplayCache("#sort-display", $selected.text());
+          },
+          size(value, changed) {
+            dataSizeSlider.slider("setValue", value);
+            updateDisplayCache("#data-size-display", value);
+            if (changed || baseData.length !== value) generateData(false);
+          },
+          sort(algorithmChanged) {
+            triggerAutoPlay =
+              algorithmChanged && settingsStore.get(playbackPreferencesAtom).autoPlay;
+            doSort();
+          },
+        });
+        disconnectSettings = () => {
+          disconnectSort();
+          disconnectAudio();
+          disconnectPlayback();
+        };
+      } catch (error) {
         disconnectAudio();
-        disconnectPlayback();
-      };
+        throw error;
+      }
     } catch (error) {
       disconnectPlayback();
       throw error;
     }
   };
 
-  Sort.init = function (options) {
-    createWorker = options.createWorker;
-    createSortRequest = options.createSortRequest;
-    runSortRequest = options.runSortRequest;
-    getSource = options.getSource;
-    loadCodeEditor = options.loadCodeEditor;
-    // when using a mobile device, decrease samplerate.
-    // idea taken from: http://mohayonao.github.io/timbre.js/misc/js/common.js
-    if (timbre.envmobile) {
-      timbre.setup({ samplerate: timbre.samplerate * 0.5 });
+  const cancelWorker = () => {
+    workerKey = (workerKey || 0) + 1;
+    if (worker) {
+      worker.removeEventListener("message", workerOnMessage);
+      worker.removeEventListener("error", workerOnError);
+      worker.terminate();
+      worker = null;
     }
-    // build our sort options
-    buildSortOptions("#sort-options");
-    // build waveform buttons
-    populateWaveformButtons();
-    // setup audio and audio players
-    setupPlayers();
-    // setup base data
-    generateData(true, "randomUnique");
-    // populate our scale dropdown
-    populateScaleOptions("#scale-options");
-    updateDisplayCache(
-      "#scale-display",
-      $('#scale-options li[data-scale="' + getSelected().scale + '"]').text(),
-    );
-    $("#scale-filter")
-      .on("keyup", onOptionBoxFilter)
-      .on("focus", function () {
-        $(this).val("");
-        $("#scale-options li").show();
-      });
-    // populate our soundfont dropdown
-    populateSoundfontOptions("#soundfont-options");
-    updateDisplayCache(
-      "#soundfont-display",
-      $('#soundfont-options li[data-soundfont="' + getSelected().soundfont + '"]').text(),
-    );
-    $("#soundfont-filter")
-      .on("keyup", onOptionBoxFilter)
-      .on("focus", function () {
-        $(this).val("");
-        $("#soundfont-options li").show();
-      });
-    // create some of our sliders
-    volumeSlider = Helper.createSlider("#volume-container", defaults.volume, onSliderVolume);
-    tempoSlider = Helper.createSlider("#tempo-container", defaults.tempo, onSliderTempo);
-    centerNoteSlider = Helper.createSlider(
-      "#center-note-container",
-      defaults.centerNote,
-      onSliderCenterNote,
-    );
-    Helper.createSlider("#data-size-container", defaults.dataSize, onSliderDataSize);
-    // create our waveform sliders
-    waveformSliders.a = Helper.createSlider(
-      "#waveform-adshr-attack-container",
-      {
-        value: getWaveform().a,
-        min: 10,
-        max: 500,
-        step: 5,
-      },
-      onSliderWaveform,
-    );
-    waveformSliders.d = Helper.createSlider(
-      "#waveform-adshr-decay-container",
-      {
-        value: getWaveform().d,
-        min: 10,
-        max: 2000,
-        step: 5,
-      },
-      onSliderWaveform,
-    );
-    waveformSliders.s = Helper.createSlider(
-      "#waveform-adshr-sustain-container",
-      {
-        value: getWaveform().s,
-        min: 0,
-        max: 1,
-        step: 0.01,
-      },
-      onSliderWaveform,
-    );
-    waveformSliders.h = Helper.createSlider(
-      "#waveform-adshr-hold-container",
-      {
-        value: getWaveform().h,
-        min: 10,
-        max: 3000,
-        step: 5,
-      },
-      onSliderWaveform,
-    );
-    waveformSliders.r = Helper.createSlider(
-      "#waveform-adshr-release-container",
-      {
-        value: getWaveform().r,
-        min: 10,
-        max: 3000,
-        step: 5,
-      },
-      onSliderWaveform,
-    );
-    // cache a few items
-    const $sortAutoPlay = $("#sort-autoplay");
-    $sortAutoPlay.on("click", () => {
-      settingsStore.set(toggleAutoPlayAtom);
+  };
+
+  const closeModals = () => {
+    $("#modal-sort, #modal-add-algorithm, #modal-midi-export").each(function () {
+      const $modal = $(this);
+      const modal = $modal.data("modal");
+      if (!modal) return;
+      $modal.removeClass("fade");
+      modal.$backdrop?.removeClass("fade");
+      $modal.modal("hide");
+      modal.$backdrop?.remove();
+      $modal.addClass("fade");
     });
-    $("#modal-sort, #modal-add-algorithm").on("hide", function () {
-      if (activeEditorModal !== "#" + this.id) return;
-      editorRequest++;
-      activeEditorModal = null;
-    });
-    // handle button clicks
-    $("#audio-type-container .btn").on("click", onAudioTypeButtonClick);
-    $("#audio-type-tab-link").on("click", onAudioTypeTabLinkClick);
-    $("#waveform .btn-group .btn").on("click", onWaveformButtonClick);
-    $("span[data-midi-export]").on("click", onMidiExportClick);
-    $("#midi-export-btn").on("click", onMidiSave);
-    $("#modal-sort-open").on("click", onSortModalClick);
-    $("#add-algorithm-btn").on("click", onAddAlgorithmModalClick);
-    $("#save-algorithm-edit").on("click", onSaveAlgorithmEdit);
-    $("#save-algorithm-new").on("click", onSaveAlgorithmNew);
-    $("#base-buttons").on("click", ".btn", onAudioDataButton);
-    $("#sort-options").on("click", "li", onSortOptionSelected);
-    $(".sort-visualization").on("click", onSortVisualizationButton);
-    $("#sort-options [data-sort=" + getSelected().sort + "]").click();
-    // draw envelope canvas
-    players.base.drawWaveformCanvases();
-    // update slider selction text
-    updateDisplayCache("#data-size-display", getSelected().dataSize);
+  };
+
+  Sort.suspend = function () {
+    if (destroyed || suspended) return;
+    suspended = true;
+    Sort.disconnectSettings();
+    clearTimeout(clickTimer);
+    clickTimer = null;
+    triggerAutoPlay = false;
+    cancelWorker();
+    players.base?.suspend();
+    players.sort?.suspend();
+    editorRequest++;
+    activeEditorModal = null;
+    if (initialized) closeModals();
+  };
+
+  Sort.resume = function () {
+    if (destroyed || !suspended) return;
+    suspended = false;
     Sort.connectSettings();
+  };
+
+  Sort.destroy = function () {
+    if (destroyed) return;
+    Sort.suspend();
+    destroyed = true;
+    if (!initialized) return;
+    // The legacy controller owns a document-wide UI, but removes only its
+    // uniquely namespaced handlers, never unrelated jQuery/plugin listeners.
+    $("body").find("*").addBack().off(eventNamespace);
+    players.base?.destroy();
+    players.sort?.destroy();
+    players.base = players.sort = null;
+    Helper.destroySliders();
+    if (aceEditor) {
+      const session = aceEditor.getSession();
+      aceEditor.destroy();
+      session.destroy();
+      aceEditor = null;
+    }
+    $("#modal-sort, #modal-add-algorithm, #modal-midi-export").each(function () {
+      const $modal = $(this);
+      const modal = $modal.data("modal");
+      if (modal) {
+        $modal.off(".modal").removeData("modal");
+      }
+      $modal.find(".editor-status, .js-editor").remove();
+    });
+    baseData = maxData = [];
+    for (const key of Object.keys(displayCache)) delete displayCache[key];
+  };
+
+  Sort.init = function (options) {
+    if (destroyed) throw new Error("Cannot initialize a destroyed controller");
+    if (initialized) throw new Error("Controller is already initialized");
+    initialized = true;
+    try {
+      createWorker = options.createWorker;
+      createSortRequest = options.createSortRequest;
+      runSortRequest = options.runSortRequest;
+      getSource = options.getSource;
+      loadCodeEditor = options.loadCodeEditor;
+      // when using a mobile device, decrease samplerate.
+      // idea taken from: http://mohayonao.github.io/timbre.js/misc/js/common.js
+      if (timbre.envmobile) {
+        timbre.setup({ samplerate: timbre.samplerate * 0.5 });
+      }
+      // build our sort options
+      buildSortOptions("#sort-options");
+      // build waveform buttons
+      populateWaveformButtons();
+      // setup audio and audio players
+      setupPlayers();
+      // setup base data
+      generateData(true, "randomUnique");
+      // populate our scale dropdown
+      populateScaleOptions("#scale-options");
+      updateDisplayCache(
+        "#scale-display",
+        $('#scale-options li[data-scale="' + getSelected().scale + '"]').text(),
+      );
+      $("#scale-filter")
+        .on("keyup" + eventNamespace, onOptionBoxFilter)
+        .on("focus" + eventNamespace, function () {
+          $(this).val("");
+          $("#scale-options li").show();
+        });
+      // populate our soundfont dropdown
+      populateSoundfontOptions("#soundfont-options");
+      updateDisplayCache(
+        "#soundfont-display",
+        $('#soundfont-options li[data-soundfont="' + getSelected().soundfont + '"]').text(),
+      );
+      $("#soundfont-filter")
+        .on("keyup" + eventNamespace, onOptionBoxFilter)
+        .on("focus" + eventNamespace, function () {
+          $(this).val("");
+          $("#soundfont-options li").show();
+        });
+      // create some of our sliders
+      volumeSlider = Helper.createSlider("#volume-container", defaults.volume, onSliderVolume);
+      tempoSlider = Helper.createSlider("#tempo-container", defaults.tempo, onSliderTempo);
+      centerNoteSlider = Helper.createSlider(
+        "#center-note-container",
+        defaults.centerNote,
+        onSliderCenterNote,
+      );
+      dataSizeSlider = Helper.createSlider(
+        "#data-size-container",
+        defaults.dataSize,
+        onSliderDataSize,
+      );
+      // create our waveform sliders
+      waveformSliders.a = Helper.createSlider(
+        "#waveform-adshr-attack-container",
+        {
+          value: getWaveform().a,
+          min: 10,
+          max: 500,
+          step: 5,
+        },
+        onSliderWaveform,
+      );
+      waveformSliders.d = Helper.createSlider(
+        "#waveform-adshr-decay-container",
+        {
+          value: getWaveform().d,
+          min: 10,
+          max: 2000,
+          step: 5,
+        },
+        onSliderWaveform,
+      );
+      waveformSliders.s = Helper.createSlider(
+        "#waveform-adshr-sustain-container",
+        {
+          value: getWaveform().s,
+          min: 0,
+          max: 1,
+          step: 0.01,
+        },
+        onSliderWaveform,
+      );
+      waveformSliders.h = Helper.createSlider(
+        "#waveform-adshr-hold-container",
+        {
+          value: getWaveform().h,
+          min: 10,
+          max: 3000,
+          step: 5,
+        },
+        onSliderWaveform,
+      );
+      waveformSliders.r = Helper.createSlider(
+        "#waveform-adshr-release-container",
+        {
+          value: getWaveform().r,
+          min: 10,
+          max: 3000,
+          step: 5,
+        },
+        onSliderWaveform,
+      );
+      // cache a few items
+      const $sortAutoPlay = $("#sort-autoplay");
+      $sortAutoPlay.on("click" + eventNamespace, () => {
+        settingsStore.set(toggleAutoPlayAtom);
+      });
+      $("#modal-sort, #modal-add-algorithm").on("hide" + eventNamespace, function () {
+        if (activeEditorModal !== "#" + this.id) return;
+        editorRequest++;
+        activeEditorModal = null;
+      });
+      // handle button clicks
+      $("#audio-type-container .btn").on("click" + eventNamespace, onAudioTypeButtonClick);
+      $("#audio-type-tab-link").on("click" + eventNamespace, onAudioTypeTabLinkClick);
+      $("#waveform .btn-group .btn").on("click" + eventNamespace, onWaveformButtonClick);
+      $("span[data-midi-export]").on("click" + eventNamespace, onMidiExportClick);
+      $("#midi-export-btn").on("click" + eventNamespace, onMidiSave);
+      $("#modal-sort-open").on("click" + eventNamespace, onSortModalClick);
+      $("#add-algorithm-btn").on("click" + eventNamespace, onAddAlgorithmModalClick);
+      $("#save-algorithm-edit").on("click" + eventNamespace, onSaveAlgorithmEdit);
+      $("#save-algorithm-new").on("click" + eventNamespace, onSaveAlgorithmNew);
+      $("#base-buttons").on("click" + eventNamespace, ".btn", onAudioDataButton);
+      $("#sort-options").on("click" + eventNamespace, "li", onSortOptionSelected);
+      $(".sort-visualization").on("click" + eventNamespace, onSortVisualizationButton);
+      // draw envelope canvas
+      players.base.drawWaveformCanvases();
+      // update slider selction text
+      updateDisplayCache("#data-size-display", getSelected().dataSize);
+      Sort.connectSettings();
+    } catch (error) {
+      Sort.destroy();
+      throw error;
+    }
   };
 
   return Sort;
