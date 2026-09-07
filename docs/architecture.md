@@ -32,7 +32,7 @@ JavaScript mode, Monokai theme, and diagnostics worker bundled by Vite. The edit
 two-space soft tabs and preserves source text without a separate beautifier.
 It targets fixed DOM IDs and has no multi-mount or teardown
 lifecycle. Data generators and utilities are modules with explicit imports;
-[`generator-registry.mjs`](../src/js/generators/generator-registry.mjs) supplies the controller's generator catalog.
+[`generator-registry.ts`](../src/js/generators/generator-registry.ts) supplies the controller's generator catalog.
 
 Musical scales are immutable local data in `src/js/midi/scales.ts`, extracted
 from the former subcollider.js bundle with its MIT notice. Scale grouping and

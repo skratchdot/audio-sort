@@ -1,7 +1,7 @@
 import { expect, test, vi } from "vitest";
 import random from "../src/js/utilities/random.ts";
-import shuffle from "../src/js/utilities/shuffle.mjs";
-import swap from "../src/js/utilities/swap.mjs";
+import shuffle from "../src/js/utilities/shuffle.ts";
+import swap from "../src/js/utilities/swap.ts";
 
 test("random includes both integer endpoints", () => {
   const rng = vi.spyOn(Math, "random").mockReturnValue(0);
@@ -46,4 +46,24 @@ test("shuffle uses Fisher-Yates in place", () => {
   expect(shuffle(arr)).toBe(arr);
   expect(arr).toEqual([1, 2, 3, 0]);
   expect(rng).toHaveBeenCalledTimes(3);
+});
+
+test("generic array utilities preserve object identity", () => {
+  vi.spyOn(Math, "random").mockReturnValue(0);
+  const first = { value: 1 };
+  const second = { value: 2 };
+  const arr = [first, second];
+  expect(swap(arr, 0, 1)).toBe(arr);
+  expect(arr[0]).toBe(second);
+  expect(shuffle(arr)).toBe(arr);
+  expect(arr[0]).toBe(first);
+  expect(arr[1]).toBe(second);
+});
+
+test("swap retains partial-string, fractional, and null index coercion", () => {
+  const arr = [10, 20, 30];
+  swap(arr, "1tail", 2.9);
+  expect(arr).toEqual([10, 30, 20]);
+  swap(arr, null, "invalid");
+  expect(arr).toEqual([10, 30, 20]);
 });

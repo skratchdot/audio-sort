@@ -3,7 +3,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { algorithmNames } from "../helpers/algorithms.mjs";
-import { generators } from "../../src/js/generators/generator-registry.mjs";
+import { generators } from "../../src/js/generators/generator-registry.ts";
 import { scales } from "../../src/js/midi/scales.ts";
 
 test("all local scales populate the menu without subcollider", async ({ page }) => {

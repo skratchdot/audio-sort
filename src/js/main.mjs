@@ -1,4 +1,4 @@
-import { generators } from "./generators/generator-registry.mjs";
+import { generators } from "./generators/generator-registry.ts";
 import { createSortController } from "./ui/create-sort-controller.mjs";
 import { algorithms } from "./sorting/algorithm-registry.mjs";
 import { sources } from "./sorting/algorithm-sources.mjs";
