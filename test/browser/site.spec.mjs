@@ -136,6 +136,13 @@ test("header stays within the viewport without sharing widgets", async ({ page }
     expect(
       titleBox.x + titleBox.width <= navBox.x || titleBox.y + titleBox.height <= navBox.y,
     ).toBe(true);
+    if (width >= 768) {
+      expect(
+        Math.abs(titleBox.y + titleBox.height / 2 - (navBox.y + navBox.height / 2)),
+      ).toBeLessThanOrEqual(1);
+    } else {
+      expect(navBox.y).toBeGreaterThanOrEqual(titleBox.y + titleBox.height);
+    }
   }
 });
 

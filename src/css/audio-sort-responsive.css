@@ -1,3 +1,13 @@
+@media (min-width: 768px) {
+  #header > .container > .row {
+    display: flex;
+    align-items: center;
+  }
+  #header .breadcrumb {
+    margin: 0;
+  }
+}
+
 @media (max-width: 979px) {
   #settings {
     font-size: 9px;
