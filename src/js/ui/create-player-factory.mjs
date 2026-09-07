@@ -1,7 +1,6 @@
 import { createTimbreAudio } from "../audio/create-timbre-audio.mjs";
 import { createTransport } from "../audio/create-transport.ts";
 import { $, timbre } from "../vendor.mjs";
-import { drawEnvelopeDiagram } from "./envelope-diagram.ts";
 import { drawStringPreview } from "./string-preview.ts";
 import { select } from "d3-selection";
 import { createMidiBytes } from "../midi/create-midi-bytes.mjs";
@@ -292,15 +291,8 @@ export function createPlayerFactory(settings, Helper, settingsStore, soundfont) 
 
     player.refreshWaveGenerator = audio.refresh;
 
-    player.drawEnvelope = function () {
-      const svg = $("#envelope-diagram").get(0);
-      if (svg) drawEnvelopeDiagram(svg, settings.getSelectedWaveformInfo());
-    };
-
     player.drawWaveformCanvases = function () {
       const canvas = $("#waveform-canvas").get(0);
-      // ADSHR
-      player.drawEnvelope();
       // Waveform
       clearCanvas(canvas);
       const isString = settings.getSelected("waveform") === "string";

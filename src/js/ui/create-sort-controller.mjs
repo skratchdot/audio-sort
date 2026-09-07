@@ -13,9 +13,8 @@ import { MidiExport } from "../midi/midi-export.mjs";
 import { instruments } from "../midi/instruments.ts";
 import { createStore } from "jotai/vanilla";
 import { defaults, settingsAtom, updateSettingAtom } from "../state/settings.ts";
-import { waveformDefaults, selectedWaveformAtom } from "../state/waveforms.ts";
-import { updateEnvelopeAtom } from "../state/envelope.ts";
-import { formatEnvelopeValue } from "./envelope-diagram.ts";
+import { selectedWaveformAtom } from "../state/waveforms.ts";
+import { mountWaveformControls } from "./waveform-controls.tsx";
 import { playbackPreferencesAtom, toggleAutoPlayAtom } from "../state/playback-preferences.ts";
 import {
   algorithmCatalogAtom,
@@ -35,6 +34,7 @@ export function createSortController(generators, settingsStore = createStore()) 
   const soundfont = createTimbreSoundfont(timbre);
   const createPlayer = createPlayerFactory(Sort, Helper, settingsStore, soundfont);
   let disconnectSettings = () => {};
+  let unmountWaveformControls = () => {};
   let volumeSlider;
   let tempoSlider;
   let centerNoteSlider;
@@ -88,26 +88,6 @@ export function createSortController(generators, settingsStore = createStore()) 
         }
       }
     }
-  };
-
-  const populateWaveformButtons = function () {
-    let html = "";
-    $.each(waveformDefaults, function (waveformName) {
-      html += $("<button />")
-        .addClass("btn btn-mini" + (waveformName === getSelected().waveform ? " active" : ""))
-        .attr("type", "button")
-        .attr("data-waveform", waveformName)
-        .text(waveformName)
-        .wrap("<div />")
-        .parent()
-        .html();
-    });
-    $("#waveform .btn-group").html(html);
-  };
-
-  const onWaveformButtonClick = function () {
-    const $this = $(this);
-    setSelected("waveform", $this.attr("data-waveform"));
   };
 
   const getBaseDataAsPlayableObjects = function (playIndex) {
@@ -188,13 +168,6 @@ export function createSortController(generators, settingsStore = createStore()) 
     setSelected("dataSize", e.value);
   };
 
-  const onSliderWaveform = function (e) {
-    settingsStore.set(updateEnvelopeAtom, {
-      key: e.target.dataset.envelope,
-      value: Number(e.target.value),
-    });
-  };
-
   const onAudioDataButton = function () {
     const action = $(this).data("action");
     if (generators.hasOwnProperty(action)) {
@@ -213,30 +186,6 @@ export function createSortController(generators, settingsStore = createStore()) 
       triggerAutoPlay = settingsStore.get(playbackPreferencesAtom).autoPlay;
       doSort();
     } else setSelected("sort", id);
-  };
-
-  const updateWaveformDisplays = function () {
-    for (const [key, name] of Object.entries({
-      a: "attack",
-      d: "decay",
-      s: "sustain",
-      h: "hold",
-      r: "release",
-    })) {
-      updateDisplayCache(
-        `#waveform-adshr-${name}-display`,
-        formatEnvelopeValue(key, getWaveform()[key]),
-      );
-    }
-  };
-
-  const setSliderWaveformFromSelected = function () {
-    $("#envelope-controls input").each(function () {
-      const key = this.dataset.envelope;
-      this.value = getWaveform()[key];
-      this.setAttribute("aria-valuetext", formatEnvelopeValue(key, getWaveform()[key]));
-    });
-    updateWaveformDisplays();
   };
 
   const getScale = function (domainMin, domainMax, rangeMin, rangeMax) {
@@ -683,11 +632,6 @@ export function createSortController(generators, settingsStore = createStore()) 
             const active = $(this).attr("data-audio-type") === value.audioType;
             $(this).toggleClass("active", active).attr("aria-pressed", String(active));
           });
-          $("#waveform .btn-group .btn").each(function () {
-            const active = $(this).attr("data-waveform") === value.waveform;
-            $(this).toggleClass("active", active).attr("aria-pressed", String(active));
-          });
-          setSliderWaveformFromSelected();
           updateDisplayCache(
             "#audio-type-display",
             value.audioType === "waveform" ? "waveform: " + value.waveform : $instrument.text(),
@@ -801,6 +745,7 @@ export function createSortController(generators, settingsStore = createStore()) 
     players.base?.destroy();
     players.sort?.destroy();
     players.base = players.sort = null;
+    unmountWaveformControls();
     Helper.destroySliders();
     if (aceEditor) {
       const session = aceEditor.getSession();
@@ -837,8 +782,11 @@ export function createSortController(generators, settingsStore = createStore()) 
       }
       // build our sort options
       buildSortOptions("#sort-options");
-      // build waveform buttons
-      populateWaveformButtons();
+      // Mount before players so the preview canvas exists synchronously.
+      unmountWaveformControls = mountWaveformControls(
+        document.getElementById("waveform-controls"),
+        settingsStore,
+      );
       // setup audio and audio players
       setupPlayers();
       // setup base data
@@ -880,11 +828,6 @@ export function createSortController(generators, settingsStore = createStore()) 
         defaults.dataSize,
         onSliderDataSize,
       );
-      $("#envelope-controls").on(
-        "input" + eventNamespace,
-        "input[data-envelope]",
-        onSliderWaveform,
-      );
       // cache a few items
       const $sortAutoPlay = $("#sort-autoplay");
       $sortAutoPlay.on("click" + eventNamespace, () => {
@@ -898,7 +841,6 @@ export function createSortController(generators, settingsStore = createStore()) 
       // handle button clicks
       $("#audio-type-container .btn").on("click" + eventNamespace, onAudioTypeButtonClick);
       $("#audio-type-tab-link").on("click" + eventNamespace, onAudioTypeTabLinkClick);
-      $("#waveform .btn-group .btn").on("click" + eventNamespace, onWaveformButtonClick);
       $("span[data-midi-export]").on("click" + eventNamespace, onMidiExportClick);
       $("#midi-export-btn").on("click" + eventNamespace, onMidiSave);
       $("#modal-sort-open").on("click" + eventNamespace, onSortModalClick);

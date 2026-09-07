@@ -846,6 +846,22 @@ test("audio settings render selections and survive subscription reconnection", a
   expect(errors).toEqual([]);
 });
 
+test("charts use extra laptop height without enlarging short or narrow layouts", async ({
+  page,
+}) => {
+  await page.goto("index.html");
+  for (const [width, height, chartHeight] of [
+    [1440, 900, "240px"],
+    [1366, 768, "200px"],
+    [1280, 700, "200px"],
+    [768, 900, "200px"],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await expect(page.locator("#base-chart")).toHaveCSS("height", chartHeight);
+    await expect(page.locator("#sort-chart")).toHaveCSS("height", chartHeight);
+  }
+});
+
 test("envelope controls preserve the compact settings panel", async ({ page }) => {
   await page.goto("index.html");
   for (const width of [1280, 1024, 768, 390]) {
@@ -859,6 +875,11 @@ test("envelope controls preserve the compact settings panel", async ({ page }) =
     for (const selector of ["#envelope-controls", ".waveform-section"]) {
       const controls = await page.locator(selector).boundingBox();
       expect(controls.y + controls.height).toBeLessThanOrEqual(panel.y + panel.height);
+    }
+    const envelope = await page.locator("#envelope-controls").boundingBox();
+    for (const slider of await page.locator('#envelope-controls input[type="range"]').all()) {
+      const bounds = await slider.boundingBox();
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(envelope.x + envelope.width + 1);
     }
   }
 });

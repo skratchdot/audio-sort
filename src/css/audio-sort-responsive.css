@@ -82,5 +82,19 @@
 @media (max-height: 630px) {
 }
 
+/* Use spare laptop height without making short screens or phones taller. */
+@media (min-width: 980px) and (min-height: 900px) {
+  #base-chart,
+  #sort-chart {
+    height: 240px;
+  }
+  #settings-content {
+    min-height: 254px;
+  }
+  #sort-options {
+    height: 240px;
+  }
+}
+
 @media (max-height: 400px) {
 }

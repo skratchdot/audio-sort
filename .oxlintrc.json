@@ -20,7 +20,7 @@
   },
   "overrides": [
     {
-      "files": ["src/js/**/*.js", "src/js/**/*.mjs", "src/js/**/*.ts"],
+      "files": ["src/js/**/*.js", "src/js/**/*.mjs", "src/js/**/*.ts", "src/js/**/*.tsx"],
       "env": { "node": false, "browser": true }
     },
     {

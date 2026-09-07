@@ -1,0 +1,5 @@
+/* No Preflight while Bootstrap styles remain. Prefix avoids legacy class clashes. */
+@layer theme, utilities;
+@import "tailwindcss/theme.css" layer(theme) prefix(tw);
+@import "tailwindcss/utilities.css" layer(utilities) prefix(tw);
+@source "../js";
