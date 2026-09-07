@@ -1,5 +1,18 @@
 import { expect, test } from "vitest";
-import { createSortEngine } from "../src/js/sorting/create-sort-engine.mjs";
+import { createSortEngine } from "../src/js/sorting/create-sort-engine.ts";
+
+test("preserves the final playback frame even when a nonempty sort does no work", () => {
+  const engine = createSortEngine();
+  engine.init([1], "sort");
+  const frames = engine.end("sort");
+  expect(frames).toHaveLength(2);
+  expect(frames[0]).toEqual(frames[1]);
+  expect(frames[0].arr[0]).not.toBe(frames[1].arr[0]);
+  expect(engine.size).toBe(engine.length);
+  expect(engine.end("sort")).toHaveLength(3);
+  engine.init([], "empty");
+  expect(engine.end("empty")).toHaveLength(1);
+});
 
 test("importing and creating engines does not install a global AS", () => {
   expect(Object.hasOwn(globalThis, "AS")).toBe(false);

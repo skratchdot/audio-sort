@@ -2,7 +2,7 @@ import { generators } from "./generators/generator-registry.ts";
 import { createSortController } from "./ui/create-sort-controller.mjs";
 import { algorithms } from "./sorting/algorithm-registry.mjs";
 import { sources } from "./sorting/algorithm-sources.mjs";
-import { createSortRequest, getFunctionBody, runSortRequest } from "./sorting/sort-requests.mjs";
+import { createSortRequest, getFunctionBody, runSortRequest } from "./sorting/sort-requests.ts";
 
 function createSortWorker() {
   return new Worker(new URL("./worker.mjs", import.meta.url), { type: "module" });
