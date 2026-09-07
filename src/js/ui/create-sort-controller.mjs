@@ -4,6 +4,7 @@ import { min, max } from "d3-array";
 import { scaleLinear } from "d3-scale";
 import { saveAs } from "file-saver";
 import { createHelpers } from "./create-helpers.mjs";
+import { connectPlaybackSettings } from "./connect-playback-settings.ts";
 import { createPlayerFactory } from "./create-player-factory.mjs";
 import { MidiExport } from "../midi/midi-export.mjs";
 import { instruments } from "../midi/instruments.ts";
@@ -21,6 +22,9 @@ export function createSortController(generators, settingsStore = createStore()) 
   const Sort = {};
   const Helper = createHelpers(Sort);
   const createPlayer = createPlayerFactory(Sort, Helper, settingsStore);
+  let disconnectSettings = () => {};
+  let volumeSlider;
+  let tempoSlider;
   // Read the current atom value on demand; do not keep a second settings cache.
   const getSelected = () => settingsStore.get(settingsAtom);
   const setSelected = (key, value) => settingsStore.set(updateSettingAtom, { key, value });
@@ -193,19 +197,11 @@ export function createSortController(generators, settingsStore = createStore()) 
   };
 
   const onSliderVolume = function (e) {
-    onSlider("volume", "#volume-display", e, function (val) {
-      return val.toFixed(2);
-    });
-    const volume = getWaveform().mul * getSelected().volume;
-    players.base.setVolume(volume);
-    players.sort.setVolume(volume);
+    setSelected("volume", e.value);
   };
 
   const onSliderTempo = function (e) {
-    const tempo = Sort.getTempoString();
-    onSlider("tempo", "#tempo-display", e);
-    players.base.setTempo(tempo);
-    players.sort.setTempo(tempo);
+    setSelected("tempo", e.value);
   };
 
   const onSliderCenterNote = function (e) {
@@ -676,6 +672,39 @@ export function createSortController(generators, settingsStore = createStore()) 
     return "bpm" + (parseFloat(getSelected().tempo) || defaults.tempo) + " l16";
   };
 
+  Sort.disconnectSettings = function () {
+    disconnectSettings();
+    disconnectSettings = () => {};
+  };
+
+  Sort.connectSettings = function () {
+    Sort.disconnectSettings();
+    disconnectSettings = connectPlaybackSettings(settingsStore, {
+      volume(value, gain) {
+        volumeSlider.slider("setValue", value);
+        updateDisplayCache("#volume-display", value.toFixed(2));
+        players.base.setVolume(gain);
+        players.sort.setVolume(gain);
+      },
+      tempo(value) {
+        tempoSlider.slider("setValue", value);
+        updateDisplayCache("#tempo-display", value);
+        players.base.setTempo(Sort.getTempoString());
+        players.sort.setTempo(Sort.getTempoString());
+      },
+      preferences(value) {
+        $("#sort-autoplay")
+          .toggleClass("active", value.autoPlay)
+          .attr("aria-pressed", String(value.autoPlay));
+        for (const id of ["base", "sort"]) {
+          $("#" + id + '-section [data-action="loop"]')
+            .toggleClass("active", value.loop[id])
+            .attr("aria-pressed", String(value.loop[id]));
+        }
+      },
+    });
+  };
+
   Sort.init = function (options) {
     createWorker = options.createWorker;
     createSortRequest = options.createSortRequest;
@@ -720,8 +749,8 @@ export function createSortController(generators, settingsStore = createStore()) 
         $("#soundfont-options li").show();
       });
     // create some of our sliders
-    Helper.createSlider("#volume-container", defaults.volume, onSliderVolume);
-    Helper.createSlider("#tempo-container", defaults.tempo, onSliderTempo);
+    volumeSlider = Helper.createSlider("#volume-container", defaults.volume, onSliderVolume);
+    tempoSlider = Helper.createSlider("#tempo-container", defaults.tempo, onSliderTempo);
     Helper.createSlider("#center-note-container", defaults.centerNote, onSliderCenterNote);
     Helper.createSlider("#data-size-container", defaults.dataSize, onSliderDataSize);
     // create our waveform sliders
@@ -777,14 +806,8 @@ export function createSortController(generators, settingsStore = createStore()) 
     );
     // cache a few items
     const $sortAutoPlay = $("#sort-autoplay");
-    const renderAutoPlay = () => {
-      const active = settingsStore.get(playbackPreferencesAtom).autoPlay;
-      $sortAutoPlay.toggleClass("active", active).attr("aria-pressed", String(active));
-    };
-    renderAutoPlay();
     $sortAutoPlay.on("click", () => {
       settingsStore.set(toggleAutoPlayAtom);
-      renderAutoPlay();
     });
     $("#modal-sort, #modal-add-algorithm").on("hide", function () {
       if (activeEditorModal !== "#" + this.id) return;
@@ -809,10 +832,9 @@ export function createSortController(generators, settingsStore = createStore()) 
     // draw envelope canvas
     players.base.drawWaveformCanvases();
     // update slider selction text
-    updateDisplayCache("#volume-display", getSelected().volume);
-    updateDisplayCache("#tempo-display", getSelected().tempo);
     updateDisplayCache("#center-note-display", getSelected().centerNote, getNoteName);
     updateDisplayCache("#data-size-display", getSelected().dataSize);
+    Sort.connectSettings();
   };
 
   return Sort;

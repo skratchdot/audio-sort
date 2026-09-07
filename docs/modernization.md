@@ -63,7 +63,9 @@ Jotai now owns the nine selected settings and per-waveform envelopes behind the 
 vanilla store per controller. No React dependency or audio lifecycle changes.
 Custom algorithm overrides now live in the same store, with the catalog derived
 from imported built-ins and overrides. AutoPlay and per-player looping also live
-in state; transport status and scheduling remain player-owned. Next: add explicit
-UI/audio synchronization and cleanup before multiple UI owners.
+in state; transport status and scheduling remain player-owned. Volume, tempo,
+AutoPlay, and loop-button state now synchronize through a disposable connection.
+Next: extend synchronization to remaining settings and implement full controller/
+player teardown before multiple UI owners.
 The algorithm function/metadata format and editor remain unchanged; do not add parser/build
 machinery solely to reorganize metadata.

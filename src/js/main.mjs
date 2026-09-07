@@ -18,3 +18,9 @@ controller.init({
     return getFunctionBody(algorithm === algorithms[id] ? sources[id] : algorithm);
   },
 });
+
+// Release subscriptions while away; restore them when returning from the back/forward cache.
+globalThis.addEventListener("pagehide", () => controller.disconnectSettings());
+globalThis.addEventListener("pageshow", (event) => {
+  if (event.persisted) controller.connectSettings();
+});
