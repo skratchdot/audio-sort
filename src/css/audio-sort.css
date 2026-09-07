@@ -9,7 +9,7 @@ html, body {
 }
 
 #header, #footer, svg, .hero-unit, #sort-options, .option-box, #waveform canvas {
-	background: #e6e6e6 url(../img/gradient_squares.png) repeat center center;
+	background: #e6e6e6 url(/img/gradient_squares.png) repeat center center;
 }
 
 #settings {

@@ -4,7 +4,7 @@
   "categories": { "correctness": "error" },
   "env": { "node": true },
   "ignorePatterns": [
-    "src/js/lib/**",
+    "public/**",
     "dist/**",
     "_site/**",
     "_ignore/**",

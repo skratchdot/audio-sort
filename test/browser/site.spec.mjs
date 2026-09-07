@@ -1,7 +1,39 @@
 import { expect, test } from "@playwright/test";
-import { readdirSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import { join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 import { algorithmNames } from "../helpers/algorithms.mjs";
 import { generators } from "../../src/js/fn/registry.mjs";
+
+test("public assets are copied unchanged and CSS images load under the site base", async ({
+  page,
+  request,
+  baseURL,
+}) => {
+  const source = fileURLToPath(new URL("../../public/", import.meta.url));
+  const output = fileURLToPath(new URL("../../_site/", import.meta.url));
+  const files = readdirSync(source, { recursive: true, withFileTypes: true }).filter(
+    (entry) => entry.isFile() && entry.name !== ".DS_Store",
+  );
+  for (const entry of files) {
+    const sourceFile = join(entry.parentPath, entry.name);
+    const assetPath = relative(source, sourceFile);
+    expect(readFileSync(join(output, assetPath)).equals(readFileSync(sourceFile)), assetPath).toBe(
+      true,
+    );
+  }
+  await page.goto("index.html");
+  for (const selector of ["#header", ".icon-repeat", ".icon-white"]) {
+    const background = await page
+      .locator(selector)
+      .first()
+      .evaluate((element) => globalThis.getComputedStyle(element).backgroundImage);
+    const url = background.match(/url\(["']?(.*?)["']?\)/)?.[1];
+    expect(url).toBeTruthy();
+    expect(url.startsWith(`${baseURL}img/`)).toBe(true);
+    expect((await request.get(url)).ok()).toBe(true);
+  }
+});
 
 test("every data generator feeds valid input to the worker", async ({ page }) => {
   const errors = [];
