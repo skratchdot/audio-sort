@@ -1,0 +1,4 @@
+# Only timbre/timbre.dev.js is used. Its Node entry and native output are not.
+overrides:
+  "timbre>speaker": "-"
+  "timbre>readable-stream": "-"

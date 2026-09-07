@@ -33,7 +33,7 @@ All waveforms, including string, start with attack 50 ms, decay 300 ms, sustain
 
 Timbre's bundled `adshr` implementation holds **at sustain level after decay**,
 not at the peak before decay (see `register("adshr")` in
-[`timbre.dev.js`](../public/js/timbre.dev.js)). The native envelope controls and
+the pinned `timbre/timbre.dev.js` package entry). The native envelope controls and
 [`envelope-diagram.ts`](../src/js/ui/envelope-diagram.ts) use that same ordering.
 The diagram shows amplitude against proportional elapsed time; it is an envelope
 preview, not the resulting oscillator or plucked-string signal.

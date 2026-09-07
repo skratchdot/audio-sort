@@ -1,3 +1,5 @@
-// Compatibility boundary: classic scripts in footer.html load before main.mjs.
-// Keep plugin-bearing jQuery and the legacy audio libraries unchanged.
-export const { jQuery: $, timbre } = globalThis;
+import timbre from "timbre/timbre.dev.js";
+
+// Only plugin-bearing jQuery still comes from classic scripts in footer.html.
+export const { jQuery: $ } = globalThis;
+export { timbre };

@@ -5,7 +5,7 @@ export function formatEnvelopeValue(key: EnvelopeKey, value: number): string {
   return value < 1000 ? `${value} ms` : `${Number((value / 1000).toFixed(3))} s`;
 }
 
-// Verified against public/js/timbre.dev.js, register("adshr"):
+// Verified against timbre@14.11.25/timbre.dev.js, register("adshr"):
 // [0, [1,a], [s,d], [s,h], [0,r]]. Hold is at sustain level AFTER decay,
 // unlike an AHDSR peak hold before decay.
 export function getEnvelopePoints(e: Envelope) {

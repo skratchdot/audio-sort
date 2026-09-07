@@ -33,9 +33,32 @@ buffer playback using a generated fixture, and a manual Chrome network/decode sm
 check of notes 60 for instruments 0, 42, and 127. The real host returned HTTP 200,
 allowed CORS, and all three MP3s decoded as stereo at 44100 Hz on 2026-09-07.
 
-## Initial audit (2026-09-07, before native sample loading)
+## Packaged Timbre
 
-These findings motivated the native loader above; Timbre packaging is still pending.
+The app imports `timbre/timbre.dev.js` from pinned `timbre@14.11.25`, not the
+package's Node entry. pnpm overrides exclude its unused `speaker` and
+`readable-stream` dependencies, avoiding native Node audio installation.
+Vite maps the bundle's CommonJS `global` reference to `globalThis`. The package
+still publishes a legacy global as a side effect; application consumers use the
+imported value rather than reading that global.
+
+The actual deployed minified bundle identified itself as `14.06.23`; the old
+development file was `13.05.03` and was not its matching source. This migration
+is therefore an explicit upgrade, not a claim of byte-for-byte equivalence.
+All seven oscillator preview blocks matched the old deployed bundle. Deterministic
+ADSHR and seeded pluck output matched over 700 processing blocks; regression
+fingerprints preserve those checks without keeping a vendored baseline.
+The published browser entry supports standard AudioContext, and production
+browser tests exercise native stereo samples, playback controls, and teardown.
+Listening review is still required for behavior beyond those checks.
+
+Third-party attribution is deferred to a separate, project-wide changeset.
+Local Timbre bundles, the stale map, and the Flash fallback asset are removed. The site
+requires Web Audio; Flash-only browsers are no longer supported.
+
+## Initial audit (2026-09-07, before the migrations)
+
+These historical findings motivated the native loader and package migration above.
 
 | Component                    | Evidence and compatibility concerns                                                                                                                                                                                                                                     | Next action                                                                                                                                                                                                                   |
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -46,9 +69,7 @@ These findings motivated the native loader above; Timbre packaging is still pend
 | Development bundle/map/Flash | The footer loads only `timbre.js`, but it references its source map and contains a conditional `timbre.swf` fallback. Documentation currently links the development source for envelope semantics.                                                                      | Remove these only with an explicit browser-support decision and updated source references.                                                                                                                                    |
 
 Registry checks identify specific package names, not proof that no alternative
-package exists. The deployed minified bundle has not yet been proven identical
-to an upstream release. Full modification and license review remains a gate for
-any replacement; package availability alone does not establish compatibility.
+package exists. The comparison above supersedes the initial packaging blockers.
 
 Primary references:
 
@@ -58,11 +79,10 @@ Primary references:
 - [Soundfont extension source](https://github.com/skratchdot/timbre.soundfont.js)
 - [Current sample collection](https://skratchdot.com/projects/free-midi/)
 
-## Next cohesive audio changeset
+## Listening review and future changes
 
-Complete the Timbre browser-artifact/license comparison, then choose pinned
-compatible packaging or a first-party synthesis implementation. Native sample
-loading no longer depends on its old decoder extensions, reducing that coupling.
+No audio-engine rewrite is required for the React migration. Native sample
+loading no longer depends on the old decoder extensions, reducing coupling.
 Do not change the sample bank silently: another soundfont library's defaults can
 change every instrument's sound. Keep synthesis replacement separate from React.
 Audition waveform and soundfont modes, envelope edits, instrument changes,
