@@ -33,11 +33,11 @@ export default function bar(settings) {
     var circle, len, radius, cy;
     if (hasMarkers) {
       // select some items
-      circle = svg.selectAll("circle." + property).data(info.arr);
+      circle = svg
+        .selectAll("circle." + property)
+        .data(info.arr)
+        .join("circle");
       len = info.arr.length;
-
-      // create
-      circle.enter().append("circle");
 
       // determine our radius and our y position
       radius = 100 / (Math.max(len, 20) * 4);
@@ -57,9 +57,6 @@ export default function bar(settings) {
         .attr("style", function (d) {
           return d[property] ? "" : "display:none";
         });
-
-      // exit
-      circle.exit().remove();
     }
   };
 
@@ -163,11 +160,8 @@ export default function bar(settings) {
       info = data[index];
 
       // select some items
-      rect = svg.selectAll("rect").data(info.arr);
+      rect = svg.selectAll("rect").data(info.arr).join("rect");
       len = info.arr.length;
-
-      // create
-      rect.enter().append("rect");
 
       // update
       rect
@@ -186,9 +180,6 @@ export default function bar(settings) {
         .attr("class", function (d) {
           return d.play ? "play" : "";
         });
-
-      // exit
-      rect.exit().remove();
 
       // draw our markers
       drawMarkers(info, 1, "highlight");

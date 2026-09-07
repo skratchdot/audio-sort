@@ -1,4 +1,6 @@
-import { $, sc, d3, timbre } from "../vendor.mjs";
+import { $, sc, timbre } from "../vendor.mjs";
+import { min, max } from "d3-array";
+import { scaleLinear } from "d3-scale";
 import { saveAs } from "file-saver";
 import { createHelpers } from "./create-helpers.mjs";
 import { createPlayerFactory } from "./create-player-factory.mjs";
@@ -341,7 +343,7 @@ export function createSortController(generators) {
   };
 
   getScale = function (domainMin, domainMax, rangeMin, rangeMax) {
-    return d3.scale.linear().domain([domainMin, domainMax]).range([rangeMin, rangeMax]);
+    return scaleLinear().domain([domainMin, domainMax]).range([rangeMin, rangeMax]);
   };
 
   generateData = function (regenerateMaxData, action) {
@@ -351,7 +353,7 @@ export function createSortController(generators) {
         baseData = generators[action](selected.dataSize);
         maxData = generators[action](defaults.dataSize.max);
         slice = maxData.slice(0, selected.dataSize);
-        scale = getScale(0, baseData.length - 1, d3.min(slice), d3.max(slice));
+        scale = getScale(0, baseData.length - 1, min(slice), max(slice));
         // we always want our current "baseData" when re-sizing
         for (i = 0; i < baseData.length; i++) {
           maxData[i] = Math.round(scale(baseData[i]));
@@ -359,7 +361,7 @@ export function createSortController(generators) {
       }
     } else {
       baseData = maxData.slice(0, selected.dataSize);
-      scale = getScale(d3.min(baseData), d3.max(baseData), 0, baseData.length - 1);
+      scale = getScale(min(baseData), max(baseData), 0, baseData.length - 1);
       // normalize data
       for (i = 0; i < baseData.length; i++) {
         baseData[i] = Math.round(scale(maxData[i]));
