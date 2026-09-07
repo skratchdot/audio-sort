@@ -1,13 +1,11 @@
 // a slightly modified version of:
 // https://raw.github.com/nzakas/computer-science-in-javascript/master/algorithms/sorting/quicksort/quicksort.js
 export default function quick(AS) {
-  var partition, quickSort;
-
-  partition = function (left, right) {
-    var pivotIndex = Math.floor((right + left) / 2),
-      pivotValue = AS.get(pivotIndex),
-      i = left,
-      j = right;
+  const partition = function (left, right) {
+    const pivotIndex = Math.floor((right + left) / 2);
+    const pivotValue = AS.get(pivotIndex);
+    let i = left;
+    let j = right;
 
     AS.clearHighlight();
     AS.play(i, j);
@@ -47,9 +45,8 @@ export default function quick(AS) {
     return i;
   };
 
-  quickSort = function (left, right) {
-    var index,
-      len = AS.length();
+  const quickSort = function (left, right) {
+    const len = AS.length();
 
     // performance - don't sort an array with zero or one items
     if (len > 1) {
@@ -60,7 +57,7 @@ export default function quick(AS) {
       AS.mark(left, right);
 
       // split up the entire array
-      index = partition(left, right);
+      const index = partition(left, right);
 
       // if the returned index
       if (left < index - 1) {

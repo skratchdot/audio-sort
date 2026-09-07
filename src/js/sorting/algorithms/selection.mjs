@@ -1,14 +1,11 @@
 // a slightly modified version of:
 // https://github.com/nzakas/computer-science-in-javascript/blob/master/algorithms/sorting/selection-sort/selection-sort.js
 export default function selection(AS) {
-  var len = AS.length(),
-    min,
-    i,
-    j;
+  const len = AS.length();
 
-  for (i = 0; i < len; i++) {
-    min = i;
-    for (j = i + 1; j < len; j++) {
+  for (let i = 0; i < len; i++) {
+    let min = i;
+    for (let j = i + 1; j < len; j++) {
       AS.play(j);
       AS.mark(i, j);
       if (AS.lt(j, min)) {

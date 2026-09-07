@@ -8,36 +8,28 @@
  */
 // Each instance owns its arrays, frames, markers, and counters.
 export function createSortEngine() {
-  var AS = {},
-    // internal arrays
-    _array = [],
-    _frames = [],
-    _token = "",
-    // state
-    recent = {
-      play: [],
-      mark: [],
-      swap: [],
-      compare: [],
-      highlight: [],
-    },
-    // counters
-    compareCount = 0,
-    swapCount = 0,
-    // functions
-    addFrame,
-    compare,
-    copyObject,
-    frameCheck,
-    getIndexFromSortObject,
-    getSortObjects,
-    mark;
+  const AS = {};
+  // internal arrays
+  let _array = [];
+  let _frames = [];
+  let _token = "";
+  // state
+  const recent = {
+    play: [],
+    mark: [],
+    swap: [],
+    compare: [],
+    highlight: [],
+  };
+  // counters
+  let compareCount = 0;
+  let swapCount = 0;
 
-  copyObject = function (obj) {
-    var isObject = typeof obj === "object",
-      rand = parseInt(Math.random() * 10000000, 10),
-      result;
-    result = {
+  const copyObject = function (obj) {
+    const isObject = typeof obj === "object";
+    const rand = parseInt(Math.random() * 10000000, 10);
+
+    const result = {
       id: isObject ? obj.id : rand + "_" + obj,
       value: isObject ? obj.value : obj,
       play: isObject ? obj.play : false,
@@ -50,18 +42,17 @@ export function createSortEngine() {
     return result;
   };
 
-  frameCheck = function (type) {
+  const frameCheck = function (type) {
     if (_frames.length === 0 || (recent.hasOwnProperty(type) && recent[type].length)) {
       addFrame();
     }
   };
 
-  addFrame = function () {
-    var i,
-      copy = [],
-      obj;
-    for (i = 0; i < _array.length; i++) {
-      obj = copyObject(_array[i]);
+  const addFrame = function () {
+    const copy = [];
+
+    for (let i = 0; i < _array.length; i++) {
+      const obj = copyObject(_array[i]);
       // justSwapped
       if (recent.swap.indexOf(obj.id) >= 0) {
         obj.justSwapped = true;
@@ -83,9 +74,8 @@ export function createSortEngine() {
     recent.compare = [];
   };
 
-  getIndexFromSortObject = function (obj) {
-    var i;
-    for (i = 0; i < _array.length; i++) {
+  const getIndexFromSortObject = function (obj) {
+    for (let i = 0; i < _array.length; i++) {
       if (_array[i].id === obj.id) {
         return i;
       }
@@ -93,12 +83,10 @@ export function createSortEngine() {
     return -1;
   };
 
-  getSortObjects = function (inputArray) {
-    var i,
-      current,
-      ret = [];
-    for (i = 0; i < inputArray.length; i++) {
-      current = inputArray[i];
+  const getSortObjects = function (inputArray) {
+    const ret = [];
+    for (let i = 0; i < inputArray.length; i++) {
+      let current = inputArray[i];
       if (typeof current === "number") {
         current = AS.get(current);
       }
@@ -107,24 +95,20 @@ export function createSortEngine() {
     return ret;
   };
 
-  compare = function (one, two) {
-    var sortObjects = mark("compare", [one, two]);
+  const compare = function (one, two) {
+    const sortObjects = mark("compare", [one, two]);
     compareCount++;
     _frames[_frames.length - 1].compareCount = compareCount;
     return sortObjects;
   };
 
-  mark = function (type, inputArray) {
-    var frameIndex,
-      len,
-      i,
-      index,
-      sortObjects = getSortObjects(inputArray);
+  const mark = function (type, inputArray) {
+    const sortObjects = getSortObjects(inputArray);
     frameCheck(type);
-    frameIndex = _frames.length - 1;
-    len = _frames[frameIndex].arr.length;
-    for (i = 0; i < sortObjects.length; i++) {
-      index = getIndexFromSortObject(sortObjects[i]);
+    const frameIndex = _frames.length - 1;
+    const len = _frames[frameIndex].arr.length;
+    for (let i = 0; i < sortObjects.length; i++) {
+      const index = getIndexFromSortObject(sortObjects[i]);
       if (index >= 0 && index < len) {
         _frames[frameIndex].arr[index][type] = true;
         if (recent.hasOwnProperty(type)) {
@@ -140,7 +124,6 @@ export function createSortEngine() {
   };
 
   AS.init = function (inputArray, token) {
-    var i;
     _array = [];
     _frames = [];
     _token = token;
@@ -148,21 +131,20 @@ export function createSortEngine() {
     swapCount = 0;
     // Reusing an instance must not carry marker IDs into the next data set.
     for (const type of Object.keys(recent)) recent[type] = [];
-    for (i = 0; i < inputArray.length; i++) {
+    for (let i = 0; i < inputArray.length; i++) {
       _array.push(copyObject(inputArray[i]));
     }
   };
 
   AS.end = function (token) {
-    var i, lastFrameArray;
     if (_token === token) {
       // handle empty frames
       if (_frames.length === 0) {
         addFrame();
       }
       // handle the case in which last frame doesn't match _array
-      lastFrameArray = _frames[_frames.length - 1].arr;
-      for (i = 0; i < _array.length; i++) {
+      const lastFrameArray = _frames[_frames.length - 1].arr;
+      for (let i = 0; i < _array.length; i++) {
         if (_array[i].id !== lastFrameArray) {
           addFrame();
           return _frames;
@@ -183,32 +165,32 @@ export function createSortEngine() {
   AS.size = AS.length;
 
   AS.lt = function (one, two) {
-    var sortObjects = compare(one, two);
+    const sortObjects = compare(one, two);
     return sortObjects[0].value < sortObjects[1].value;
   };
 
   AS.lte = function (one, two) {
-    var sortObjects = compare(one, two);
+    const sortObjects = compare(one, two);
     return sortObjects[0].value <= sortObjects[1].value;
   };
 
   AS.gt = function (one, two) {
-    var sortObjects = compare(one, two);
+    const sortObjects = compare(one, two);
     return sortObjects[0].value > sortObjects[1].value;
   };
 
   AS.gte = function (one, two) {
-    var sortObjects = compare(one, two);
+    const sortObjects = compare(one, two);
     return sortObjects[0].value >= sortObjects[1].value;
   };
 
   AS.eq = function (one, two) {
-    var sortObjects = compare(one, two);
+    const sortObjects = compare(one, two);
     return sortObjects[0].value === sortObjects[1].value;
   };
 
   AS.neq = function (one, two) {
-    var sortObjects = compare(one, two);
+    const sortObjects = compare(one, two);
     return sortObjects[0].value !== sortObjects[1].value;
   };
 
@@ -234,14 +216,13 @@ export function createSortEngine() {
   };
 
   AS.swap = function (one, two) {
-    var indexOne, indexTwo, tempOne, tempTwo, sortObjects;
     // mark as swapped
-    sortObjects = mark("swap", [one, two]);
-    indexOne = getIndexFromSortObject(sortObjects[0]);
-    indexTwo = getIndexFromSortObject(sortObjects[1]);
+    const sortObjects = mark("swap", [one, two]);
+    const indexOne = getIndexFromSortObject(sortObjects[0]);
+    const indexTwo = getIndexFromSortObject(sortObjects[1]);
     // perform swap
-    tempOne = _array[indexOne];
-    tempTwo = _array[indexTwo];
+    const tempOne = _array[indexOne];
+    const tempTwo = _array[indexTwo];
     _array[indexOne] = tempTwo;
     _array[indexTwo] = tempOne;
     swapCount++;

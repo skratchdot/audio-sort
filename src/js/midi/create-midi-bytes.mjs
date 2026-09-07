@@ -2,41 +2,33 @@ import Midi from "jsmidgen";
 
 // Keep the original export timing and velocity independent of library defaults.
 export function createMidiBytes(data, getMidiNumber, tempo, channel, instrument) {
-  var i,
-    j,
-    midiFile,
-    midiTrack,
-    duration = 64,
-    totalDuration = 0,
-    info,
-    currentItem,
-    midiNumber,
-    play;
+  const duration = 64;
+  let totalDuration = 0;
 
   // setup midi file
-  midiFile = new Midi.File();
-  midiTrack = new Midi.Track();
+  const midiFile = new Midi.File();
+  const midiTrack = new Midi.Track();
   midiTrack.setTempo(tempo);
   midiTrack.setInstrument(channel, instrument);
   midiFile.addTrack(midiTrack);
 
   // build midi track
-  for (i = 0; i < data.length; i++) {
-    info = data[i];
-    play = [];
+  for (let i = 0; i < data.length; i++) {
+    const info = data[i];
+    const play = [];
     totalDuration += duration;
     // get the notes we need to play
-    for (j = 0; j < info.arr.length; j++) {
-      currentItem = info.arr[j];
+    for (let j = 0; j < info.arr.length; j++) {
+      const currentItem = info.arr[j];
       if (currentItem.play) {
-        midiNumber = getMidiNumber(currentItem.value);
+        const midiNumber = getMidiNumber(currentItem.value);
         if (midiNumber >= 0 && midiNumber < 128) {
           play.push(midiNumber);
         }
       }
     }
     // note on
-    for (j = 0; j < play.length; j++) {
+    for (let j = 0; j < play.length; j++) {
       if (j === 0) {
         midiTrack.noteOn(channel, play[j], duration, 100);
       } else {
@@ -44,7 +36,7 @@ export function createMidiBytes(data, getMidiNumber, tempo, channel, instrument)
       }
     }
     // note off
-    for (j = 0; j < play.length; j++) {
+    for (let j = 0; j < play.length; j++) {
       midiTrack.noteOff(channel, play[j], 0, 100);
     }
   }
