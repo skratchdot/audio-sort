@@ -1,8 +1,8 @@
-import swap from "./swap.mjs";
+import swap from "./swap.ts";
 
 // shuffle function is the fisherYates algorithm adapted from:
 // http://sedition.com/perl/javascript-fy.html
-export default function shuffle(arr) {
+export default function shuffle<T>(arr: T[]): T[] {
   let i = arr.length;
 
   if (i === 0) {

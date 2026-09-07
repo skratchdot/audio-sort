@@ -6,10 +6,10 @@ algorithms, and static hosting throughout. Skip an interim Bootstrap 5 migration
 1. **TypeScript foundation.** Add strict, no-emit checking and migrate independent
    data/utilities first. Keep existing JavaScript working; expand type coverage
    incrementally rather than suppressing errors across the legacy controller.
-2. **Algorithm definitions and editor source.** Export metadata separately from
-   the default algorithm. Replace brace-based source extraction with syntax-aware
-   extraction before changing the module format. Keep editor input JavaScript;
-   TypeScript editing requires separate compilation and diagnostics work.
+2. **Finish independent TypeScript modules.** Type array utilities, generators,
+   and their registry while preserving runtime behavior. Keep the current
+   algorithm function/metadata format and JavaScript editor unchanged; a format
+   redesign is deferred until it simplifies code or enables useful type checking.
 3. **Typed recording API.** Type items, frames, metadata, and worker messages
    without changing recording semantics. Keep the factory unless a class solves
    a concrete problem; algorithms depend on an interface, not its implementation.
@@ -55,5 +55,9 @@ installs, and working editor, playback, MIDI export, and static-path checks.
 
 ## Current phase
 
-TypeScript checks cover scales, instruments, and the random-number utility.
+TypeScript checks cover scales, instruments, all array utilities, generators,
+and the generator registry.
 Remaining `.mjs` modules and browser-entered algorithms are not type-checked yet.
+
+Next: type the recording API and worker contracts without changing their public
+behavior. Do not add parser/build machinery solely to reorganize metadata.
