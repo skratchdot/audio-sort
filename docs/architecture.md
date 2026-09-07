@@ -25,9 +25,18 @@ Selected settings live in [`state/settings.ts`](../src/js/state/settings.ts), us
 `jotai/vanilla` without React. Each controller owns a separate store unless one
 is supplied. UI handlers write through `updateSettingAtom`; helpers and players
 read fresh values through the existing controller getters. There is no mirrored
-settings object. Snapshots and defaults are immutable. Per-waveform envelope edits
-live in [`state/waveforms.ts`](../src/js/state/waveforms.ts) in the same store;
-generator presets stay fixed, and sustain edits retain two-decimal rounding.
+settings object. Snapshots and defaults are immutable. One shared envelope lives
+in [`state/envelope.ts`](../src/js/state/envelope.ts); changing waveform only
+selects a generator from [`state/waveforms.ts`](../src/js/state/waveforms.ts).
+All waveforms, including string, start with attack 50 ms, decay 300 ms, sustain
+50%, hold 200 ms, and release 300 ms. Sustain edits retain two-decimal rounding.
+
+Timbre's bundled `adshr` implementation holds **at sustain level after decay**,
+not at the peak before decay (see `register("adshr")` in
+[`timbre.dev.js`](../public/js/timbre.dev.js)). The native envelope controls and
+[`envelope-diagram.ts`](../src/js/ui/envelope-diagram.ts) use that same ordering.
+The diagram shows amplitude against proportional elapsed time; it is an envelope
+preview, not the resulting oscillator or plucked-string signal.
 
 [`connect-playback-settings.ts`](../src/js/ui/connect-playback-settings.ts) connects
 volume, tempo, AutoPlay, and loop preferences to UI/audio effects. It applies
@@ -36,7 +45,7 @@ function. The controller replaces its old connections before reconnecting.
 [`connect-audio-settings.ts`](../src/js/ui/connect-audio-settings.ts) shares that
 lifecycle and synchronizes audio type, waveform/envelopes, center note, scale,
 and instrument. It sets the instrument before soundfont preloading and avoids
-rebuilding generators for unrelated settings or unselected envelope edits.
+rebuilding generators for unrelated settings.
 Envelope labels now populate on initial connection.
 [`connect-sort-settings.ts`](../src/js/ui/connect-sort-settings.ts) renders the
 catalog/selection and data size, resizes data before sorting, and reruns the

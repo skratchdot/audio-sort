@@ -2,7 +2,7 @@ import { expect, test, vi } from "vitest";
 import { createStore } from "jotai/vanilla";
 import { connectAudioSettings } from "../src/js/ui/connect-audio-settings.ts";
 import { updateSettingAtom } from "../src/js/state/settings.ts";
-import { updateEnvelopeAtom } from "../src/js/state/waveforms.ts";
+import { updateEnvelopeAtom } from "../src/js/state/envelope.ts";
 
 const createEffects = () => ({
   render: vi.fn(),
@@ -45,16 +45,16 @@ test("waveform and envelope changes refresh only the selected generator", () => 
   const effects = createEffects();
   const disconnect = connectAudioSettings(store, effects);
   clear(effects);
-  store.set(updateEnvelopeAtom, { waveform: "sin", key: "a", value: 100 });
-  expect(effects.refreshWaveform).not.toHaveBeenCalled();
+  store.set(updateEnvelopeAtom, { key: "a", value: 100 });
+  expect(effects.refreshWaveform).toHaveBeenCalledTimes(1);
   store.set(updateSettingAtom, { key: "waveform", value: "sin" });
   expect(effects.render.mock.calls[0][1].a).toBe(100);
-  expect(effects.refreshWaveform).toHaveBeenCalledTimes(1);
-  store.set(updateEnvelopeAtom, { waveform: "sin", key: "a", value: 200 });
   expect(effects.refreshWaveform).toHaveBeenCalledTimes(2);
+  store.set(updateEnvelopeAtom, { key: "a", value: 200 });
+  expect(effects.refreshWaveform).toHaveBeenCalledTimes(3);
   store.set(updateSettingAtom, { key: "tempo", value: 150 });
   store.set(updateSettingAtom, { key: "volume", value: 0.5 });
-  expect(effects.refreshWaveform).toHaveBeenCalledTimes(2);
+  expect(effects.refreshWaveform).toHaveBeenCalledTimes(3);
   expect(effects.preload).not.toHaveBeenCalled();
   disconnect();
 });
@@ -85,7 +85,7 @@ test("disconnect releases both subscriptions and reconnect applies pending chang
   disconnect();
   disconnect();
   clear(effects);
-  store.set(updateEnvelopeAtom, { waveform: "string", key: "a", value: 200 });
+  store.set(updateEnvelopeAtom, { key: "a", value: 200 });
   store.set(updateSettingAtom, { key: "centerNote", value: 60 });
   for (const effect of Object.values(effects)) expect(effect).not.toHaveBeenCalled();
   const stop = connectAudioSettings(store, effects);
@@ -103,6 +103,6 @@ test("failed initial synchronization releases subscriptions", () => {
   expect(() => connectAudioSettings(store, effects)).toThrow("not mounted");
   clear(effects);
   store.set(updateSettingAtom, { key: "centerNote", value: 60 });
-  store.set(updateEnvelopeAtom, { waveform: "string", key: "a", value: 200 });
+  store.set(updateEnvelopeAtom, { key: "a", value: 200 });
   expect(effects.render).not.toHaveBeenCalled();
 });

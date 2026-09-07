@@ -1,4 +1,5 @@
 import { $, timbre } from "../vendor.mjs";
+import { drawEnvelopeDiagram } from "./envelope-diagram.ts";
 import { select } from "d3-selection";
 import { createMidiBytes } from "../midi/create-midi-bytes.mjs";
 import { visualizations } from "../visualizations/visualization-registry.mjs";
@@ -65,7 +66,7 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
       $swapMax = $container.find(".swap-max");
       $positionCurrent = $container.find(".position-current");
       $positionMax = $container.find(".position-max");
-      $svg = $container.find("svg");
+      $svg = $container.find(`#${options.id}-chart svg`);
       svg = select("#" + $svg.attr("id"));
       onPlayerButtonClickCallback = options.onPlayerButtonClickCallback || null;
 
@@ -401,22 +402,15 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
       }
     };
 
-    player.drawEnvelopeCanvas = function () {
-      const canvas = $("#waveform-adshr-canvas").get(0);
-      // ADSHR
-      clearCanvas(canvas);
-      if (env && typeof env.plot === "function") {
-        env.plot({
-          target: canvas,
-          background: canvasBackground,
-        });
-      }
+    player.drawEnvelope = function () {
+      const svg = $("#envelope-diagram").get(0);
+      if (svg) drawEnvelopeDiagram(svg, settings.getSelectedWaveformInfo());
     };
 
     player.drawWaveformCanvases = function () {
       const canvas = $("#waveform-canvas").get(0);
       // ADSHR
-      player.drawEnvelopeCanvas();
+      player.drawEnvelope();
       // Waveform
       clearCanvas(canvas);
       if (waveGenerator && waveGenerator.osc) {

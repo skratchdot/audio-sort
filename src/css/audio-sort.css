@@ -42,12 +42,12 @@ svg,
   border-right: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
   padding: 20px;
-  height: 214px;
+  min-height: 214px;
   overflow: visible;
 }
 
 #waveform .waveform-section {
-  width: 48%;
+  width: 100%;
 }
 
 #waveform .btn-group {
@@ -56,7 +56,7 @@ svg,
 }
 
 #waveform .btn-group .btn {
-  width: 50%;
+  width: 25%;
   margin: 0;
   border-radius: 0px;
 }
@@ -70,6 +70,54 @@ svg,
 
 #base-chart svg {
   cursor: pointer;
+}
+
+#envelope-diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #fafafa;
+  font: 13px sans-serif;
+  fill: #444;
+}
+
+.envelope-grid {
+  stroke: #ddd;
+}
+.envelope-sustain {
+  stroke: #aaa;
+  stroke-dasharray: 4 4;
+}
+.envelope-curve {
+  fill: none;
+  stroke: #087ca7;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+#envelope-help {
+  margin: 10px 0;
+  color: #555;
+  font-size: 12px;
+  line-height: 1.4;
+}
+#envelope-controls label {
+  margin: 0;
+  font-weight: bold;
+}
+#envelope-controls output {
+  float: right;
+  font-weight: normal;
+  font-variant-numeric: tabular-nums;
+}
+#envelope-controls input {
+  display: block;
+  width: 100%;
+  margin: 2px 0 8px;
+  accent-color: #087ca7;
+}
+#envelope-controls input:focus-visible {
+  outline: 2px solid #087ca7;
+  outline-offset: 3px;
 }
 
 svg,
