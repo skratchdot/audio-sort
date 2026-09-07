@@ -432,9 +432,7 @@ test("module UI connects data, visualization, playback navigation, sliders, and 
   expect(bytes.readUInt32BE(18)).toBe(bytes.length - 22);
   expect(bytes.includes(Buffer.from("Audio Sort <skratchdot.com>"))).toBe(true);
   expect(bytes.subarray(-4)).toEqual(Buffer.from([0, 0xff, 0x2f, 0]));
-  await expect(
-    page.locator('script[src*="jsmidgen"], script[src*="FileSaver"], script[src*="Blob.js"]'),
-  ).toHaveCount(0);
+  await expect(page.locator('script[src*="jsmidgen"], script[src*="FileSaver"]')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 

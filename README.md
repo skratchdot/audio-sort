@@ -32,25 +32,15 @@ See [development documentation](docs/development.md) for browser tests and deplo
 
 ## Built With
 
-- [timbre.js](http://mohayonao.github.io/timbre.js/)
-
-- [subcollider.js](http://mohayonao.github.io/subcollider.js/)
-
-- [d3](http://d3js.org/)
-
-- [jquery](http://jquery.com/)
-
-- [bootstrap](http://twitter.github.com/bootstrap/)
-
-- [bootstrap-slider](http://www.eyecon.ro/bootstrap-slider/)
-
-- [Ace](https://ace.c9.io/)
-
-- [JsMidGen](https://github.com/dingram/jsmidgen)
-
-- [Blob.js](https://github.com/eligrey/Blob.js)
-
-- [FileSaver.js](https://github.com/eligrey/FileSaver.js)
+- [timbre.js](https://mohayonao.github.io/timbre.js/) — Synthesizes tones and plays soundfont instruments for sorting playback.
+- [subcollider.js](https://www.npmjs.com/package/subcollider) — Supplies musical scales used to map array values to notes.
+- [D3](https://d3js.org/) — Draws SVG bars, markers, and paths using modular selection, scale, color, shape, and array utilities.
+- [jQuery](https://jquery.com/) — Handles DOM updates, UI events, and legacy plugins.
+- [Bootstrap 2](https://getbootstrap.com/2.3.2/) — Provides the responsive layout, styling, tabs, dropdowns, and modals.
+- [bootstrap-slider](https://www.eyecon.ro/bootstrap-slider/) — Stefan Petre's slider controls for audio settings, dataset size, and playback position.
+- [Ace](https://ace.c9.io/) — Powers the algorithm editor with syntax highlighting and JavaScript diagnostics.
+- [jsmidgen](https://github.com/dingram/jsmidgen) — Encodes sorting playback as MIDI files.
+- [FileSaver.js](https://github.com/eligrey/FileSaver.js) — Downloads generated MIDI files in the browser.
 
 ## See Also / Credits
 
