@@ -198,6 +198,7 @@
     color: #c80000;
   }
   #header h1 small {
+    font-weight: normal;
     line-height: 1;
   }
   #header-author:hover {
@@ -280,7 +281,11 @@
     border-top: 1px solid #333;
   }
   .button {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    vertical-align: middle;
     border: 1px solid #bbb;
     border-radius: 3px;
     padding: 1px 6px;
@@ -295,6 +300,15 @@
   .button:hover {
     filter: brightness(0.96);
     text-decoration: none;
+  }
+  .control-icon {
+    flex: none;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .close .control-icon {
+    width: 20px;
+    height: 20px;
   }
   .button[aria-pressed="true"] {
     background: #ddd;
@@ -423,14 +437,19 @@
     line-height: 16px;
     padding: 5px 12px;
   }
-  #sort-options li button:hover,
-  .option-box li button:hover {
+  #sort-options li button:where(:hover, :focus-visible):not([aria-pressed="true"]),
+  .option-box li button:where(:hover, :focus-visible):not([aria-pressed="true"]) {
+    color: #005580;
     background: #fdfdfd;
   }
   #sort-options button[aria-pressed="true"],
   .option-box button[aria-pressed="true"] {
     color: white;
     background: #0088cc;
+  }
+  #sort-options button[aria-pressed="true"]:where(:hover, :focus-visible),
+  .option-box button[aria-pressed="true"]:where(:hover, :focus-visible) {
+    background: #006699;
   }
   .option-heading {
     color: #999;
