@@ -240,6 +240,46 @@ test("built UI loads and algorithm IDs execute in the bundled worker", async ({
   expect(missing).toEqual([]);
 });
 
+test("editor supports modern JavaScript, syntax diagnostics, and two-space soft tabs", async ({
+  page,
+}) => {
+  await page.goto("index.html");
+  await page.locator("#modal-sort-open").click();
+  await expect(page.locator("#modal-sort")).toBeVisible();
+  const editor = page.locator("#sort-algorithm .js-editor");
+  await page.locator('#modal-sort a[href="#sort-algorithm"]').click();
+  await editor.evaluate((element) => {
+    const editor = globalThis.ace.edit(element);
+    editor.setValue("let = ;");
+  });
+  await expect
+    .poll(() =>
+      editor.evaluate((element) => globalThis.ace.edit(element).session.getAnnotations().length),
+    )
+    .toBeGreaterThan(0);
+  await editor.evaluate((element) => {
+    globalThis.ace
+      .edit(element)
+      .setValue("const values = [1, 2];\nlet index = values?.[0] ?? 0;\nAS.play(index);\nreturn;");
+  });
+  await expect
+    .poll(() => editor.evaluate((element) => globalThis.ace.edit(element).session.getAnnotations()))
+    .toEqual([]);
+  expect(
+    await editor.evaluate((element) => {
+      const editor = globalThis.ace.edit(element);
+      return { tabSize: editor.session.getTabSize(), softTabs: editor.session.getUseSoftTabs() };
+    }),
+  ).toEqual({ tabSize: 2, softTabs: true });
+  await editor.evaluate((element) => {
+    const editor = globalThis.ace.edit(element);
+    editor.setValue("", -1);
+    editor.focus();
+  });
+  await page.keyboard.press("Tab");
+  expect(await editor.evaluate((element) => globalThis.ace.edit(element).getValue())).toBe("  ");
+});
+
 test("all built-ins can be edited and saved from readable production source", async ({ page }) => {
   test.setTimeout(15000 + algorithmNames.length * 5000);
   const errors = [];
