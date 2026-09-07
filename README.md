@@ -16,7 +16,7 @@ npm ci
 npm start
 ```
 
-Build with `npm run build` (output: `_site/`). Run checks with `npm run check`.
+Build with `npm run build` (output: `dist/`). Run checks with `npm run check`.
 
 See [development documentation](docs/development.md) for browser tests and deployment.
 

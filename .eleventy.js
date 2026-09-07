@@ -4,7 +4,7 @@ module.exports = async function (eleventyConfig) {
   const { default: EleventyVitePlugin } = await import("@11ty/eleventy-plugin-vite");
   const { resolve } = require("node:path");
 
-  // The plugin stages root-level public/ for Vite to copy unchanged to _site/.
+  // The plugin stages root-level public/ for Vite to copy unchanged to dist/.
   eleventyConfig.setServerPassthroughCopyBehavior("copy");
   eleventyConfig.addPlugin(EleventyVitePlugin, {
     tempFolderName: "src/.11ty-vite",
@@ -26,7 +26,7 @@ module.exports = async function (eleventyConfig) {
     dir: {
       input: "src",
       includes: "_includes",
-      output: "_site",
+      output: "dist",
     },
     htmlTemplateEngine: "liquid",
     templateFormats: ["html"],

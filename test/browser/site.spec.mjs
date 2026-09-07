@@ -11,7 +11,7 @@ test("public assets are copied unchanged and CSS images load under the site base
   baseURL,
 }) => {
   const source = fileURLToPath(new URL("../../public/", import.meta.url));
-  const output = fileURLToPath(new URL("../../_site/", import.meta.url));
+  const output = fileURLToPath(new URL("../../dist/", import.meta.url));
   const files = readdirSync(source, { recursive: true, withFileTypes: true }).filter(
     (entry) => entry.isFile() && entry.name !== ".DS_Store",
   );
@@ -73,7 +73,7 @@ test("every data generator feeds valid input to the worker", async ({ page }) =>
 });
 
 test("production output contains only public pages and assets", () => {
-  const output = new URL("../../_site/", import.meta.url);
+  const output = new URL("../../dist/", import.meta.url);
   expect(readdirSync(output).sort()).toEqual([
     ".nojekyll",
     "about.html",
@@ -86,6 +86,12 @@ test("production output contains only public pages and assets", () => {
   // Only public pages should be rendered, with no source-directory nesting.
   const pages = readdirSync(output, { recursive: true }).filter((file) => file.endsWith(".html"));
   expect(pages.sort()).toEqual(["about.html", "api.html", "index.html"]);
+  for (const filename of pages) {
+    const html = readFileSync(new URL(filename, output), "utf8");
+    expect(html.match(/<!doctype html>/gi)).toHaveLength(1);
+    expect(html.match(/<\/html>/gi)).toHaveLength(1);
+    expect(html).not.toContain("{%");
+  }
 });
 
 test.beforeEach(async ({ page, baseURL }) => {
@@ -129,6 +135,9 @@ test("built UI loads and algorithm IDs execute in the bundled worker", async ({
   });
   await page.goto("index.html");
   const sortWorker = await workerReady;
+  await expect(page.locator("#wrapper > #header")).toHaveCount(1);
+  await expect(page.locator("#wrapper > #base-section")).toHaveCount(1);
+  await expect(page.locator("body > #footer")).toHaveCount(1);
   const workerURL = sortWorker.url();
   expect(await sortWorker.evaluate(() => Object.hasOwn(globalThis, "AS"))).toBe(false);
   expect(await page.evaluate(() => Object.hasOwn(globalThis, "AS"))).toBe(false);

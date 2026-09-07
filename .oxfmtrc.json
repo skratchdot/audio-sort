@@ -2,15 +2,11 @@
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   "ignorePatterns": [
     "public/**",
-    "src/css/**",
     "dist/**",
-    "_site/**",
     "src/.11ty-vite/**",
     "test-results/**",
     "playwright-report/**",
     "_ignore/**",
-    "src/_includes/**",
-    "src/*.html",
     "package-lock.json"
   ]
 }
