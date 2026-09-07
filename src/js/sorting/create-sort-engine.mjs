@@ -1,6 +1,6 @@
 /*!
  * Project: Audio Sort
- *    File: AS.mjs
+ *    File: create-sort-engine.mjs
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot

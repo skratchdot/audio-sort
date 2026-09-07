@@ -1,8 +1,8 @@
-import { $, timbre, d3, Midi } from "./vendor.mjs";
-import { visualizations } from "./visualization/registry.mjs";
+import { $, timbre, d3, Midi } from "../vendor.mjs";
+import { visualizations } from "../visualizations/visualization-registry.mjs";
 /*!
  * Project: Audio Sort
- *    File: A.Player.mjs
+ *    File: create-player-factory.mjs
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot

@@ -1,6 +1,6 @@
-import sorted from "./fn.datagen.sorted.mjs";
-import random from "./fn.random.mjs";
-import swap from "./fn.swap.mjs";
+import sorted from "./sorted.mjs";
+import random from "../../utilities/random.mjs";
+import swap from "../../utilities/swap.mjs";
 
 var almostSortedFactor = 2;
 

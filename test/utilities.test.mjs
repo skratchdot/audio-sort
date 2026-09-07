@@ -1,7 +1,7 @@
 import { expect, test, vi } from "vitest";
-import random from "../src/js/fn/fn.random.mjs";
-import shuffle from "../src/js/fn/fn.shuffle.mjs";
-import swap from "../src/js/fn/fn.swap.mjs";
+import random from "../src/js/utilities/random.mjs";
+import shuffle from "../src/js/utilities/shuffle.mjs";
+import swap from "../src/js/utilities/swap.mjs";
 
 test("random includes both integer endpoints", () => {
   const rng = vi.spyOn(Math, "random").mockReturnValue(0);

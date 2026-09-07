@@ -1,8 +1,8 @@
-import bubble from "./sort.bubble.mjs";
-import heap from "./sort.heap.mjs";
-import insertion from "./sort.insertion.mjs";
-import quick from "./sort.quick.mjs";
-import selection from "./sort.selection.mjs";
+import bubble from "./algorithms/bubble.mjs";
+import heap from "./algorithms/heap.mjs";
+import insertion from "./algorithms/insertion.mjs";
+import quick from "./algorithms/quick.mjs";
+import selection from "./algorithms/selection.mjs";
 
 // Stable IDs shared by the UI and worker. Custom edits live in a separate catalog.
 export const algorithms = Object.freeze({ bubble, heap, insertion, quick, selection });

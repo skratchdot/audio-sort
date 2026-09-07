@@ -1,6 +1,6 @@
 /*!
  * Project: Audio Sort
- *    File: A.instruments.mjs
+ *    File: instruments.mjs
  *  Source: https://github.com/skratchdot/audio-sort/
  *
  * Copyright (c) 2013 skratchdot

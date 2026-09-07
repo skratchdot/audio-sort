@@ -1,4 +1,4 @@
-import shuffle from "./fn.shuffle.mjs";
+import shuffle from "../../utilities/shuffle.mjs";
 
 var fewUniqueSize = 4;
 
