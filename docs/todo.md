@@ -23,8 +23,5 @@
 
 ## Maintenance ideas
 
-These are options, not a prioritized plan.
-
-- Replace jQuery incrementally, starting with chooser/filter events and rendering.
-- Assess playback and remote soundfonts before deciding whether to retain, wrap,
-  or replace timbre.
+See the ordered [modernization plan](modernization.md) for TypeScript, state,
+UI, site-build, and remaining vendor-script migrations.

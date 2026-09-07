@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 import { readdirSync } from "node:fs";
 import { generators } from "../src/js/generators/generator-registry.mjs";
-import { instruments } from "../src/js/midi/instruments.mjs";
+import { instruments } from "../src/js/midi/instruments.ts";
 
 const names = ["sorted", "reverse", "randomUnique", "randomDupes", "almostSorted", "fewUnique"];
 

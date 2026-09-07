@@ -24,7 +24,13 @@
  * THE SOFTWARE.
  */
 
-export const scales = {
+export type Scale = {
+  readonly name: string;
+  readonly pitchesPerOctave: number;
+  readonly degrees: readonly number[];
+};
+
+export const scales: Readonly<Record<string, Scale>> = {
   aeolian: {
     name: "Aeolian",
     pitchesPerOctave: 12,

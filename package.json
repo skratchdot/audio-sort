@@ -29,7 +29,8 @@
     "lint": "oxlint --deny-warnings",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "check": "pnpm run lint && pnpm run format:check && pnpm test && pnpm run build",
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm run lint && pnpm run format:check && pnpm run typecheck && pnpm test && pnpm run build",
     "watch": "pnpm run serve"
   },
   "dependencies": {
@@ -48,6 +49,7 @@
     "@playwright/test": "^1.63.0",
     "oxfmt": "^0.66.0",
     "oxlint": "^1.81.0",
+    "typescript": "7.0.2",
     "vite": "^8.2.2",
     "vitest": "^5.0.0"
   },

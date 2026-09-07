@@ -1,5 +1,5 @@
 import { expect, test, vi } from "vitest";
-import random from "../src/js/utilities/random.mjs";
+import random from "../src/js/utilities/random.ts";
 import shuffle from "../src/js/utilities/shuffle.mjs";
 import swap from "../src/js/utilities/swap.mjs";
 

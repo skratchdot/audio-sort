@@ -1,4 +1,10 @@
-export const instruments = [
+export type Instrument = {
+  val: number;
+  name: string;
+  group: string;
+};
+
+export const instruments: Instrument[] = [
   { val: 0, name: "Acoustic Grand Piano", group: "Piano" },
   { val: 1, name: "Bright Acoustic Piano", group: "Piano" },
   { val: 2, name: "Electric Grand Piano", group: "Piano" },
