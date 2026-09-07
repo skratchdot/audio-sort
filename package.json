@@ -33,7 +33,9 @@
     "watch": "pnpm run serve"
   },
   "dependencies": {
-    "ace-builds": "1.44.0"
+    "ace-builds": "1.44.0",
+    "file-saver": "2.0.5",
+    "jsmidgen": "0.1.8"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.1.6",

@@ -1,4 +1,5 @@
-import { $, timbre, d3, Midi } from "../vendor.mjs";
+import { $, timbre, d3 } from "../vendor.mjs";
+import { createMidiBytes } from "../midi/create-midi-bytes.mjs";
 import { visualizations } from "../visualizations/visualization-registry.mjs";
 /*!
  * Project: Audio Sort
@@ -347,63 +348,7 @@ export function createPlayerFactory(settings, Helper) {
     };
 
     player.getMidiBytes = function (tempo, channel, instrument) {
-      var i,
-        j,
-        midiFile,
-        midiTrack,
-        duration = 64,
-        totalDuration = 0,
-        info,
-        currentItem,
-        midiNumber,
-        play;
-
-      // setup midi file
-      midiFile = new Midi.File();
-      midiTrack = new Midi.Track();
-      midiTrack.setTempo(tempo);
-      midiTrack.setInstrument(channel, instrument);
-      midiFile.addTrack(midiTrack);
-
-      // build midi track
-      for (i = 0; i < data.length; i++) {
-        info = data[i];
-        play = [];
-        totalDuration += duration;
-        // get the notes we need to play
-        for (j = 0; j < info.arr.length; j++) {
-          currentItem = info.arr[j];
-          if (currentItem.play) {
-            midiNumber = Helper.getMidiNumber(currentItem.value);
-            if (midiNumber >= 0 && midiNumber < 128) {
-              play.push(midiNumber);
-            }
-          }
-        }
-        // note on
-        for (j = 0; j < play.length; j++) {
-          if (j === 0) {
-            midiTrack.noteOn(channel, play[j], duration);
-          } else {
-            midiTrack.noteOn(channel, play[j]);
-          }
-        }
-        // note off
-        for (j = 0; j < play.length; j++) {
-          midiTrack.noteOff(channel, play[j]);
-        }
-      }
-
-      // extend track so the last note plays
-      midiTrack.addEvent(
-        new Midi.MetaEvent({
-          type: Midi.MetaEvent.COPYRIGHT,
-          data: "Audio Sort <skratchdot.com>",
-          time: totalDuration + 1024,
-        }),
-      );
-
-      return midiFile.toBytes();
+      return createMidiBytes(data, Helper.getMidiNumber, tempo, channel, instrument);
     };
 
     player.refreshWaveGenerator = function () {

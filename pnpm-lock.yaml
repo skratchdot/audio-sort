@@ -112,6 +112,12 @@ importers:
       ace-builds:
         specifier: 1.44.0
         version: 1.44.0
+      file-saver:
+        specifier: 2.0.5
+        version: 2.0.5
+      jsmidgen:
+        specifier: 0.1.8
+        version: 0.1.8
     devDependencies:
       '@11ty/eleventy':
         specifier: ^3.1.6
@@ -757,6 +763,9 @@ packages:
       picomatch:
         optional: true
 
+  file-saver@2.0.5:
+    resolution: {integrity: sha512-P9bmyZ3h/PRG+Nzga+rbdI4OEpNDzAVyy74uVO9ATgzLK6VtAsYybF/+TOCvrc0MO793d6+42lLyZTw7/ArVzA==}
+
   filesize@10.1.6:
     resolution: {integrity: sha512-sJslQKU2uM33qH5nqewAwVB2QgR6w1aMNsYUp3aN5rMRyXEwJGmZvaWzeJFNTOXWlHQyBFCWrdj3fV/fsTOX8w==}
     engines: {node: '>= 10.4.0'}
@@ -843,6 +852,9 @@ packages:
   js-yaml@4.3.2:
     resolution: {integrity: sha512-SFNOvSJ+Dgf/9An904Yx+CgSlIPCkIpao4qo51lpee25TIRejdH3rhR4EZMGoNx3/TP3O+wzWuiTFl4sqbltzA==}
     hasBin: true
+
+  jsmidgen@0.1.8:
+    resolution: {integrity: sha512-ftv8u96bnZvgsJE1/z0kV2BJrYNUofgZKztvpGxPpkocwB3+Yo/w2eHtwiTyb+U4cLTeaI9GUX4mAS6XWEl7IA==}
 
   junk@3.1.0:
     resolution: {integrity: sha512-pBxcB3LFc8QVgdggvZWyeys+hnrNWg4OcZIU/1X59k5jQdLBlCsYGRQaz234SqoRLTCgMH00fY0xRJH+F9METQ==}
@@ -1780,6 +1792,8 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.7
 
+  file-saver@2.0.5: {}
+
   filesize@10.1.6: {}
 
   fill-range@7.1.1:
@@ -1868,6 +1882,8 @@ snapshots:
   js-yaml@4.3.2:
     dependencies:
       argparse: 2.0.1
+
+  jsmidgen@0.1.8: {}
 
   junk@3.1.0: {}
 
