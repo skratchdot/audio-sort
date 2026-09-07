@@ -15,13 +15,13 @@ Eleventy renders the HTML and Vite bundles JavaScript and CSS. Site files live i
 `src/`; tests and tool configuration stay at the root. `dist/` and temporary
 `src/.11ty-vite/` output are ignored by Git.
 
-Static files live in root-level `public/`: vendor scripts in `public/js/`,
-images in `public/img/`, and the `.nojekyll` marker. Files are copied unchanged
+Static files live in root-level `public/`: images in `public/img/` and the
+`.nojekyll` marker. There are no vendored JavaScript files. Files are copied unchanged
 to `dist/` without a `public/` URL prefix. Use `/img/...` in source CSS; Vite
 adjusts these URLs for the deployment path. Application modules and CSS stay in `src/`.
 
-CSS is bundled and minified by Vite. Bootstrap 2's obsolete star-prefixed IE declarations have
-been removed so its styles work with the CSS minifier.
+CSS is bundled and minified by Vite. Tailwind supplies Preflight and utilities;
+first-party styles preserve the existing design. No Bootstrap overrides are needed.
 
 ## Checks
 

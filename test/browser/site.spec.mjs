@@ -14,7 +14,10 @@ test("all local scales populate the menu without subcollider", async ({ page }) 
   const actual = await page
     .locator("[data-scale]")
     .evaluateAll((elements) =>
-      elements.map((element) => [element.getAttribute("data-scale"), element.textContent.trim()]),
+      elements.map((element) => [
+        element.getAttribute("data-scale"),
+        element.querySelector("button").textContent.trim(),
+      ]),
     );
   const expected = Object.entries(scales)
     .sort(
@@ -47,7 +50,7 @@ test("public assets are copied unchanged and CSS images load under the site base
     );
   }
   await page.goto("index.html");
-  for (const selector of ["#header", ".icon-repeat", ".icon-white"]) {
+  for (const selector of ["#header", "#base-svg", "#sort-svg"]) {
     const background = await page
       .locator(selector)
       .first()
@@ -105,7 +108,6 @@ test("production output contains only public pages and assets", () => {
     "assets",
     "img",
     "index.html",
-    "js",
   ]);
   // Only public pages should be rendered, with no source-directory nesting.
   const pages = readdirSync(output, { recursive: true }).filter((file) => file.endsWith(".html"));
@@ -181,6 +183,67 @@ test("header stays within the viewport without sharing widgets", async ({ page }
   }
 });
 
+test("React controls work without Bootstrap, jQuery, or classic vendor scripts", async ({
+  page,
+}) => {
+  await page.goto("index.html");
+  await expect(page.locator("#base-svg rect")).toHaveCount(12);
+  expect(await page.evaluate(() => [typeof globalThis.jQuery, typeof globalThis.$])).toEqual([
+    "undefined",
+    "undefined",
+  ]);
+  await expect(page.locator('script[src*="/js/"], .slider, .modal-backdrop')).toHaveCount(0);
+  await page.locator("#tab-audio").focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.locator("#tab-waveform")).toBeFocused();
+  await expect(page.locator("#waveform")).toBeVisible();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.locator("#tab-scale")).toBeFocused();
+  await page.locator("#scale-filter").fill("[");
+  await expect(page.locator("#scale-options button")).toHaveCount(0);
+  await page.locator("#scale-filter").fill("major");
+  await expect(page.locator('#scale-options [data-scale="major"] button')).toBeVisible();
+  for (const width of [320, 390, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(
+      await page.evaluate(() => globalThis.document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+  }
+});
+
+test("native dialogs trap focus, report invalid edits, and close on cached-page suspension", async ({
+  page,
+}) => {
+  await page.goto("index.html");
+  const trigger = page.locator("#add-algorithm-btn");
+  await trigger.click();
+  const dialog = page.getByRole("dialog", { name: "Add Algorithm" });
+  await expect(dialog).toBeVisible();
+  await page.locator("#new-sort-name").fill("Invalid algorithm");
+  await expect(page.locator("#save-algorithm-new")).toBeEnabled();
+  await page
+    .locator("#new-sort-algorithm .js-editor.ace_editor")
+    .evaluate((element) => globalThis.ace.edit(element).setValue("let = ;"));
+  await page.locator("#save-algorithm-new").click();
+  await expect(dialog.getByRole("alert")).toBeVisible();
+  await expect(page.locator("#sort-options button")).toHaveCount(algorithmNames.length);
+  await page.keyboard.press("Tab");
+  expect(
+    await dialog.evaluate((element) => element.contains(globalThis.document.activeElement)),
+  ).toBe(true);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+  await trigger.click();
+  await page.evaluate(() => {
+    globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pagehide", { persisted: true }));
+    globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pageshow", { persisted: true }));
+  });
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await trigger.click();
+  await expect(page.locator("#new-sort-name")).toHaveValue("");
+});
+
 test("built UI loads and algorithm IDs execute in the bundled worker", async ({
   page,
   baseURL,
@@ -198,7 +261,7 @@ test("built UI loads and algorithm IDs execute in the bundled worker", async ({
   await page.goto("index.html");
   const sortWorker = await workerReady;
   await expect(page.locator("#wrapper > #header")).toHaveCount(1);
-  await expect(page.locator("#wrapper > #base-section")).toHaveCount(1);
+  await expect(page.locator("#workspace > #base-section")).toHaveCount(1);
   await expect(page.locator("body > #footer")).toHaveCount(1);
   const workerURL = sortWorker.url();
   expect(await sortWorker.evaluate(() => Object.hasOwn(globalThis, "AS"))).toBe(false);
@@ -292,18 +355,19 @@ test("Ace loads on demand and a closed dialog cannot finish initializing", async
   expect(await page.evaluate(() => typeof globalThis.ace)).toBe("undefined");
   expect(editorRequests).toEqual([]);
   await page.locator("#modal-sort-open").click();
-  await expect(page.locator("#modal-sort .editor-status")).toHaveText("Loading editor…");
-  await expect(page.locator("#save-algorithm-edit")).toHaveAttribute("aria-disabled", "true");
+  await expect(page.locator("#modal-sort [role=status]")).toHaveText("Loading editor…");
+  await expect(page.locator("#save-algorithm-edit")).toBeDisabled();
   await page.locator("#save-algorithm-edit").dispatchEvent("click");
   await expect(page.locator("#modal-sort")).toBeVisible();
-  await page.locator('#modal-sort .modal-footer [data-dismiss="modal"]').click();
+  await page.locator("#modal-sort .modal-footer button:first-child").click();
   await expect(page.locator("#modal-sort")).toBeHidden();
   releaseEditor();
   await expect.poll(() => page.evaluate(() => typeof globalThis.ace)).toBe("object");
-  await expect(page.locator("#sort-algorithm .js-editor")).toHaveCount(0);
+  await expect(page.locator("#sort-algorithm .js-editor.ace_editor")).toHaveCount(0);
   await page.locator("#add-algorithm-btn").click();
-  await expect(page.locator("#save-algorithm-new")).toHaveAttribute("aria-disabled", "false");
-  await expect(page.locator("#new-sort-algorithm .js-editor")).toHaveCount(1);
+  await page.locator("#new-sort-name").fill("Lazy editor");
+  await expect(page.locator("#save-algorithm-new")).toBeEnabled();
+  await expect(page.locator("#new-sort-algorithm .js-editor.ace_editor")).toHaveCount(1);
   expect(editorRequests).toHaveLength(1);
 });
 
@@ -314,7 +378,7 @@ test("an editor download failure keeps Save disabled and offers recovery", async
   await expect(page.locator("#modal-add-algorithm [role=alert]")).toContainText(
     "The editor could not load.",
   );
-  await expect(page.locator("#save-algorithm-new")).toHaveAttribute("aria-disabled", "true");
+  await expect(page.locator("#save-algorithm-new")).toBeDisabled();
   await page.locator("#new-sort-name").fill("Unavailable editor");
   await page.locator("#save-algorithm-new").dispatchEvent("click");
   await expect(page.locator("#modal-add-algorithm")).toBeVisible();
@@ -322,7 +386,8 @@ test("an editor download failure keeps Save disabled and offers recovery", async
   await page.getByRole("button", { name: "Reload page" }).click();
   await page.waitForLoadState("load");
   await page.locator("#add-algorithm-btn").click();
-  await expect(page.locator("#save-algorithm-new")).toHaveAttribute("aria-disabled", "false");
+  await page.locator("#new-sort-name").fill("Recovered editor");
+  await expect(page.locator("#save-algorithm-new")).toBeEnabled();
 });
 
 test("editor supports modern JavaScript, syntax diagnostics, and two-space soft tabs", async ({
@@ -331,8 +396,8 @@ test("editor supports modern JavaScript, syntax diagnostics, and two-space soft 
   await page.goto("index.html");
   await page.locator("#modal-sort-open").click();
   await expect(page.locator("#modal-sort")).toBeVisible();
-  const editor = page.locator("#sort-algorithm .js-editor");
-  await page.locator('#modal-sort a[href="#sort-algorithm"]').click();
+  const editor = page.locator("#sort-algorithm .js-editor.ace_editor");
+  await page.locator("#modal-sort .tabs button:last-child").click();
   await editor.evaluate((element) => {
     const editor = globalThis.ace.edit(element);
     editor.setValue("let = ;");
@@ -376,7 +441,7 @@ test("all built-ins can be edited and saved from readable production source", as
     await expect(page.locator("#modal-sort")).toBeVisible();
     const display = await page.locator("#sort-info-display").textContent();
     const source = await page
-      .locator("#sort-algorithm .js-editor")
+      .locator("#sort-algorithm .js-editor.ace_editor")
       .evaluate((element) => globalThis.ace.edit(element).getValue());
     expect(source).toContain("AS.");
     await page.locator("#save-algorithm-edit").click();
@@ -399,7 +464,7 @@ test("all built-ins can be edited and saved from readable production source", as
     expect(values).toEqual([...values].sort((a, b) => a - b));
     await page.locator("#modal-sort-open").click();
     await expect(page.locator("#sort-info-display")).toHaveText(display);
-    await page.locator('#modal-sort .modal-footer [data-dismiss="modal"]').click();
+    await page.locator("#modal-sort .modal-footer button:first-child").click();
     await expect(page.locator("#modal-sort")).toBeHidden();
   }
   expect(errors).toEqual([]);
@@ -419,11 +484,11 @@ for (const fallback of [false, true]) {
     await page.locator("#add-algorithm-btn").click();
     await page.locator("#new-sort-name").fill("Custom smoke");
     await page
-      .locator("#new-sort-algorithm .js-editor")
+      .locator("#new-sort-algorithm .js-editor.ace_editor")
       .evaluate((element) => globalThis.ace.edit(element).setValue("AS.play(0);"));
     await page.locator("#save-algorithm-new").click();
     await expect(page.locator("#modal-add-algorithm")).toBeHidden();
-    await page.locator("#sort-options a").filter({ hasText: "Custom smoke" }).click();
+    await page.locator("#sort-options button").filter({ hasText: "Custom smoke" }).click();
     // The engine records a played frame and a final frame for this custom body.
     await expect(page.locator("#sort-player .position-max")).toHaveText("2");
     if (!fallback)
@@ -438,7 +503,7 @@ test("D3 joins resize bars, markers, and paths without stale elements", async ({
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("index.html");
-  const slider = page.locator("#data-size-container .slider");
+  const slider = page.locator("#data-size-container input[type=range]");
   const bounds = await slider.boundingBox();
   let previousSize = 12;
   for (const fraction of [0.7, 0.15]) {
@@ -497,7 +562,7 @@ test("module UI connects data, visualization, playback navigation, sliders, and 
     .toBeGreaterThan(1);
   await page.locator('#sort-player [data-action="stop"]').click();
   const originalVolume = await page.locator("#volume-display").textContent();
-  const slider = page.locator("#volume-container .slider");
+  const slider = page.locator("#volume-container input[type=range]");
   const bounds = await slider.boundingBox();
   await slider.click({ position: { x: bounds.width * 0.6, y: bounds.height / 2 } });
   await expect(page.locator("#volume-display")).not.toHaveText(originalVolume);
@@ -542,7 +607,7 @@ test("playback preferences toggle independently and autoplay starts a selected s
   await expect(autoPlay).toHaveAttribute("aria-pressed", "false");
   await autoPlay.click();
   await expect(autoPlay).toHaveAttribute("aria-pressed", "true");
-  await expect(autoPlay).toHaveClass(/active/);
+
   await page.locator('#sort-options [data-sort="insertion"]').click();
   await expect
     .poll(async () => Number(await page.locator("#sort-player .position-current").textContent()))
@@ -550,7 +615,7 @@ test("playback preferences toggle independently and autoplay starts a selected s
   await page.locator('#sort-player [data-action="stop"]').click();
   await autoPlay.click();
   await expect(autoPlay).toHaveAttribute("aria-pressed", "false");
-  await expect(autoPlay).not.toHaveClass(/active/);
+
   expect(errors).toEqual([]);
 });
 
@@ -561,8 +626,8 @@ test("settings subscriptions reconnect after a cached-page lifecycle", async ({ 
   await page.evaluate(() =>
     globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pagehide", { persisted: true })),
   );
-  await autoPlay.click(); // Handler changes the store while rendering is disconnected.
-  await expect(autoPlay).toHaveAttribute("aria-pressed", "false");
+  await autoPlay.click(); // React reflects state while runtime effects are suspended.
+  await expect(autoPlay).toHaveAttribute("aria-pressed", "true");
   await page.evaluate(() =>
     globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pageshow", { persisted: true })),
   );
@@ -582,10 +647,10 @@ test("teardown clears owned resources and repeated remounts do not duplicate UI 
   await page.goto("index.html");
   await page.locator('#sort-options [data-sort="insertion"]').click();
   const initialScaleCount = await page.locator("#scale-options li").count();
-  const initialSliderCount = await page.locator(".audio-sort-slider").count();
+  const initialSliderCount = await page.locator("input[type=range]").count();
   for (let cycle = 0; cycle < 2; cycle++) {
     await page.locator("#add-algorithm-btn").click();
-    await expect(page.locator("#new-sort-algorithm .js-editor")).toHaveCount(1);
+    await expect(page.locator("#new-sort-algorithm .js-editor.ace_editor")).toHaveCount(1);
     await page.evaluate(() => {
       globalThis.dispatchEvent(
         new globalThis.PageTransitionEvent("pagehide", { persisted: false }),
@@ -595,31 +660,19 @@ test("teardown clears owned resources and repeated remounts do not duplicate UI 
       );
     });
     await expect(
-      page.locator(".js-editor, .editor-status, .modal-backdrop, .audio-sort-slider"),
+      page.locator(".js-editor.ace_editor, .editor-status, .modal-backdrop, input[type=range]"),
     ).toHaveCount(0);
     expect(
       await page.evaluate(() => globalThis.sortWorkers.every((worker) => worker.wasTerminated)),
     ).toBe(true);
-    expect(
-      await page.evaluate(() => {
-        const $ = globalThis.jQuery;
-        return $("body")
-          .find("*")
-          .addBack()
-          .get()
-          .some((element) =>
-            Object.values($._data(element, "events") || {})
-              .flat()
-              .some((handler) => /audioSort/.test(handler.namespace)),
-          );
-      }),
-    ).toBe(false);
+    expect(await page.evaluate(() => typeof globalThis.jQuery)).toBe("undefined");
+    await expect(page.locator("#workspace > *")).toHaveCount(0);
     await page.evaluate(() =>
       globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pageshow", { persisted: true })),
     );
     await expect(page.locator("#scale-options li")).toHaveCount(initialScaleCount);
-    await expect(page.locator(".audio-sort-slider")).toHaveCount(initialSliderCount);
-    await expect(page.locator("#sort-options li.active a")).toHaveAttribute(
+    await expect(page.locator("input[type=range]")).toHaveCount(initialSliderCount);
+    await expect(page.locator("#sort-options li.active button")).toHaveAttribute(
       "data-sort",
       "insertion",
     );
@@ -654,15 +707,15 @@ test("destroy during an editor download cannot initialize a stale editor", async
   const loaded = page.waitForResponse(/create-code-editor-.*\.js/);
   release();
   await loaded;
-  await expect(page.locator(".js-editor, .editor-status")).toHaveCount(0);
+  await expect(page.locator(".js-editor.ace_editor, .editor-status")).toHaveCount(0);
   await page.evaluate(() =>
     globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pageshow", { persisted: true })),
   );
   await page.locator("#add-algorithm-btn").click();
-  await expect(page.locator("#new-sort-algorithm .js-editor")).toHaveCount(1);
+  await expect(page.locator("#new-sort-algorithm .js-editor.ace_editor")).toHaveCount(1);
 });
 
-test("teardown cancels pending audio resume and removes only owned slider drag handlers", async ({
+test("teardown cancels pending audio resume without removing unrelated native listeners", async ({
   page,
 }) => {
   const errors = [];
@@ -673,34 +726,31 @@ test("teardown cancels pending audio resume and removes only owned slider drag h
       globalThis.finishResume = resolve;
     });
     globalThis.timbre.fn._audioContext.resume = () => globalThis.pendingResume;
-    globalThis.jQuery(globalThis.document).on("mousemove.lifecycleWitness", () => {});
+    globalThis.witnessMoves = 0;
+    globalThis.document.addEventListener("mousemove", () => globalThis.witnessMoves++);
+    globalThis.lateStarts = 0;
+    const start = globalThis.timbre.fn.getClass("interval").prototype.start;
+    globalThis.timbre.fn.getClass("interval").prototype.start = function (...args) {
+      globalThis.lateStarts++;
+      return start.apply(this, args);
+    };
   });
   await page.locator('#sort-player [data-action="play"]').click();
-  const slider = page.locator("#volume-container .slider");
+  const slider = page.locator("#volume-container input[type=range]");
   const box = await slider.boundingBox();
   await page.mouse.move(box.x + box.width * 0.5, box.y + box.height / 2);
   await page.mouse.down();
   await page.evaluate(() => {
-    globalThis.oldDrag = globalThis
-      .jQuery("#volume-container .audio-sort-slider")
-      .data("slider").mousemove;
     globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pagehide", { persisted: false }));
     globalThis.finishResume();
   });
   await page.mouse.up();
-  const handlers = await page.evaluate(() => {
-    const events = globalThis.jQuery._data(globalThis.document, "events") || {};
-    return {
-      ownsDrag: Object.values(events)
-        .flat()
-        .some((handler) => handler.guid === globalThis.oldDrag.guid),
-      keepsOther: (events.mousemove || []).some(
-        (handler) => handler.namespace === "lifecycleWitness",
-      ),
-    };
-  });
-  expect(handlers).toEqual({ ownsDrag: false, keepsOther: true });
-  await expect(page.locator(".audio-sort-slider")).toHaveCount(0);
+  await page.evaluate(() =>
+    globalThis.document.dispatchEvent(new globalThis.MouseEvent("mousemove")),
+  );
+  expect(await page.evaluate(() => globalThis.witnessMoves)).toBeGreaterThan(0);
+  expect(await page.evaluate(() => globalThis.lateStarts)).toBe(0);
+  await expect(page.locator("input[type=range]")).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 
@@ -726,7 +776,7 @@ test("resizing and saving a selected algorithm update sorting without reselectin
   page,
 }) => {
   await page.goto("index.html");
-  const sizeSlider = page.locator("#data-size-container .slider");
+  const sizeSlider = page.locator("#data-size-container input[type=range]");
   const bounds = await sizeSlider.boundingBox();
   await sizeSlider.click({ position: { x: bounds.width * 0.4, y: bounds.height / 2 } });
   const size = Number(await page.locator("#data-size-display").textContent());
@@ -734,9 +784,9 @@ test("resizing and saving a selected algorithm update sorting without reselectin
     .poll(() => page.evaluate(() => globalThis.sortRequests.at(-1)?.arr.length))
     .toBe(size);
   await page.locator("#modal-sort-open").click();
-  await page.locator('#modal-sort a[href="#sort-algorithm"]').click();
+  await page.locator("#modal-sort .tabs button:last-child").click();
   await page
-    .locator("#sort-algorithm .js-editor")
+    .locator("#sort-algorithm .js-editor.ace_editor")
     .evaluate((element) => globalThis.ace.edit(element).setValue("AS.play(0);"));
   await page.locator("#save-algorithm-edit").click();
   await expect.poll(() => page.evaluate(() => globalThis.sortRequests.at(-1)?.type)).toBe("custom");
@@ -788,7 +838,7 @@ test("soundfonts decode native audio and play buffered notes without JSONP", asy
       return bang.apply(this, args);
     };
   });
-  await page.locator('[data-audio-type="soundfont"].btn').click();
+  await page.locator('[data-audio-type="soundfont"].button').click();
   await expect.poll(() => requests.length).toBeGreaterThan(0);
   // Replaying retries missed first-pass notes, matching preload-only cache misses.
   await expect(async () => {
@@ -813,36 +863,40 @@ test("audio settings render selections and survive subscription reconnection", a
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("index.html");
-  await page.locator('#settings a[href="#waveform"]').click();
+  await page.locator("#settings #tab-waveform").click();
   await expect(page.locator("#waveform-adshr-attack-display")).toHaveText("50 ms");
   await page.locator('#waveform button[data-waveform="sin"]').click();
   await expect(page.locator('#waveform button[data-waveform="sin"]')).toHaveAttribute(
     "aria-pressed",
     "true",
   );
-  await page.locator('#settings a[href="#audio"]').click();
+  await page.locator("#settings #tab-audio").click();
   await expect(page.locator("#audio-type-display")).toHaveText("waveform: sin");
-  await page.locator('[data-audio-type="soundfont"].btn').click();
-  await expect(page.locator('#settings a[href="#soundfont"]')).toBeVisible();
-  await expect(page.locator('#settings a[href="#waveform"]')).toBeHidden();
-  await page.locator('#settings a[href="#soundfont"]').click();
+  await page.locator('[data-audio-type="soundfont"].button').click();
+  await expect(page.locator("#settings #tab-soundfont")).toBeVisible();
+  await expect(page.locator("#settings #tab-waveform")).toBeHidden();
+  await page.locator("#settings #tab-soundfont").click();
   const instrument = page.locator('#soundfont-options li[data-soundfont="42"]');
   await instrument.click();
-  await expect(page.locator("#soundfont-display")).toHaveText(await instrument.textContent());
-  await page.locator('#settings a[href="#scale"]').click();
+  await expect(page.locator("#soundfont-display")).toHaveText(
+    await instrument.locator("button").textContent(),
+  );
+  await page.locator("#settings #tab-scale").click();
   const scale = page.locator('#scale-options li[data-scale="major"]');
   await scale.click();
-  await expect(page.locator("#scale-display")).toHaveText(await scale.textContent());
+  await expect(page.locator("#scale-display")).toHaveText(
+    await scale.locator("button").textContent(),
+  );
   await page.evaluate(() => {
     globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pagehide", { persisted: true }));
     globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pageshow", { persisted: true }));
   });
   await expect(scale).toHaveClass(/active/);
   await expect(instrument).toHaveClass(/active/);
-  await page.locator('#settings a[href="#audio"]').click();
-  await page.locator('[data-audio-type="waveform"].btn').click();
+  await page.locator("#settings #tab-audio").click();
+  await page.locator('[data-audio-type="waveform"].button').click();
   await expect(page.locator("#audio-type-display")).toHaveText("waveform: sin");
-  await expect(page.locator('#settings a[href="#waveform"]')).toBeVisible();
+  await expect(page.locator("#settings #tab-waveform")).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -865,15 +919,15 @@ test("charts use extra laptop height without enlarging short or narrow layouts",
 test("envelope controls preserve the compact settings panel", async ({ page }) => {
   await page.goto("index.html");
   // Exercise fallback font metrics even on Macs with Helvetica installed.
-  // Bootstrap must not override the React panel's compact typography.
+  // Keep compact typography and stable panel height with fallback fonts.
   await page.addStyleTag({
     content: "body, input, button { font-family: Arial, sans-serif !important; }",
   });
   for (const width of [1280, 1024, 768, 390]) {
     await page.setViewportSize({ width, height: 900 });
-    await page.locator('#settings a[href="#audio"]').click();
+    await page.locator("#settings #tab-audio").click();
     const before = await page.locator("#sort-section").boundingBox();
-    await page.locator('#settings a[href="#waveform"]').click();
+    await page.locator("#settings #tab-waveform").click();
     await expect(page.locator("#envelope-controls label").first()).toHaveCSS("font-size", "12px");
     await expect(page.locator("#waveform button").first()).toHaveCSS("font-size", "11px");
     const after = await page.locator("#sort-section").boundingBox();
@@ -895,7 +949,7 @@ test("waveform envelope edits survive switching presets", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("index.html");
-  await page.locator('#settings a[href="#waveform"]').click();
+  await page.locator("#settings #tab-waveform").click();
   await page.locator('#waveform button[data-waveform="string"]').click();
   const display = page.locator("#waveform-adshr-attack-display");
   const preview = page.locator("#waveform-canvas");

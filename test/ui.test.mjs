@@ -1,17 +1,17 @@
 import { expect, test } from "vitest";
-import { createSortController } from "../src/js/ui/create-sort-controller.mjs";
+import { createWorkspace } from "../src/js/ui/create-workspace.mjs";
 import { createHelpers } from "../src/js/ui/create-helpers.mjs";
-import { createPlayerFactory } from "../src/js/ui/create-player-factory.mjs";
+import { createWorkspacePlayer } from "../src/js/ui/create-workspace-player.mjs";
 import { visualizations } from "../src/js/visualizations/visualization-registry.mjs";
 
 test("UI modules import without DOM initialization or first-party globals", () => {
   for (const name of ["A", "visualization"]) expect(Object.hasOwn(globalThis, name)).toBe(false);
-  const first = createSortController({});
-  const second = createSortController({});
+  const first = createWorkspace();
+  const second = createWorkspace();
   expect(first).not.toBe(second);
-  expect(typeof first.init).toBe("function");
-  expect(first.getSelected("unknown", "fallback")).toBe("fallback");
-  expect(typeof createPlayerFactory(first, {})).toBe("function");
+  expect(typeof first.mount).toBe("function");
+  expect(first.settings.getSelected("unknown", "fallback")).toBe("fallback");
+  expect(typeof createWorkspacePlayer).toBe("function");
   expect(Object.keys(visualizations).sort()).toEqual(["bar", "flat"]);
   for (const name of ["A", "visualization"]) expect(Object.hasOwn(globalThis, name)).toBe(false);
 });
@@ -33,11 +33,10 @@ test("MIDI helper reads current settings from its injected controller", () => {
   expect(helpers.getMidiNumber(4)).toBe(72);
 });
 
-test("destroying an unmounted controller is safe and prevents reuse", () => {
-  const controller = createSortController({});
+test("destroying an unmounted workspace is safe and prevents reuse", () => {
+  const controller = createWorkspace();
   controller.destroy();
   controller.destroy();
-  controller.connectSettings();
   controller.resume();
-  expect(() => controller.init({})).toThrow("destroyed controller");
+  expect(() => controller.mount({})).toThrow("destroyed workspace");
 });

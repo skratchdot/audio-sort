@@ -16,7 +16,6 @@ export default function flat(settings) {
   const _init = function (settings) {
     data = settings.data;
     svg = settings.svg;
-    const $svg = settings.$svg;
     // setup lengths
     if (data.length) {
       numFlattenedLines = data[0].arr.length;
@@ -27,11 +26,10 @@ export default function flat(settings) {
       frameLength = 0;
       flattenedLines = [];
     }
-    $svg.empty();
+    svg.selectAll("*").remove();
     svg.attr("viewBox", "0 0 0 0");
     svg.attr("preserveAspectRatio", "none");
     svg.attr("viewBox", "0 0 " + (frameLength - 1) + " " + numFlattenedLines);
-    $svg.empty();
     drawFlattenedLines();
   };
 

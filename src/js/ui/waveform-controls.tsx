@@ -1,6 +1,4 @@
-import { Fragment, StrictMode, useLayoutEffect, useRef } from "react";
-import { createRoot } from "react-dom/client";
-import { flushSync } from "react-dom";
+import { Fragment, useLayoutEffect, useRef } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import type { createStore } from "jotai/vanilla";
 import { settingsAtom, updateSettingAtom } from "../state/settings.ts";
@@ -57,7 +55,7 @@ const controls: ReadonlyArray<{
   },
 ];
 
-function WaveformControls({ store }: { store: Store }) {
+export function WaveformControls({ store }: { store: Store }) {
   const { waveform } = useAtomValue(settingsAtom, { store });
   const envelope = useAtomValue(envelopeAtom, { store });
   const updateSetting = useSetAtom(updateSettingAtom, { store });
@@ -79,7 +77,15 @@ function WaveformControls({ store }: { store: Store }) {
           preserveAspectRatio="none"
         />
         {/* The audio adapter alone draws this canvas; React never owns its pixels. */}
-        <canvas id="waveform-canvas" />
+        <canvas
+          id="waveform-canvas"
+          role="img"
+          aria-label={
+            waveform === "string"
+              ? "String: illustrative decaying plucked tone (not a live audio trace)"
+              : `${waveform} oscillator waveform`
+          }
+        />
         <div className="tw:grid tw:grid-cols-2" role="group" aria-label="Waveform">
           {(Object.keys(waveformDefaults) as WaveformId[]).map((id) => (
             <button
@@ -87,7 +93,7 @@ function WaveformControls({ store }: { store: Store }) {
               type="button"
               data-waveform={id}
               aria-pressed={id === waveform}
-              className="tw:border tw:border-solid tw:border-[#ccc] tw:bg-[#f5f5f5] tw:px-1 tw:py-0 tw:text-[11px]! tw:leading-5 tw:text-[#333] tw:aria-pressed:bg-[#ddd] tw:focus-visible:outline-2! tw:focus-visible:outline-[#087ca7]! tw:focus-visible:outline-offset-2"
+              className="tw:border tw:border-solid tw:border-[#ccc] tw:bg-[#f5f5f5] tw:px-1 tw:py-0 tw:text-[11px] tw:leading-5 tw:text-[#333] tw:aria-pressed:bg-[#ddd]"
               onClick={() => updateSetting({ key: "waveform", value: id })}
             >
               {id}
@@ -100,7 +106,7 @@ function WaveformControls({ store }: { store: Store }) {
           <Fragment key={control.key}>
             <label
               htmlFor={`envelope-${control.name}`}
-              className="tw:m-0! tw:text-[12px]! tw:font-bold!"
+              className="tw:block tw:m-0 tw:text-[12px] tw:font-bold"
             >
               {control.label}
               <output
@@ -121,7 +127,7 @@ function WaveformControls({ store }: { store: Store }) {
               max={control.max}
               step={control.step}
               value={envelope[control.key]}
-              className="tw:block tw:h-[18px]! tw:w-full! tw:mt-0! tw:mb-1! tw:accent-[#087ca7] tw:focus-visible:outline-2! tw:focus-visible:outline-[#087ca7]! tw:focus-visible:outline-offset-2"
+              className="tw:block tw:h-[18px] tw:w-full tw:mt-0 tw:mb-1 tw:accent-[#087ca7]"
               onChange={(event) =>
                 updateEnvelope({ key: control.key, value: Number(event.currentTarget.value) })
               }
@@ -131,18 +137,4 @@ function WaveformControls({ store }: { store: Store }) {
       </div>
     </div>
   );
-}
-
-// Transitional island: React exclusively owns this subtree, while the old
-// controller still owns the surrounding tabs and the audio lifecycle.
-export function mountWaveformControls(host: HTMLElement, store: Store) {
-  const root = createRoot(host);
-  flushSync(() =>
-    root.render(
-      <StrictMode>
-        <WaveformControls store={store} />
-      </StrictMode>,
-    ),
-  );
-  return () => root.unmount();
 }
