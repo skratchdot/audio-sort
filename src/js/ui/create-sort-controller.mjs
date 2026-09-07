@@ -10,6 +10,11 @@ import { instruments } from "../midi/instruments.ts";
 import { createStore } from "jotai/vanilla";
 import { defaults, settingsAtom, updateSettingAtom } from "../state/settings.ts";
 import { waveformDefaults, waveformsAtom, updateEnvelopeAtom } from "../state/waveforms.ts";
+import {
+  algorithmCatalogAtom,
+  editAlgorithmAtom,
+  addAlgorithmAtom,
+} from "../state/algorithm-overrides.ts";
 
 export function createSortController(generators, settingsStore = createStore()) {
   const Sort = {};
@@ -41,7 +46,7 @@ export function createSortController(generators, settingsStore = createStore()) 
   let worker = null;
   let workerKey;
   let createWorker;
-  let algorithms;
+  const getAlgorithms = () => settingsStore.get(algorithmCatalogAtom);
   let createSortRequest;
   let runSortRequest;
   let getSource;
@@ -50,6 +55,7 @@ export function createSortController(generators, settingsStore = createStore()) 
   let activeEditorModal = null;
 
   const buildSortOptions = function (selector) {
+    const algorithms = getAlgorithms();
     if (algorithms) {
       const $container = $(selector);
       $container.empty();
@@ -385,7 +391,7 @@ export function createSortController(generators, settingsStore = createStore()) 
 
   const onSortModalClick = function () {
     const $modal = $("#modal-sort");
-    const selectedSort = algorithms[getSelected().sort];
+    const selectedSort = getAlgorithms()[getSelected().sort];
 
     $modal.find(".sort-name").text(selectedSort.display);
     $modal.find(".nav-tabs a:first").tab("show");
@@ -412,10 +418,7 @@ export function createSortController(generators, settingsStore = createStore()) 
 
   const onSaveAlgorithmEdit = function () {
     if (!aceEditor || activeEditorModal !== "#modal-sort") return;
-    algorithms[getSelected().sort] = Object.assign(
-      new Function("AS", aceEditor.getValue()),
-      algorithms[getSelected().sort],
-    );
+    settingsStore.set(editAlgorithmAtom, { id: getSelected().sort, source: aceEditor.getValue() });
     $("#modal-sort").modal("hide");
   };
 
@@ -425,14 +428,7 @@ export function createSortController(generators, settingsStore = createStore()) 
     const nameSafe = name.replace(/[^a-zA-Z]/gi, "");
     const id = nameSafe + "_id_" + new Date().getTime();
     if ($.trim(name).length) {
-      algorithms[id] = new Function("AS", aceEditor.getValue());
-      algorithms[id].display = name;
-      algorithms[id].stable = true;
-      algorithms[id].best = "";
-      algorithms[id].average = "";
-      algorithms[id].worst = "";
-      algorithms[id].memory = "";
-      algorithms[id].method = "";
+      settingsStore.set(addAlgorithmAtom, { id, name, source: aceEditor.getValue() });
     }
     $("#modal-add-algorithm").modal("hide");
     buildSortOptions("#sort-options");
@@ -640,7 +636,7 @@ export function createSortController(generators, settingsStore = createStore()) 
     const request = createSortRequest(
       workerKey,
       getSelected().sort,
-      algorithms[getSelected().sort],
+      getAlgorithms()[getSelected().sort],
       baseData,
     );
 
@@ -682,7 +678,6 @@ export function createSortController(generators, settingsStore = createStore()) 
 
   Sort.init = function (options) {
     createWorker = options.createWorker;
-    algorithms = options.algorithms;
     createSortRequest = options.createSortRequest;
     runSortRequest = options.runSortRequest;
     getSource = options.getSource;
