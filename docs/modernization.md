@@ -37,7 +37,7 @@ prototype is deferred and is not the implementation target.
 7. **TanStack Start shell.** Replace Eleventy/Liquid
    with React routes and a static build, preserving the current page structure.
    Prove static deployment early; do not wait for or bundle this with a redesign.
-   Preserve direct page URLs, root and /audio-sort/ paths, worker/assets, and
+   Use clean page URLs, preserving root and /audio-sort/ hosting, worker/assets, and
    GitHub Pages deployment. Browser-only dependencies must not run during
    prerendering. Keep existing workflow timeouts and checks. Do not combine the
    static-builder replacement with the UI migration or a redesign.
@@ -95,9 +95,16 @@ SVG/canvas hosts. The legacy controller, plugin sliders, Bootstrap CSS/JavaScrip
 jQuery, and temporary overrides are removed together. The existing two sections
 remain, with 40px taller charts only on sufficiently tall desktop viewports.
 
-Next is the TanStack Start/static shell migration. Static prerendering supports
-explicit output paths, which must be
-verified for `index.html`, `about.html`, `api.html`, and the Pages prefix in our build.
+Phase 7 replaces Eleventy/Liquid with TanStack Start routes and React documents.
+Public routes are `/`, `/about`, and `/api`, with no legacy `.html` aliases.
+Static prerendering emits directory index files into `dist/`;
+build-time server files remain in `.tanstack/` and are not deployed. Root and Pages
+builds use explicit base paths and are tested against static-only previews.
+Home imports the existing workspace after hydration; About/API need no audio or
+editor runtime. Client navigation unmounts the workspace when leaving Home.
+
+Next is phase 8: recorded writes/auxiliary buffers and Merge sort. The technical
+UI migration is complete; a larger visual redesign is still a separate decision.
 See [the migration handoff](migration-handoff.md) for fresh-context continuation.
 Keep transport state and shared vendor resources out of Jotai; retain listening checks.
 The algorithm function/metadata format and editor remain unchanged; do not add parser/build

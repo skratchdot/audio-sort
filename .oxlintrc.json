@@ -6,8 +6,11 @@
   "ignorePatterns": [
     "_ignore/**",
     "dist/**",
+    ".tanstack/**",
+    ".test-pages/**",
     "playwright-report/**",
     "public/**",
+    "src/route-tree.gen.ts",
     "src/.11ty-vite/**",
     "test-results/**"
   ],
@@ -20,7 +23,7 @@
   },
   "overrides": [
     {
-      "files": ["src/js/**/*.js", "src/js/**/*.mjs", "src/js/**/*.ts", "src/js/**/*.tsx"],
+      "files": ["src/**/*.js", "src/**/*.mjs", "src/**/*.ts", "src/**/*.tsx"],
       "env": { "node": false, "browser": true }
     },
     {

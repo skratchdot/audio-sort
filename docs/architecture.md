@@ -16,7 +16,15 @@ one level above, separate from the implementations they register.
 
 ## UI
 
-[`main.mjs`](../src/js/main.mjs) mounts one React workspace with an application-scoped
+TanStack Start routes in `src/routes/` render Home, About, and API through the
+shared document in `src/pages/`. Public URLs are `/`, `/about`, and `/api`;
+prerendering emits `index.html`, `about/index.html`, and `api/index.html`.
+TanStack links provide client navigation and ordinary anchor fallbacks without
+JavaScript. Audio and editor dependencies are dynamically imported by
+Home's effect, never evaluated during server prerendering. About/API remain usable
+without JavaScript. `src/client.tsx` hydrates the document.
+
+[`main.tsx`](../src/js/main.tsx) owns the browser workspace lifecycle with an application-scoped
 vanilla Jotai store. React owns settings, tabs, transport controls, counters, native
 range inputs, and dialogs. Components are split into settings, waveform, playback,
 and dialog modules under `ui/`. Tailwind Preflight/utilities and first-party
@@ -50,7 +58,7 @@ catalog unchanged and show an error. MIDI export uses native selects, `jsmidgen`
 Cached-page suspension disconnects runtime effects, pauses audio, cancels workers
 and pending resumes, and closes dialogs. Returning reconnects effects without
 automatically playing. React continues to represent the same Jotai store.
-Non-cached exits and Vite disposal unmount React, dispose owned resources, and
+Non-cached exits and Home effect cleanup unmount the workspace, dispose owned resources, and
 release native pointer listeners. Fresh runtime instances can reuse the store.
 The shared AudioContext stays library-owned.
 

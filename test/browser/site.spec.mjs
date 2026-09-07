@@ -9,7 +9,7 @@ import { scales } from "../../src/js/midi/scales.ts";
 test("all local scales populate the menu without subcollider", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("index.html");
+  await page.goto("./");
   await expect(page.locator("[data-scale]")).toHaveCount(108);
   const actual = await page
     .locator("[data-scale]")
@@ -49,7 +49,7 @@ test("public assets are copied unchanged and CSS images load under the site base
       true,
     );
   }
-  await page.goto("index.html");
+  await page.goto("./");
   for (const selector of ["#header", "#base-svg", "#sort-svg"]) {
     const background = await page
       .locator(selector)
@@ -65,7 +65,7 @@ test("public assets are copied unchanged and CSS images load under the site base
 test("every data generator feeds valid input to the worker", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("index.html");
+  await page.goto("./");
   await expect.poll(() => page.evaluate(() => globalThis.sortReplies.length)).toBeGreaterThan(0);
   for (const name of Object.keys(generators)) {
     const previousKey = await page.evaluate(() => globalThis.sortRequests.at(-1).key);
@@ -99,19 +99,22 @@ test("every data generator feeds valid input to the worker", async ({ page }) =>
   expect(errors).toEqual([]);
 });
 
-test("production output contains only public pages and assets", () => {
-  const output = new URL("../../dist/", import.meta.url);
+test("production output contains only public pages and assets", ({ baseURL }) => {
+  const output = new URL(
+    new URL(baseURL).pathname === "/audio-sort/" ? "../../.test-pages/audio-sort/" : "../../dist/",
+    import.meta.url,
+  );
   expect(readdirSync(output).sort()).toEqual([
     ".nojekyll",
-    "about.html",
-    "api.html",
+    "about",
+    "api",
     "assets",
     "img",
     "index.html",
   ]);
   // Only public pages should be rendered, with no source-directory nesting.
   const pages = readdirSync(output, { recursive: true }).filter((file) => file.endsWith(".html"));
-  expect(pages.sort()).toEqual(["about.html", "api.html", "index.html"]);
+  expect(pages.sort()).toEqual(["about/index.html", "api/index.html", "index.html"]);
   for (const filename of pages) {
     const html = readFileSync(new URL(filename, output), "utf8");
     expect(html.match(/<!doctype html>/gi)).toHaveLength(1);
@@ -159,7 +162,7 @@ test.beforeEach(async ({ page, baseURL }) => {
 test("option hover and keyboard focus preserve readable selected and unselected colors", async ({
   page,
 }) => {
-  await page.goto("index.html");
+  await page.goto("./");
   for (const id of ["sort", "scale", "soundfont"]) {
     if (id === "scale") await page.locator("#tab-scale").click();
     if (id === "soundfont") {
@@ -194,7 +197,7 @@ test("option hover and keyboard focus preserve readable selected and unselected 
 test("header stays within the viewport without sharing widgets", async ({ page }) => {
   for (const width of [320, 375, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("about.html");
+    await page.goto("about");
     const title = page.locator("#header-title");
     const navigation = page.locator("#header-nav");
     await expect(title).toBeVisible();
@@ -223,7 +226,7 @@ test("header stays within the viewport without sharing widgets", async ({ page }
 test("React controls work without Bootstrap, jQuery, or classic vendor scripts", async ({
   page,
 }) => {
-  await page.goto("index.html");
+  await page.goto("./");
   await expect(page.locator("#base-svg rect")).toHaveCount(12);
   for (const id of ["base", "sort"]) {
     const icons = page.locator(`#${id}-player .control-icon`);
@@ -262,7 +265,7 @@ test("React controls work without Bootstrap, jQuery, or classic vendor scripts",
 test("native dialogs trap focus, report invalid edits, and close on cached-page suspension", async ({
   page,
 }) => {
-  await page.goto("index.html");
+  await page.goto("./");
   const trigger = page.locator("#add-algorithm-btn");
   await trigger.click();
   const dialog = page.getByRole("dialog", { name: "Add Algorithm" });
@@ -306,7 +309,7 @@ test("built UI loads and algorithm IDs execute in the bundled worker", async ({
   const workerReady = page.waitForEvent("worker", {
     predicate: (worker) => /\/assets\/worker-/.test(worker.url()),
   });
-  await page.goto("index.html");
+  await page.goto("./");
   const sortWorker = await workerReady;
   await expect(page.locator("#wrapper > #header")).toHaveCount(1);
   await expect(page.locator("#workspace > #base-section")).toHaveCount(1);
@@ -399,7 +402,7 @@ test("Ace loads on demand and a closed dialog cannot finish initializing", async
     await editorGate;
     await route.continue();
   });
-  await page.goto("index.html");
+  await page.goto("./");
   expect(await page.evaluate(() => typeof globalThis.ace)).toBe("undefined");
   expect(editorRequests).toEqual([]);
   await page.locator("#modal-sort-open").click();
@@ -421,7 +424,7 @@ test("Ace loads on demand and a closed dialog cannot finish initializing", async
 
 test("an editor download failure keeps Save disabled and offers recovery", async ({ page }) => {
   await page.route("**/assets/create-code-editor-*.js", (route) => route.abort());
-  await page.goto("index.html");
+  await page.goto("./");
   await page.locator("#add-algorithm-btn").click();
   await expect(page.locator("#modal-add-algorithm [role=alert]")).toContainText(
     "The editor could not load.",
@@ -441,7 +444,7 @@ test("an editor download failure keeps Save disabled and offers recovery", async
 test("editor supports modern JavaScript, syntax diagnostics, and two-space soft tabs", async ({
   page,
 }) => {
-  await page.goto("index.html");
+  await page.goto("./");
   await page.locator("#modal-sort-open").click();
   await expect(page.locator("#modal-sort")).toBeVisible();
   const editor = page.locator("#sort-algorithm .js-editor.ace_editor");
@@ -482,7 +485,7 @@ test("all built-ins can be edited and saved from readable production source", as
   test.setTimeout(15000 + algorithmNames.length * 5000);
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("index.html");
+  await page.goto("./");
   for (const id of algorithmNames) {
     await page.locator(`#sort-options [data-sort="${id}"]`).click();
     await page.locator("#modal-sort-open").click();
@@ -524,7 +527,7 @@ for (const fallback of [false, true]) {
       await page.addInitScript(() => {
         globalThis.Worker = undefined;
       });
-    await page.goto("index.html");
+    await page.goto("./");
     expect(await page.evaluate(() => Object.hasOwn(globalThis, "AS"))).toBe(false);
     await expect
       .poll(async () => Number(await page.locator("#sort-player .position-max").textContent()))
@@ -550,7 +553,7 @@ for (const fallback of [false, true]) {
 test("D3 joins resize bars, markers, and paths without stale elements", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("index.html");
+  await page.goto("./");
   const slider = page.locator("#data-size-container input[type=range]");
   const bounds = await slider.boundingBox();
   let previousSize = 12;
@@ -586,7 +589,7 @@ test("module UI connects data, visualization, playback navigation, sliders, and 
 }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("index.html");
+  await page.goto("./");
   await page.locator('#base-buttons [data-action="reverse"]').click();
   await expect
     .poll(async () => Number(await page.locator("#sort-player .position-max").textContent()))
@@ -639,7 +642,7 @@ test("playback preferences toggle independently and autoplay starts a selected s
 }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("index.html");
+  await page.goto("./");
   const baseLoop = page.locator('#base-section [data-action="loop"]');
   const sortLoop = page.locator('#sort-section [data-action="loop"]');
   const autoPlay = page.locator("#sort-autoplay");
@@ -668,7 +671,7 @@ test("playback preferences toggle independently and autoplay starts a selected s
 });
 
 test("settings subscriptions reconnect after a cached-page lifecycle", async ({ page }) => {
-  await page.goto("index.html");
+  await page.goto("./");
   const autoPlay = page.locator("#sort-autoplay");
   await expect(autoPlay).toHaveAttribute("aria-pressed", "false");
   await page.evaluate(() =>
@@ -692,7 +695,7 @@ test("teardown clears owned resources and repeated remounts do not duplicate UI 
 }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("index.html");
+  await page.goto("./");
   await page.locator('#sort-options [data-sort="insertion"]').click();
   const initialScaleCount = await page.locator("#scale-options li").count();
   const initialSliderCount = await page.locator("input[type=range]").count();
@@ -746,7 +749,7 @@ test("destroy during an editor download cannot initialize a stale editor", async
     await pending;
     await route.continue();
   });
-  await page.goto("index.html");
+  await page.goto("./");
   await page.locator("#add-algorithm-btn").click();
   await requestStarted;
   await page.evaluate(() =>
@@ -768,7 +771,8 @@ test("teardown cancels pending audio resume without removing unrelated native li
 }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("index.html");
+  await page.goto("./");
+  await expect(page.locator("#base-svg rect")).toHaveCount(12);
   await page.evaluate(() => {
     globalThis.pendingResume = new Promise((resolve) => {
       globalThis.finishResume = resolve;
@@ -803,7 +807,7 @@ test("teardown cancels pending audio resume without removing unrelated native li
 });
 
 test("base data remains draggable across renderer data updates", async ({ page }) => {
-  await page.goto("index.html");
+  await page.goto("./");
   const svg = page.locator("#base-svg");
   const box = await svg.boundingBox();
   await page.mouse.move(box.x + box.width * 0.1, box.y + box.height * 0.8);
@@ -823,7 +827,7 @@ test("base data remains draggable across renderer data updates", async ({ page }
 test("resizing and saving a selected algorithm update sorting without reselecting", async ({
   page,
 }) => {
-  await page.goto("index.html");
+  await page.goto("./");
   const sizeSlider = page.locator("#data-size-container input[type=range]");
   const bounds = await sizeSlider.boundingBox();
   await sizeSlider.click({ position: { x: bounds.width * 0.4, y: bounds.height / 2 } });
@@ -871,7 +875,8 @@ test("soundfonts decode native audio and play buffered notes without JSONP", asy
       headers: { "access-control-allow-origin": "*" },
     });
   });
-  await page.goto("index.html");
+  await page.goto("./");
+  await expect(page.locator("#base-svg rect")).toHaveCount(12);
   await page.evaluate(() => {
     const T = globalThis.timbre;
     globalThis.samplePlays = [];
@@ -910,7 +915,7 @@ test("soundfonts decode native audio and play buffered notes without JSONP", asy
 test("audio settings render selections and survive subscription reconnection", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("index.html");
+  await page.goto("./");
   await page.locator("#settings #tab-waveform").click();
   await expect(page.locator("#waveform-adshr-attack-display")).toHaveText("50 ms");
   await page.locator('#waveform button[data-waveform="sin"]').click();
@@ -951,7 +956,7 @@ test("audio settings render selections and survive subscription reconnection", a
 test("charts use extra laptop height without enlarging short or narrow layouts", async ({
   page,
 }) => {
-  await page.goto("index.html");
+  await page.goto("./");
   for (const [width, height, chartHeight] of [
     [1440, 900, "240px"],
     [1366, 768, "200px"],
@@ -965,7 +970,7 @@ test("charts use extra laptop height without enlarging short or narrow layouts",
 });
 
 test("envelope controls preserve the compact settings panel", async ({ page }) => {
-  await page.goto("index.html");
+  await page.goto("./");
   // Exercise fallback font metrics even on Macs with Helvetica installed.
   // Keep compact typography and stable panel height with fallback fonts.
   await page.addStyleTag({
@@ -996,7 +1001,7 @@ test("envelope controls preserve the compact settings panel", async ({ page }) =
 test("waveform envelope edits survive switching presets", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("index.html");
+  await page.goto("./");
   await page.locator("#settings #tab-waveform").click();
   await page.locator('#waveform button[data-waveform="string"]').click();
   const display = page.locator("#waveform-adshr-attack-display");
@@ -1042,7 +1047,79 @@ test("waveform envelope edits survive switching presets", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-for (const filename of ["about.html", "api.html"]) {
+test("clean routes hydrate, navigate, and reload without a server", async ({
+  page,
+  request,
+  baseURL,
+}) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(message.text());
+  });
+  for (const path of ["", "?view=sort#workspace"]) {
+    const url = new URL(path, baseURL).href;
+    expect((await page.goto(url)).status()).toBe(200);
+    await expect(page.locator("#base-svg rect")).toHaveCount(12);
+    await expect(page).toHaveURL(url);
+    await page.reload();
+    await expect(page.locator("#base-svg rect")).toHaveCount(12);
+    await expect(page).toHaveURL(url);
+    await page.evaluate(() => {
+      globalThis.navigationWitness = true;
+    });
+    await page.locator("#header-nav").getByRole("link", { name: "About", exact: true }).click();
+    await expect(page).toHaveURL(new URL("about", baseURL).href);
+    await expect(page.locator("#about")).toBeVisible();
+    await page.waitForLoadState("networkidle");
+    expect(await page.locator("#workspace").count()).toBe(0);
+    expect(await page.evaluate(() => globalThis.navigationWitness)).toBe(true);
+    expect(
+      await page.evaluate(() => globalThis.sortWorkers.every((worker) => worker.wasTerminated)),
+    ).toBe(true);
+    await page.locator("#header-nav").getByRole("link", { name: "API", exact: true }).click();
+    await expect(page.locator(".table-scroll")).toBeVisible();
+    await page.reload();
+    await page.waitForLoadState("networkidle");
+    expect(await page.evaluate(() => typeof globalThis.timbre)).toBe("undefined");
+    await page.locator("#header-nav").getByRole("link", { name: "Home", exact: true }).click();
+    await expect(page.locator("#base-svg rect")).toHaveCount(12);
+  }
+  expect(errors).toEqual([]);
+  expect((await request.get(new URL("missing-page.html", baseURL).href)).status()).toBe(404);
+});
+
+test("prerendered pages and navigation remain readable without JavaScript", async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
+  try {
+    const page = await context.newPage();
+    await page.goto("./");
+    await expect(page.locator("noscript p")).toContainText("Enable JavaScript");
+    await page.locator("#header-nav").getByRole("link", { name: "About", exact: true }).click();
+    await expect(page.locator("#about")).toContainText('"hear" what sorting algorithms sound like');
+    await page.locator("#header-nav").getByRole("link", { name: "API", exact: true }).click();
+    await expect(page.locator(".table-scroll")).toContainText("AS.swap");
+    await page.reload();
+    await expect(page.locator(".table-scroll")).toBeVisible();
+  } finally {
+    await context.close();
+  }
+});
+
+test("a failed workspace download shows a recoverable error", async ({ page }) => {
+  await page.route(/\/assets\/main-[^/]+\.js$/, (route) => route.abort());
+  await page.goto("./");
+  await expect(page.getByRole("alert")).toContainText("Unable to load the workspace");
+  await page.unroute(/\/assets\/main-[^/]+\.js$/);
+  await page.reload();
+  await expect(page.locator("#base-svg rect")).toHaveCount(12);
+  await expect(page.getByRole("alert")).toHaveCount(0);
+});
+
+for (const filename of ["about", "api"]) {
   test(`${filename} and its local assets load`, async ({ page, baseURL }) => {
     const missing = [];
     page.on("response", (response) => {

@@ -3,5 +3,7 @@
 /_ignore/
 /dist/
 /src/.11ty-vite/
+/.tanstack/
+/.test-pages/
 /test-results/
 /playwright-report/
