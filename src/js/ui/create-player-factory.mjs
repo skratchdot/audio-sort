@@ -53,10 +53,6 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
       }
       intervalIndex = 0;
       const $container = $(containerSelector || null);
-      $container
-        .find('[data-action="loop"]')
-        .toggleClass("active", isLooping())
-        .attr("aria-pressed", String(isLooping()));
       $compareCurrent = $container.find(".compare-current");
       $compareMax = $container.find(".compare-max");
       $swapCurrent = $container.find(".swap-current");
@@ -220,7 +216,6 @@ export function createPlayerFactory(settings, Helper, settingsStore) {
           player.goToLast();
         } else if (action === "loop") {
           settingsStore.set(toggleLoopAtom, options.id);
-          $item.toggleClass("active", isLooping()).attr("aria-pressed", String(isLooping()));
         }
         refreshSliderPosition();
         if (typeof onPlayerButtonClickCallback === "function") {

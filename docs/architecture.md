@@ -29,9 +29,13 @@ settings object. Snapshots and defaults are immutable. Per-waveform envelope edi
 live in [`state/waveforms.ts`](../src/js/state/waveforms.ts) in the same store;
 generator presets stay fixed, and sustain edits retain two-decimal rounding.
 
-This is a state-storage migration, not a reactive UI rewrite: existing handlers
-still update DOM controls and audio resources. Writing directly to an injected
-store does not yet synchronize those side effects. AutoPlay and each player's
+[`connect-playback-settings.ts`](../src/js/ui/connect-playback-settings.ts) connects
+volume, tempo, AutoPlay, and loop preferences to UI/audio effects. It applies
+current values immediately, observes relevant changes, and returns a disconnect
+function. The controller replaces its old connection before reconnecting; pagehide
+disconnects subscriptions and a cached pageshow reconnects them. This is subscription
+cleanup, not full player/worker/editor teardown. Other settings still rely on their
+existing event handlers for DOM/audio side effects. AutoPlay and each player's
 loop preference live in `state/playback-preferences.ts`; their handlers render
 button state from the store instead of reading CSS classes. AutoPlay no longer
 uses Bootstrap's button toggle. Playing/stopped state, direction, position,

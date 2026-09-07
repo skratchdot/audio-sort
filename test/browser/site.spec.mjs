@@ -541,6 +541,26 @@ test("playback preferences toggle independently and autoplay starts a selected s
   expect(errors).toEqual([]);
 });
 
+test("settings subscriptions reconnect after a cached-page lifecycle", async ({ page }) => {
+  await page.goto("index.html");
+  const autoPlay = page.locator("#sort-autoplay");
+  await expect(autoPlay).toHaveAttribute("aria-pressed", "false");
+  await page.evaluate(() =>
+    globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pagehide", { persisted: true })),
+  );
+  await autoPlay.click(); // Handler changes the store while rendering is disconnected.
+  await expect(autoPlay).toHaveAttribute("aria-pressed", "false");
+  await page.evaluate(() =>
+    globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pageshow", { persisted: true })),
+  );
+  await expect(autoPlay).toHaveAttribute("aria-pressed", "true");
+  await page.evaluate(() =>
+    globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pageshow", { persisted: true })),
+  );
+  await autoPlay.click();
+  await expect(autoPlay).toHaveAttribute("aria-pressed", "false");
+});
+
 test("waveform envelope edits survive switching presets", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
