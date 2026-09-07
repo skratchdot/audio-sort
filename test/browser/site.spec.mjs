@@ -91,13 +91,13 @@ test("production output contains only public pages and assets", () => {
     expect(html.match(/<!doctype html>/gi)).toHaveLength(1);
     expect(html.match(/<\/html>/gi)).toHaveLength(1);
     expect(html).not.toContain("{%");
+    expect(html).not.toMatch(/addthis|google-analytics|googletagmanager|gtag\(|UA-10768188-1/i);
   }
 });
 
 test.beforeEach(async ({ page, baseURL }) => {
-  // Analytics, sharing widgets, and remote soundfonts are not build dependencies.
+  // Remote soundfonts are not build dependencies.
   await page.addInitScript(() => {
-    globalThis.addthis = { init() {} };
     globalThis.sortRequests = [];
     globalThis.sortReplies = [];
     const OriginalWorker = globalThis.Worker;
@@ -117,6 +117,26 @@ test.beforeEach(async ({ page, baseURL }) => {
     if (route.request().url().startsWith(new URL(baseURL).origin)) return route.continue();
     return route.fulfill({ body: "", contentType: "application/javascript" });
   });
+});
+
+test("header stays within the viewport without sharing widgets", async ({ page }) => {
+  for (const width of [320, 375, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("about.html");
+    const title = page.locator("#header-title");
+    const navigation = page.locator("#header-nav");
+    await expect(title).toBeVisible();
+    await expect(navigation.locator("a")).toHaveText(["Home", "About", "API", "Source"]);
+    const titleBox = await title.boundingBox();
+    const navBox = await navigation.boundingBox();
+    for (const box of [titleBox, navBox]) {
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(width);
+    }
+    expect(
+      titleBox.x + titleBox.width <= navBox.x || titleBox.y + titleBox.height <= navBox.y,
+    ).toBe(true);
+  }
 });
 
 test("built UI loads and algorithm IDs execute in the bundled worker", async ({

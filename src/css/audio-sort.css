@@ -274,11 +274,6 @@ svg,
   text-align: right;
 }
 
-#social-header {
-  float: right;
-  display: block;
-}
-
 .mobile-break {
   display: none;
   height: 3px;
