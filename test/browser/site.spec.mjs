@@ -264,6 +264,54 @@ test("built UI loads and algorithm IDs execute in the bundled worker", async ({
   expect(missing).toEqual([]);
 });
 
+test("Ace loads on demand and a closed dialog cannot finish initializing", async ({ page }) => {
+  const editorRequests = [];
+  let releaseEditor;
+  const editorGate = new Promise((resolve) => {
+    releaseEditor = resolve;
+  });
+  await page.route("**/assets/create-code-editor-*.js", async (route) => {
+    editorRequests.push(route.request().url());
+    await editorGate;
+    await route.continue();
+  });
+  await page.goto("index.html");
+  expect(await page.evaluate(() => typeof globalThis.ace)).toBe("undefined");
+  expect(editorRequests).toEqual([]);
+  await page.locator("#modal-sort-open").click();
+  await expect(page.locator("#modal-sort .editor-status")).toHaveText("Loading editor…");
+  await expect(page.locator("#save-algorithm-edit")).toHaveAttribute("aria-disabled", "true");
+  await page.locator("#save-algorithm-edit").dispatchEvent("click");
+  await expect(page.locator("#modal-sort")).toBeVisible();
+  await page.locator('#modal-sort .modal-footer [data-dismiss="modal"]').click();
+  await expect(page.locator("#modal-sort")).toBeHidden();
+  releaseEditor();
+  await expect.poll(() => page.evaluate(() => typeof globalThis.ace)).toBe("object");
+  await expect(page.locator("#sort-algorithm .js-editor")).toHaveCount(0);
+  await page.locator("#add-algorithm-btn").click();
+  await expect(page.locator("#save-algorithm-new")).toHaveAttribute("aria-disabled", "false");
+  await expect(page.locator("#new-sort-algorithm .js-editor")).toHaveCount(1);
+  expect(editorRequests).toHaveLength(1);
+});
+
+test("an editor download failure keeps Save disabled and offers recovery", async ({ page }) => {
+  await page.route("**/assets/create-code-editor-*.js", (route) => route.abort());
+  await page.goto("index.html");
+  await page.locator("#add-algorithm-btn").click();
+  await expect(page.locator("#modal-add-algorithm [role=alert]")).toContainText(
+    "The editor could not load.",
+  );
+  await expect(page.locator("#save-algorithm-new")).toHaveAttribute("aria-disabled", "true");
+  await page.locator("#new-sort-name").fill("Unavailable editor");
+  await page.locator("#save-algorithm-new").dispatchEvent("click");
+  await expect(page.locator("#modal-add-algorithm")).toBeVisible();
+  await page.unroute("**/assets/create-code-editor-*.js");
+  await page.getByRole("button", { name: "Reload page" }).click();
+  await page.waitForLoadState("load");
+  await page.locator("#add-algorithm-btn").click();
+  await expect(page.locator("#save-algorithm-new")).toHaveAttribute("aria-disabled", "false");
+});
+
 test("editor supports modern JavaScript, syntax diagnostics, and two-space soft tabs", async ({
   page,
 }) => {
