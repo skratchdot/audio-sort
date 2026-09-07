@@ -1,11 +1,3 @@
-/*!
- * Project: Audio Sort
- *    File: create-sort-engine.mjs
- *  Source: https://github.com/skratchdot/audio-sort/
- *
- * Copyright (c) 2013 skratchdot
- * Licensed under the MIT license.
- */
 // Each instance owns its arrays, frames, markers, and counters.
 export function createSortEngine() {
   const AS = {};

@@ -1,13 +1,6 @@
 import { $ } from "../vendor.mjs";
 import { scales } from "../midi/scales.mjs";
-/*!
- * Project: Audio Sort
- *    File: create-helpers.mjs
- *  Source: https://github.com/skratchdot/audio-sort/
- *
- * Copyright (c) 2013 skratchdot
- * Licensed under the MIT license.
- */
+
 export function createHelpers(settings, dependencies = { $, scales }) {
   const { $, scales } = dependencies;
 
