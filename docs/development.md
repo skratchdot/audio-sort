@@ -8,8 +8,8 @@ the resulting `pnpm-lock.yaml`. Do not generate an npm lockfile.
 
 ## Build and preview
 
-`pnpm start` serves the site with live updates. `pnpm run build` creates `dist/`;
-`pnpm run preview` serves that production build.
+`pnpm dev` serves the site with live updates (`pnpm start` is an alias).
+`pnpm build` creates `dist/`; `pnpm preview` serves that production build.
 
 TanStack Start prerenders the React pages and Vite bundles JavaScript and CSS.
 Site files live in `src/`; tests and tool configuration stay at the root.
@@ -19,7 +19,8 @@ GitHub Pages needs no Node server.
 Routes are `/`, `/about`, and `/api`; the latter two are deployed as directory
 index files. A static host may append a trailing slash on direct visits.
 
-The default build targets `/`. `pnpm run build:pages` targets `/audio-sort/`.
+The default build targets `/`. The deployment workflow sets
+`VITE_BASE_PATH=/audio-sort/` and runs the same build command.
 For another hosting path, set `VITE_BASE_PATH` when building. Preview uses `sirv-cli`
 to serve static files only, with no server rendering or SPA fallback.
 To preview the Pages path locally, run `pnpm run build:test-pages`, then
