@@ -73,7 +73,9 @@ export function createSortController(generators) {
   let createSortRequest;
   let runSortRequest;
   let getSource;
-  let createCodeEditor;
+  let loadCodeEditor;
+  let editorRequest = 0;
+  let activeEditorModal = null;
 
   const buildSortOptions = function (selector) {
     if (algorithms) {
@@ -317,15 +319,39 @@ export function createSortController(generators) {
     preloadSoundfonts();
   };
 
-  const addAceEditor = function (container) {
+  const addAceEditor = async function (container, modal, source = "") {
+    const request = ++editorRequest;
+    activeEditorModal = modal;
+    const $modal = $(modal);
     const $container = $(container);
-    const id = "id_" + new Date().getTime();
+    const $save = $modal.find(".btn-primary");
+    $save.addClass("disabled").attr("aria-disabled", "true");
     if (aceEditor) {
       aceEditor.destroy();
       aceEditor.getSession().destroy();
+      aceEditor = null;
     }
-    $container.empty().append('<div class="js-editor" id="' + id + '"></div>');
-    aceEditor = createCodeEditor(id);
+    $container.empty();
+    $modal.find(".editor-status").remove();
+    const $status = $('<p class="editor-status" role="status"></p>')
+      .text("Loading editor…")
+      .appendTo($modal.find(".modal-body"));
+    try {
+      const { createCodeEditor } = await loadCodeEditor();
+      if (request !== editorRequest) return;
+      const $editor = $('<div class="js-editor"></div>').appendTo($container);
+      aceEditor = createCodeEditor($editor.get(0));
+      aceEditor.setValue(source);
+      aceEditor.clearSelection();
+      $status.remove();
+      $save.removeClass("disabled").attr("aria-disabled", "false");
+    } catch {
+      if (request !== editorRequest) return;
+      $status.attr("role", "alert").text("The editor could not load. ");
+      $('<button type="button" class="btn btn-small">Reload page</button>')
+        .on("click", () => window.location.reload())
+        .appendTo($status);
+    }
   };
 
   const onMidiExportClick = function () {
@@ -394,11 +420,8 @@ export function createSortController(generators) {
     $modal.find("#sort-info-worst").html(selectedSort.worst || "&nbsp;");
     $modal.find("#sort-info-memory").html(selectedSort.memory || "&nbsp;");
     $modal.find("#sort-info-method").html(selectedSort.method || "&nbsp;");
-    addAceEditor("#sort-algorithm");
-    const fnText = getSource(selected.sort, selectedSort);
-    aceEditor.setValue(fnText);
-    aceEditor.clearSelection();
     $modal.modal();
+    void addAceEditor("#sort-algorithm", "#modal-sort", getSource(selected.sort, selectedSort));
   };
 
   const onSortVisualizationButton = function () {
@@ -408,6 +431,7 @@ export function createSortController(generators) {
   };
 
   const onSaveAlgorithmEdit = function () {
+    if (!aceEditor || activeEditorModal !== "#modal-sort") return;
     algorithms[selected.sort] = Object.assign(
       new Function("AS", aceEditor.getValue()),
       algorithms[selected.sort],
@@ -416,6 +440,7 @@ export function createSortController(generators) {
   };
 
   const onSaveAlgorithmNew = function () {
+    if (!aceEditor || activeEditorModal !== "#modal-add-algorithm") return;
     const name = $("#new-sort-name").val();
     const nameSafe = name.replace(/[^a-zA-Z]/gi, "");
     const id = nameSafe + "_id_" + new Date().getTime();
@@ -436,8 +461,8 @@ export function createSortController(generators) {
   const onAddAlgorithmModalClick = function () {
     const $modal = $("#modal-add-algorithm");
     $modal.find("#new-sort-name").val("");
-    addAceEditor("#new-sort-algorithm");
     $modal.modal();
+    void addAceEditor("#new-sort-algorithm", "#modal-add-algorithm");
   };
 
   const playerButtonCallback = function (player, action) {
@@ -681,7 +706,7 @@ export function createSortController(generators) {
     createSortRequest = options.createSortRequest;
     runSortRequest = options.runSortRequest;
     getSource = options.getSource;
-    createCodeEditor = options.createCodeEditor;
+    loadCodeEditor = options.loadCodeEditor;
     // when using a mobile device, decrease samplerate.
     // idea taken from: http://mohayonao.github.io/timbre.js/misc/js/common.js
     if (timbre.envmobile) {
@@ -777,6 +802,11 @@ export function createSortController(generators) {
     );
     // cache a few items
     $sortAutoPlay = $("#sort-autoplay");
+    $("#modal-sort, #modal-add-algorithm").on("hide", function () {
+      if (activeEditorModal !== "#" + this.id) return;
+      editorRequest++;
+      activeEditorModal = null;
+    });
     // handle button clicks
     $("#audio-type-container .btn").on("click", onAudioTypeButtonClick);
     $("#audio-type-tab-link").on("click", onAudioTypeTabLinkClick);

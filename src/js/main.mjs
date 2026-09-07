@@ -1,6 +1,5 @@
 import { generators } from "./generators/generator-registry.mjs";
 import { createSortController } from "./ui/create-sort-controller.mjs";
-import { createCodeEditor } from "./ui/create-code-editor.mjs";
 import { algorithms } from "./sorting/algorithm-registry.mjs";
 import { sources } from "./sorting/algorithm-sources.mjs";
 import { createSortRequest, getFunctionBody, runSortRequest } from "./sorting/sort-requests.mjs";
@@ -11,7 +10,7 @@ function createSortWorker() {
 
 const controller = createSortController(generators);
 controller.init({
-  createCodeEditor,
+  loadCodeEditor: () => import("./ui/create-code-editor.mjs"),
   createWorker: createSortWorker,
   algorithms: { ...algorithms },
   createSortRequest,
