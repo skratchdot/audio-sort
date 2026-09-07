@@ -7,35 +7,16 @@ import { createHelpers } from "./create-helpers.mjs";
 import { createPlayerFactory } from "./create-player-factory.mjs";
 import { MidiExport } from "../midi/midi-export.mjs";
 import { instruments } from "../midi/instruments.ts";
+import { createStore } from "jotai/vanilla";
+import { defaults, settingsAtom, updateSettingAtom } from "../state/settings.ts";
 
-export function createSortController(generators) {
+export function createSortController(generators, settingsStore = createStore()) {
   const Sort = {};
   const Helper = createHelpers(Sort);
   const createPlayer = createPlayerFactory(Sort, Helper);
-  // Default Settings
-  const defaults = {
-    volume: { value: 0.25, min: 0, max: 1, step: 0.01 },
-    tempo: { value: 90, min: 20, max: 300, step: 1 },
-    centerNote: { value: 69, min: 0, max: 127, step: 1 },
-    scale: { value: "chromatic" },
-    sort: { value: "bubble" },
-    dataSize: { value: 12, min: 4, max: 48, step: 1 },
-    audioType: { value: "waveform" },
-    waveform: { value: "string" },
-    soundfont: { value: 0 },
-  };
-  // Currently Selected Items
-  const selected = {
-    volume: defaults.volume.value,
-    tempo: defaults.tempo.value,
-    centerNote: defaults.centerNote.value,
-    scale: defaults.scale.value,
-    sort: defaults.sort.value,
-    dataSize: defaults.dataSize.value,
-    audioType: defaults.audioType.value,
-    waveform: defaults.waveform.value,
-    soundfont: defaults.soundfont.value,
-  };
+  // Read the current atom value on demand; do not keep a second settings cache.
+  const getSelected = () => settingsStore.get(settingsAtom);
+  const setSelected = (key, value) => settingsStore.set(updateSettingAtom, { key, value });
   // Waveform Data
   const waveform = {
     string: { gen: "PluckGen", poly: 10, mul: 1, a: 50, d: 300, s: 0.5, h: 500, r: 2500 },
@@ -99,7 +80,7 @@ export function createSortController(generators) {
     let html = "";
     $.each(waveform, function (waveformName) {
       html += $("<button />")
-        .addClass("btn btn-mini" + (waveformName === selected.waveform ? " active" : ""))
+        .addClass("btn btn-mini" + (waveformName === getSelected().waveform ? " active" : ""))
         .attr("type", "button")
         .attr("data-waveform", waveformName)
         .text(waveformName)
@@ -112,11 +93,11 @@ export function createSortController(generators) {
 
   const onWaveformButtonClick = function () {
     const $this = $(this);
-    selected.waveform = $this.attr("data-waveform");
+    setSelected("waveform", $this.attr("data-waveform"));
     // update slider values
     setSliderWaveformFromSelected();
     // update text on audio tab
-    updateDisplayCache("#audio-type-display", "waveform: " + selected.waveform);
+    updateDisplayCache("#audio-type-display", "waveform: " + getSelected().waveform);
     // start using new selection
     players.base.refreshWaveGenerator();
     players.sort.refreshWaveGenerator();
@@ -185,13 +166,13 @@ export function createSortController(generators) {
     const audioTypeName = $this.text();
 
     // set selected type
-    selected.audioType = audioType;
+    setSelected("audioType", audioType);
     let displayName = audioType;
-    if (selected.audioType === "waveform") {
-      displayName += ": " + selected.waveform;
+    if (getSelected().audioType === "waveform") {
+      displayName += ": " + getSelected().waveform;
       players.base.refreshWaveGenerator();
       players.sort.refreshWaveGenerator();
-    } else if (selected.audioType === "soundfont") {
+    } else if (getSelected().audioType === "soundfont") {
       displayName = $("#soundfont-options li.active").text();
     }
     updateDisplayCache("#audio-type-display", displayName);
@@ -209,16 +190,16 @@ export function createSortController(generators) {
 
   const onSlider = function (key, selector, event, fnFormat) {
     if (event) {
-      selected[key] = event.value;
+      setSelected(key, event.value);
     }
-    updateDisplayCache(selector, selected[key], fnFormat);
+    updateDisplayCache(selector, getSelected()[key], fnFormat);
   };
 
   const onSliderVolume = function (e) {
     onSlider("volume", "#volume-display", e, function (val) {
       return val.toFixed(2);
     });
-    const volume = waveform[selected.waveform].mul * selected.volume;
+    const volume = waveform[getSelected().waveform].mul * getSelected().volume;
     players.base.setVolume(volume);
     players.sort.setVolume(volume);
   };
@@ -245,7 +226,8 @@ export function createSortController(generators) {
     const $slider = $(e.target);
     const $container = $slider.parents("[data-adshr]:first");
     const adshr = $container.attr("data-adshr");
-    waveform[selected.waveform][adshr] = adshr === "s" ? parseFloat(e.value.toFixed(2)) : e.value;
+    waveform[getSelected().waveform][adshr] =
+      adshr === "s" ? parseFloat(e.value.toFixed(2)) : e.value;
     updateWaveformDisplays();
     players.base.refreshWaveGenerator();
     players.sort.refreshWaveGenerator();
@@ -269,7 +251,7 @@ export function createSortController(generators) {
     $parent.find("li").removeClass("active");
     $item.addClass("active");
     updateDisplayCache("#sort-display", $item.text());
-    selected.sort = $item.find("a").data("sort");
+    setSelected("sort", $item.find("a").data("sort"));
     if ($sortAutoPlay.hasClass("active")) {
       triggerAutoPlay = true;
     }
@@ -277,16 +259,16 @@ export function createSortController(generators) {
   };
 
   const updateWaveformDisplays = function () {
-    updateDisplayCache("#waveform-adshr-attack-display", waveform[selected.waveform].a);
-    updateDisplayCache("#waveform-adshr-decay-display", waveform[selected.waveform].d);
-    updateDisplayCache("#waveform-adshr-sustain-display", waveform[selected.waveform].s);
-    updateDisplayCache("#waveform-adshr-hold-display", waveform[selected.waveform].h);
-    updateDisplayCache("#waveform-adshr-release-display", waveform[selected.waveform].r);
+    updateDisplayCache("#waveform-adshr-attack-display", waveform[getSelected().waveform].a);
+    updateDisplayCache("#waveform-adshr-decay-display", waveform[getSelected().waveform].d);
+    updateDisplayCache("#waveform-adshr-sustain-display", waveform[getSelected().waveform].s);
+    updateDisplayCache("#waveform-adshr-hold-display", waveform[getSelected().waveform].h);
+    updateDisplayCache("#waveform-adshr-release-display", waveform[getSelected().waveform].r);
   };
 
   const setSliderWaveformFromSelected = function () {
     $.each(["a", "d", "s", "h", "r"], function (index, key) {
-      waveformSliders[key].slider("setValue", waveform[selected.waveform][key]);
+      waveformSliders[key].slider("setValue", waveform[getSelected().waveform][key]);
     });
     updateWaveformDisplays();
   };
@@ -298,9 +280,9 @@ export function createSortController(generators) {
   const generateData = function (regenerateMaxData, action) {
     if (regenerateMaxData) {
       if (generators.hasOwnProperty(action)) {
-        baseData = generators[action](selected.dataSize);
+        baseData = generators[action](getSelected().dataSize);
         maxData = generators[action](defaults.dataSize.max);
-        const slice = maxData.slice(0, selected.dataSize);
+        const slice = maxData.slice(0, getSelected().dataSize);
         const scale = getScale(0, baseData.length - 1, min(slice), max(slice));
         // we always want our current "baseData" when re-sizing
         for (let i = 0; i < baseData.length; i++) {
@@ -308,7 +290,7 @@ export function createSortController(generators) {
         }
       }
     } else {
-      baseData = maxData.slice(0, selected.dataSize);
+      baseData = maxData.slice(0, getSelected().dataSize);
       const scale = getScale(min(baseData), max(baseData), 0, baseData.length - 1);
       // normalize data
       for (let i = 0; i < baseData.length; i++) {
@@ -391,7 +373,7 @@ export function createSortController(generators) {
       const byteNumbers = $.map(
         players[playerType]
           .getMidiBytes(
-            selected.tempo,
+            getSelected().tempo,
             $("#midi-export-channel").val(),
             $("#midi-export-instrument").val(),
           )
@@ -409,7 +391,7 @@ export function createSortController(generators) {
 
   const onSortModalClick = function () {
     const $modal = $("#modal-sort");
-    const selectedSort = algorithms[selected.sort];
+    const selectedSort = algorithms[getSelected().sort];
 
     $modal.find(".sort-name").text(selectedSort.display);
     $modal.find(".nav-tabs a:first").tab("show");
@@ -421,7 +403,11 @@ export function createSortController(generators) {
     $modal.find("#sort-info-memory").html(selectedSort.memory || "&nbsp;");
     $modal.find("#sort-info-method").html(selectedSort.method || "&nbsp;");
     $modal.modal();
-    void addAceEditor("#sort-algorithm", "#modal-sort", getSource(selected.sort, selectedSort));
+    void addAceEditor(
+      "#sort-algorithm",
+      "#modal-sort",
+      getSource(getSelected().sort, selectedSort),
+    );
   };
 
   const onSortVisualizationButton = function () {
@@ -432,9 +418,9 @@ export function createSortController(generators) {
 
   const onSaveAlgorithmEdit = function () {
     if (!aceEditor || activeEditorModal !== "#modal-sort") return;
-    algorithms[selected.sort] = Object.assign(
+    algorithms[getSelected().sort] = Object.assign(
       new Function("AS", aceEditor.getValue()),
-      algorithms[selected.sort],
+      algorithms[getSelected().sort],
     );
     $("#modal-sort").modal("hide");
   };
@@ -549,7 +535,7 @@ export function createSortController(generators) {
       if (!$this.hasClass("disabled")) {
         $ul.find("li").removeClass("active");
         $this.addClass("active");
-        selected.scale = $this.data("scale");
+        setSelected("scale", $this.data("scale"));
         updateDisplayCache("#scale-display", $this.text());
         preloadSoundfonts();
       }
@@ -574,7 +560,7 @@ export function createSortController(generators) {
       const $li = $("<li />")
         .attr("data-soundfont", instrument.val)
         .wrapInner($('<a href="javascript:void(0);"></a>').text(i + ": " + instrument.name));
-      if (selected.soundfont === i) {
+      if (getSelected().soundfont === i) {
         $li.addClass("active");
       }
       htmlString += $li.wrap("<div />").parent().html();
@@ -585,8 +571,8 @@ export function createSortController(generators) {
       if (!$this.hasClass("disabled")) {
         $ul.find("li").removeClass("active");
         $this.addClass("active");
-        selected.soundfont = $this.data("soundfont");
-        timbre.soundfont.setInstrument(selected.soundfont);
+        setSelected("soundfont", $this.data("soundfont"));
+        timbre.soundfont.setInstrument(getSelected().soundfont);
         updateDisplayCache("#soundfont-display", $this.text());
         updateDisplayCache("#audio-type-display", $this.text());
         preloadSoundfonts();
@@ -597,7 +583,7 @@ export function createSortController(generators) {
   const preloadSoundfonts = function () {
     const midiNotes = [];
 
-    if (selected.audioType === "soundfont") {
+    if (getSelected().audioType === "soundfont") {
       for (let i = 0; i < baseData.length; i++) {
         const midi = Helper.getMidiNumber(baseData[i]);
         if (midiNotes.indexOf(midi) === -1 && midi >= 0 && midi < 128) {
@@ -659,8 +645,8 @@ export function createSortController(generators) {
     workerKey = (workerKey || 0) + 1;
     const request = createSortRequest(
       workerKey,
-      selected.sort,
-      algorithms[selected.sort],
+      getSelected().sort,
+      algorithms[getSelected().sort],
       baseData,
     );
 
@@ -689,15 +675,15 @@ export function createSortController(generators) {
   };
 
   Sort.getSelected = function (key, defaultValue) {
-    return selected.hasOwnProperty(key) ? selected[key] : defaultValue;
+    return getSelected().hasOwnProperty(key) ? getSelected()[key] : defaultValue;
   };
 
   Sort.getSelectedWaveformInfo = function () {
-    return waveform[selected.waveform];
+    return waveform[getSelected().waveform];
   };
 
   Sort.getTempoString = function () {
-    return "bpm" + (parseFloat(selected.tempo) || defaults.tempo) + " l16";
+    return "bpm" + (parseFloat(getSelected().tempo) || defaults.tempo) + " l16";
   };
 
   Sort.init = function (options) {
@@ -724,7 +710,7 @@ export function createSortController(generators) {
     populateScaleOptions("#scale-options");
     updateDisplayCache(
       "#scale-display",
-      $('#scale-options li[data-scale="' + selected.scale + '"]').text(),
+      $('#scale-options li[data-scale="' + getSelected().scale + '"]').text(),
     );
     $("#scale-filter")
       .on("keyup", onOptionBoxFilter)
@@ -736,7 +722,7 @@ export function createSortController(generators) {
     populateSoundfontOptions("#soundfont-options");
     updateDisplayCache(
       "#soundfont-display",
-      $('#soundfont-options li[data-soundfont="' + selected.soundfont + '"]').text(),
+      $('#soundfont-options li[data-soundfont="' + getSelected().soundfont + '"]').text(),
     );
     $("#soundfont-filter")
       .on("keyup", onOptionBoxFilter)
@@ -753,7 +739,7 @@ export function createSortController(generators) {
     waveformSliders.a = Helper.createSlider(
       "#waveform-adshr-attack-container",
       {
-        value: waveform[selected.waveform].a,
+        value: waveform[getSelected().waveform].a,
         min: 10,
         max: 500,
         step: 5,
@@ -763,7 +749,7 @@ export function createSortController(generators) {
     waveformSliders.d = Helper.createSlider(
       "#waveform-adshr-decay-container",
       {
-        value: waveform[selected.waveform].d,
+        value: waveform[getSelected().waveform].d,
         min: 10,
         max: 2000,
         step: 5,
@@ -773,7 +759,7 @@ export function createSortController(generators) {
     waveformSliders.s = Helper.createSlider(
       "#waveform-adshr-sustain-container",
       {
-        value: waveform[selected.waveform].s,
+        value: waveform[getSelected().waveform].s,
         min: 0,
         max: 1,
         step: 0.01,
@@ -783,7 +769,7 @@ export function createSortController(generators) {
     waveformSliders.h = Helper.createSlider(
       "#waveform-adshr-hold-container",
       {
-        value: waveform[selected.waveform].h,
+        value: waveform[getSelected().waveform].h,
         min: 10,
         max: 3000,
         step: 5,
@@ -793,7 +779,7 @@ export function createSortController(generators) {
     waveformSliders.r = Helper.createSlider(
       "#waveform-adshr-release-container",
       {
-        value: waveform[selected.waveform].r,
+        value: waveform[getSelected().waveform].r,
         min: 10,
         max: 3000,
         step: 5,
@@ -810,7 +796,7 @@ export function createSortController(generators) {
     // handle button clicks
     $("#audio-type-container .btn").on("click", onAudioTypeButtonClick);
     $("#audio-type-tab-link").on("click", onAudioTypeTabLinkClick);
-    $('#audio-type-container .btn[data-audio-type="' + selected.audioType + '"]').click();
+    $('#audio-type-container .btn[data-audio-type="' + getSelected().audioType + '"]').click();
     $("#waveform .btn-group .btn").on("click", onWaveformButtonClick);
     $("span[data-midi-export]").on("click", onMidiExportClick);
     $("#midi-export-btn").on("click", onMidiSave);
@@ -821,14 +807,14 @@ export function createSortController(generators) {
     $("#base-buttons").on("click", ".btn", onAudioDataButton);
     $("#sort-options").on("click", "li", onSortOptionSelected);
     $(".sort-visualization").on("click", onSortVisualizationButton);
-    $("#sort-options [data-sort=" + selected.sort + "]").click();
+    $("#sort-options [data-sort=" + getSelected().sort + "]").click();
     // draw envelope canvas
     players.base.drawWaveformCanvases();
     // update slider selction text
-    updateDisplayCache("#volume-display", selected.volume);
-    updateDisplayCache("#tempo-display", selected.tempo);
-    updateDisplayCache("#center-note-display", selected.centerNote, getNoteName);
-    updateDisplayCache("#data-size-display", selected.dataSize);
+    updateDisplayCache("#volume-display", getSelected().volume);
+    updateDisplayCache("#tempo-display", getSelected().tempo);
+    updateDisplayCache("#center-note-display", getSelected().centerNote, getNoteName);
+    updateDisplayCache("#data-size-display", getSelected().dataSize);
   };
 
   return Sort;
