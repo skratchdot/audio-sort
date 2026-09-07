@@ -19,8 +19,6 @@
 - Fix the play intervalCallback() function. Shouldn't be looping so much in there. The
   program was running faster before I re-factored a bunch of stuff and added this stupid loop.
 
-- Correct Quick's stability metadata and remove its expected-failure test.
-
 - Review engine frame-recording quirks and shared bar-pointer state.
 
 ## Maintenance ideas

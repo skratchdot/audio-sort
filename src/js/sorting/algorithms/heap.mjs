@@ -83,5 +83,6 @@ heap.stable = false;
 heap.best = "n";
 heap.worst = "nlogn";
 heap.average = "nlogn";
-heap.memory = "1";
+// Recursive heapify uses a logarithmic call stack.
+heap.memory = "logn";
 heap.method = "heap";

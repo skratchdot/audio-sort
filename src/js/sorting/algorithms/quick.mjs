@@ -77,9 +77,10 @@ export default function quick(AS) {
 }
 
 quick.display = "Quick";
-quick.stable = true;
-quick.best = "n";
-quick.average = "n^2";
+quick.stable = false;
+quick.best = "nlogn";
+quick.average = "nlogn";
 quick.worst = "n^2";
-quick.memory = "1";
+// Worst-case auxiliary stack space; balanced partitions use O(log n).
+quick.memory = "n";
 quick.method = "exchanging";
