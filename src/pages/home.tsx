@@ -7,7 +7,7 @@ export function Home() {
   useEffect(() => {
     let cancelled = false;
     // Audio/editor code is browser-only; never evaluate it during prerendering.
-    void import("../js/main.tsx")
+    void import("../main.tsx")
       .then(({ BrowserWorkspace }) => {
         if (!cancelled) setWorkspace(() => BrowserWorkspace);
       })

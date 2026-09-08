@@ -49,7 +49,7 @@ prototype is deferred and is not the implementation target.
 
 No third-party JavaScript is served from `public/js/` or read from `globalThis`.
 Dependencies come from pnpm package imports; application replacements live in
-`src/js/`. Moving copied vendor scripts into `src/js/` is not a replacement.
+`src/`. Moving copied vendor scripts into `src/` is not a replacement.
 Retain required attribution for adapted data/code. Package-managed assets such
 as Ace workers may be emitted by the build; they are not manually vendored files.
 

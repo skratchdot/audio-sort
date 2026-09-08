@@ -28,7 +28,7 @@ export default defineConfig({
       env: { node: false, browser: true },
     },
     {
-      files: ["src/js/worker.mjs"],
+      files: ["src/worker.mjs"],
       env: { browser: false, worker: true },
     },
   ],

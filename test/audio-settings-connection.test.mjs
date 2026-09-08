@@ -1,8 +1,8 @@
 import { expect, test, vi } from "vitest";
 import { createStore } from "jotai/vanilla";
-import { connectAudioSettings } from "../src/js/ui/connect-audio-settings.ts";
-import { updateSettingAtom } from "../src/js/state/settings.ts";
-import { updateEnvelopeAtom } from "../src/js/state/envelope.ts";
+import { connectAudioSettings } from "../src/ui/connect-audio-settings.ts";
+import { updateSettingAtom } from "../src/state/settings.ts";
+import { updateEnvelopeAtom } from "../src/state/envelope.ts";
 
 const createEffects = () => ({
   render: vi.fn(),

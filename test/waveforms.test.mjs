@@ -1,10 +1,10 @@
 import { expect, test, vi } from "vitest";
 import { createStore } from "jotai/vanilla";
-import { waveformDefaults, selectedWaveformAtom } from "../src/js/state/waveforms.ts";
-import { envelopeDefaults, envelopeAtom, updateEnvelopeAtom } from "../src/js/state/envelope.ts";
-import { updateSettingAtom } from "../src/js/state/settings.ts";
-import { createWorkspace } from "../src/js/ui/create-workspace.mjs";
-import { getEnvelopePoints, formatEnvelopeValue } from "../src/js/ui/envelope-diagram.ts";
+import { waveformDefaults, selectedWaveformAtom } from "../src/state/waveforms.ts";
+import { envelopeDefaults, envelopeAtom, updateEnvelopeAtom } from "../src/state/envelope.ts";
+import { updateSettingAtom } from "../src/state/settings.ts";
+import { createWorkspace } from "../src/ui/create-workspace.mjs";
+import { getEnvelopePoints, formatEnvelopeValue } from "../src/ui/envelope-diagram.ts";
 
 test("all eight generators use the shared defaults, including string", () => {
   const store = createStore();

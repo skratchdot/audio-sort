@@ -4,7 +4,7 @@ import {
   playbackPreferencesAtom,
   toggleAutoPlayAtom,
   toggleLoopAtom,
-} from "../src/js/state/playback-preferences.ts";
+} from "../src/state/playback-preferences.ts";
 
 test("playback preferences preserve defaults and are isolated by store and player", () => {
   const store = createStore();

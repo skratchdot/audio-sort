@@ -1,5 +1,5 @@
 import { expect, test, vi } from "vitest";
-import { createTimbreAudio } from "../src/js/audio/create-timbre-audio.mjs";
+import { createTimbreAudio } from "../src/audio/create-timbre-audio.mjs";
 
 function setup() {
   const nodes = [];

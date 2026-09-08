@@ -38,7 +38,7 @@ The existing workspace, runtime, and visual design are retained.
 
 - `src/routes/` defines the three pages; Start generates `src/route-tree.gen.ts`.
 - `src/pages/site-document.tsx` renders the shared header/footer and document.
-- `src/pages/home.tsx` dynamically imports `src/js/main.tsx` after hydration.
+- `src/pages/home.tsx` dynamically imports `src/main.tsx` after hydration.
   It renders the workspace within Start's React root; runtime lifecycle cleanup
   handles navigation away, cached pages, and remounts. Audio/editor modules never
   execute during prerendering.
