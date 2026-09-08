@@ -47,9 +47,10 @@ Use `lg:` for the application's stacked/side-by-side layout; avoid adding extra 
 
 ## Checks
 
-`pnpm run check` runs lint, formatting checks, TypeScript checking, unit tests, and a production build.
+`pnpm run check` runs lint, formatting and spelling checks, TypeScript checking, unit tests, and a production build.
 
 - `pnpm run lint`: check first-party JavaScript and TypeScript with Oxlint.
+- `pnpm run spellcheck`: check spelling in source, docs, and configuration with CSpell.
 - `pnpm run typecheck`: check TypeScript modules and React pages with strict settings; no files are emitted.
 - `pnpm run format`: format with Oxfmt; `pnpm run format:check` checks without editing.
 - `pnpm test`: run unit tests; `pnpm run test:watch` reruns them while editing.
@@ -77,6 +78,33 @@ Browser tests serve the completed production build at `/audio-sort/`.
 They cover page URLs, workers, editor behavior,
 and UI controls. External services are stubbed; audible output and remote soundfonts
 need manual testing. Known bugs are tracked in [TODO](todo.md).
+
+## Spelling
+
+`cspell.config.ts` is the shared spelling configuration. CSpell loads TypeScript
+natively with our supported Node version; no extra loader is needed. Checks use
+US English, respect `.gitignore`, and exclude lock files, generated routes, and
+public assets. The original scale catalogue (`src/midi/scales.ts`) is also excluded
+instead of maintaining a dictionary of its names. Spelling also runs in CI through `pnpm run check`.
+
+Keep accepted vocabulary in version control:
+
+- `.cspell/project.txt`: project names, dependencies, and sorting terminology.
+- `.cspell/music.txt`: instrument terminology.
+- Config `overrides`: terms specific to a file or group, such as names in README references.
+
+Keep dictionary files lowercase and alphabetized, one word per line. Fix real typos before
+adding words; do not accept an entire error report automatically. Use a narrow
+`cspell:disable-next-line` directive with an explanation for non-language data
+such as binary signatures, rather than disabling a whole file. Avoid broad regex
+exclusions that hide prose or comments.
+
+The optional VS Code Code Spell Checker extension can use the same configuration
+(use a current version). Add shared terms to the repository dictionaries, not a
+personal editor word list, so local checks and CI agree.
+
+See CSpell's [configuration reference](https://cspell.org/docs/Configuration) and
+[custom dictionary example](https://cspell.org/docs/getting-started).
 
 ## Deployment
 

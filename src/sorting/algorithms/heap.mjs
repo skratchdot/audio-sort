@@ -1,5 +1,5 @@
 export default function heap(AS) {
-  // Reference Introduction To Algorithms 3rd ed, Corment et al., Chapter 6
+  // Reference Introduction To Algorithms 3rd ed, Cormen et al., Chapter 6
 
   // run heapsort! (pg 160 in book)
   function heapsort() {
