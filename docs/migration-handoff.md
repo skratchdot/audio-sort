@@ -16,8 +16,8 @@ PR #47 migrated the whole playground; PR #48 polished icons, hover states, and t
 - The playground uses a reusable vanilla Jotai store.
 - `components/playground/sorting-playground.tsx` assembles settings, playback controls, and dialogs.
 - `controllers/create-playground.mjs` owns worker/data coordination and audio subscriptions.
-- `controllers/create-player.mjs` bridges the existing transport/audio modules and D3.
-- React owns controls; D3 owns SVG children; audio draws the waveform canvas.
+- `controllers/create-player.mjs` bridges transport/audio modules and publishes chart snapshots.
+- React owns controls and SVG children; audio draws the waveform canvas.
 - Settings/algorithm overrides stay in Jotai. Playback snapshots use `useSyncExternalStore`.
 - Native ranges replace plugin sliders; native dialogs handle editing and MIDI export.
 - Lazy Ace loading, invalid-source errors, focus restoration, cached-page suspension,
@@ -67,7 +67,7 @@ system font, and maps the light theme to Tailwind sky/neutral colors.
 
 - `src/components/ui/`: shared primitives; `components/layout/`: header/footer.
 - `src/components/playground/` and `src/components/dialogs/`: controls and dialogs; `src/controllers/`: runtime coordination.
-- `src/styles/globals.css`: theme/document defaults; `visualizations.css`: D3 state styles.
+- `src/styles/globals.css`: theme/document defaults; chart styling lives in React components.
 - `site.css` and the `tw:` prefix are removed. Buttons and links own their Tailwind classes.
 - Two playground layouts use one 1024px threshold; chart heights are fluid.
 - Tab panels stay mounted for Ace/canvas lifetime. Slider thumbs use center alignment

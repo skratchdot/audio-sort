@@ -1,13 +1,13 @@
+import { EnvelopeChart } from "../visualizations/envelope-chart";
 import { Button } from "@/components/ui/button";
 import { ValueSlider } from "@/components/value-slider";
-import { useLayoutEffect, useRef } from "react";
 import { Field } from "@base-ui/react/field";
 import { useAtomValue, useSetAtom } from "jotai";
 import type { createStore } from "jotai/vanilla";
 import { settingsAtom, updateSettingAtom } from "../../state/settings.ts";
 import { envelopeAtom, updateEnvelopeAtom, type EnvelopeKey } from "../../state/envelope.ts";
 import { waveformDefaults, type WaveformId } from "../../state/waveforms.ts";
-import { drawEnvelopeDiagram, formatEnvelopeValue } from "../../audio/envelope-diagram.ts";
+import { formatEnvelopeValue } from "../../audio/envelope.ts";
 
 type Store = ReturnType<typeof createStore>;
 const controls: ReadonlyArray<{
@@ -63,23 +63,11 @@ export function WaveformControls({ store }: { store: Store }) {
   const envelope = useAtomValue(envelopeAtom, { store });
   const updateSetting = useSetAtom(updateSettingAtom, { store });
   const updateEnvelope = useSetAtom(updateEnvelopeAtom, { store });
-  const diagram = useRef<SVGSVGElement>(null);
-  useLayoutEffect(() => {
-    if (diagram.current) drawEnvelopeDiagram(diagram.current, envelope);
-  }, [envelope]);
 
   return (
     <div className="grid grid-cols-2 gap-3">
       <div className="waveform-section col-start-2 row-start-1 min-w-0">
-        <svg
-          ref={diagram}
-          id="envelope-diagram"
-          className="mb-2 h-16 w-full rounded-lg border bg-neutral-50 [&_text]:hidden"
-          role="img"
-          viewBox="35 25 350 135"
-          aria-label="Amplitude envelope"
-          preserveAspectRatio="none"
-        />
+        <EnvelopeChart envelope={envelope} />
         {/* The audio adapter alone draws this canvas; React never owns its pixels. */}
         <canvas
           id="waveform-canvas"

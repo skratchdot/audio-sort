@@ -26,9 +26,9 @@ TypeScript is introduced incrementally alongside `.mjs` modules. Vite handles
 bundling; `pnpm run typecheck` checks `.ts` and `.tsx` application modules separately.
 Built-in algorithm source and the Ace editor remain JavaScript for now.
 
-Generator implementations live in `generators/patterns/`; visualization
-implementations live in `visualizations/renderers/`. Their named registries sit
-one level above, separate from the implementations they register.
+Generator implementations live in `generators/patterns/`. React charts live in
+`components/visualizations/`; pure trajectory geometry and visualization names live
+in `visualizations/`. Neither the registry nor geometry code touches the DOM.
 
 ## UI
 
@@ -44,7 +44,7 @@ without JavaScript. `src/client.tsx` hydrates the document.
 vanilla Jotai store. React owns settings, tabs, transport controls, counters,
 sliders, and dialogs. Shared buttons, links, and option controls use Tailwind classes.
 `styles/globals.css` holds the shadcn theme and document defaults;
-`styles/visualizations.css` styles D3-owned SVG children. There is no `site.css`.
+Chart components use Tailwind fill/stroke classes. There is no separate visualization stylesheet.
 The light theme uses sky accents and neutral surfaces. Playground layout uses one
 threshold (`lg`, 1024px): stacked below it, side-by-side above it. Chart heights
 are fluid, bounded with `clamp()`, without height-specific media queries.
@@ -55,10 +55,13 @@ React reads its playback snapshots through `useSyncExternalStore`. Settings and
 custom algorithms are read directly from Jotai; there is no mirrored settings cache.
 Audio clocks and nodes remain outside React and Jotai.
 
-[`create-player.mjs`](../src/controllers/create-player.mjs) owns
-the contents of its D3 SVG and delegates transport and synthesis to
+[`create-player.mjs`](../src/controllers/create-player.mjs) publishes recorded frames,
+position, and renderer selection and delegates transport and synthesis to
 `audio/create-transport.ts` and `audio/create-timbre-audio.mjs`.
-React renders the surrounding controls and an empty SVG host, never chart children.
+React subscribes to player snapshots and renders all SVG children, including markers
+and the envelope diagram. Trajectory geometry is memoized by frame data; playback
+only changes active colors. D3 remains for pure array, scale, color, and path helpers,
+not selections or DOM mutations.
 The waveform preview canvas has the same explicit imperative ownership.
 Pointer capture supports dragging input values across data updates.
 
@@ -80,7 +83,7 @@ Cached-page suspension disconnects runtime effects, pauses audio, cancels worker
 and pending resumes, and closes dialogs. Returning reconnects effects without
 automatically playing. React continues to represent the same Jotai store.
 Non-cached exits and Home effect cleanup unmount the playground, dispose owned resources, and
-release native pointer listeners. Fresh runtime instances can reuse the store.
+release chart pointer state. Fresh runtime instances can reuse the store.
 The shared AudioContext stays library-owned.
 
 All third-party JavaScript uses package imports. `audio/timbre.mjs` only re-exports the

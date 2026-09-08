@@ -555,7 +555,7 @@ for (const fallback of [false, true]) {
   });
 }
 
-test("D3 joins resize bars, markers, and paths without stale elements", async ({ page }) => {
+test("React charts resize bars, markers, and paths without stale elements", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("./");

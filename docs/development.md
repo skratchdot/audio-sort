@@ -37,8 +37,8 @@ to `dist/audio-sort/` without a `public/` URL prefix. Use `/img/...` in source C
 adjusts these URLs for the deployment path. Application modules and CSS stay in `src/`.
 
 CSS is bundled and minified by Vite. `src/styles/globals.css` contains Tailwind and
-shadcn theme tokens; component classes own layout and control styling. D3-specific
-styles live in `src/styles/visualizations.css`.
+shadcn theme tokens; component classes own layout, controls, and SVG chart styling.
+React chart components live in `src/components/visualizations/`.
 
 Add primitives with `pnpm dlx shadcn@latest add <component>`. `components.json`
 selects Base UI, the Nova preset, neutral base colors, and Lucide icons. Keep shared

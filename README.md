@@ -34,7 +34,7 @@ See [development documentation](docs/development.md) for browser tests and deplo
 ## Built With
 
 - [timbre.js](https://mohayonao.github.io/timbre.js/) — Synthesizes tones and plays soundfont instruments for sorting playback.
-- [D3](https://d3js.org/) — Draws SVG bars, markers, and paths using modular selection, scale, color, shape, and array utilities.
+- [D3](https://d3js.org/) — Provides scale, color, path geometry, and array utilities; React renders the SVG charts.
 - [Jotai](https://jotai.org/) — Stores selected audio and sorting settings independently of the UI.
 - [React](https://react.dev/) — Renders settings, playback controls, and editing/export dialogs.
 - [TanStack Start](https://tanstack.com/start) — Prerenders the React pages for static hosting.

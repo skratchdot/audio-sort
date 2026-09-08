@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import { createPlayground } from "../src/controllers/create-playground.mjs";
 import { createHelpers } from "../src/controllers/create-helpers.mjs";
 import { createPlayer } from "../src/controllers/create-player.mjs";
-import { visualizations } from "../src/visualizations/visualization-registry.mjs";
+import { visualizations } from "../src/visualizations/visualization-types.ts";
 
 test("UI modules import without DOM initialization or first-party globals", () => {
   for (const name of ["A", "visualization"]) expect(Object.hasOwn(globalThis, name)).toBe(false);

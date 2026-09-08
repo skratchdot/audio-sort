@@ -4,7 +4,7 @@ import { waveformDefaults, selectedWaveformAtom } from "../src/state/waveforms.t
 import { envelopeDefaults, envelopeAtom, updateEnvelopeAtom } from "../src/state/envelope.ts";
 import { updateSettingAtom } from "../src/state/settings.ts";
 import { createPlayground } from "../src/controllers/create-playground.mjs";
-import { getEnvelopePoints, formatEnvelopeValue } from "../src/audio/envelope-diagram.ts";
+import { getEnvelopePoints, formatEnvelopeValue } from "../src/audio/envelope.ts";
 
 test("all eight generators use the shared defaults, including string", () => {
   const store = createStore();

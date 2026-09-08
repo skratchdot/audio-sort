@@ -1,7 +1,8 @@
+import { PlayerChart } from "../visualizations/player-chart";
 import { PlayerSection } from "./player-section";
 import { SortSidebar } from "./sort-sidebar";
 import { Button } from "@/components/ui/button";
-import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useState, useSyncExternalStore } from "react";
 import { Settings } from "./settings-controls.tsx";
 import { Transport, Scrubber } from "./playback-controls.tsx";
 import { AlgorithmDialog } from "../dialogs/algorithm-dialog.tsx";
@@ -11,8 +12,6 @@ type Modal = "sort" | "add-algorithm" | "midi-export" | null;
 export function SortingPlayground({ runtime }: Props) {
   const error = useSyncExternalStore(runtime.subscribe, () => runtime.getSnapshot().error);
   const suspended = useSyncExternalStore(runtime.subscribe, () => runtime.getSnapshot().suspended);
-  const base = useRef<SVGSVGElement>(null);
-  const sort = useRef<SVGSVGElement>(null);
   const [modal, setModal] = useState<Modal>(null);
   const [exportId, setExportId] = useState<PlayerId>("base");
   useEffect(
@@ -24,8 +23,6 @@ export function SortingPlayground({ runtime }: Props) {
   );
   useLayoutEffect(() => {
     runtime.mount({
-      base: base.current,
-      sort: sort.current,
       canvas: document.getElementById("waveform-canvas"),
     });
     return () => runtime.destroy();
@@ -47,7 +44,7 @@ export function SortingPlayground({ runtime }: Props) {
           <div className="min-w-0">
             <Transport runtime={runtime} id="base" />
             <div id="base-chart" className="my-3 h-[clamp(12rem,24vh,17rem)]">
-              <svg ref={base} id="base-svg" aria-label="Input data visualization" />
+              <PlayerChart runtime={runtime} id="base" />
             </div>
             <Scrubber runtime={runtime} id="base" />
             <div id="base-buttons" className="mt-3 flex flex-wrap justify-center gap-1">
@@ -88,7 +85,7 @@ export function SortingPlayground({ runtime }: Props) {
           <div className="min-w-0">
             <Transport runtime={runtime} id="sort" />
             <div id="sort-chart" className="my-3 h-[clamp(12rem,24vh,17rem)]">
-              <svg ref={sort} id="sort-svg" aria-label="Sorting visualization" />
+              <PlayerChart runtime={runtime} id="sort" />
             </div>
             <Scrubber runtime={runtime} id="sort" />
           </div>

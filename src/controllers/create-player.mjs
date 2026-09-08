@@ -1,23 +1,14 @@
 import { createTimbreAudio } from "../audio/create-timbre-audio.mjs";
 import { createTransport } from "../audio/create-transport.ts";
 import { timbre } from "../audio/timbre.mjs";
-import { select } from "d3-selection";
-import { visualizations } from "../visualizations/visualization-registry.mjs";
+import { visualizations } from "../visualizations/visualization-types.ts";
 import { createMidiBytes } from "../midi/create-midi-bytes.mjs";
 import { drawStringPreview } from "../audio/string-preview.ts";
 
-// Owns only the D3 SVG contents and audio resources. React owns all controls.
-export function createPlayer({
-  svg,
-  settings,
-  getMidiNumber,
-  soundfont,
-  isLooping,
-  onUpdate,
-  onEdit,
-}) {
+// Owns transport and audio resources; React renders the published chart data.
+export function createPlayer({ settings, getMidiNumber, soundfont, isLooping, onUpdate }) {
   let data = [];
-  let visualization;
+  /** @type {import('../visualizations/visualization-types.ts').VisualizationType} */
   let renderer = "bar";
   let disposed = false;
   const audio = createTimbreAudio(
@@ -29,9 +20,11 @@ export function createPlayer({
   );
   const draw = () => {
     const position = transport.getPosition();
-    const frame = visualization?.draw(position);
+    const frame = data[position];
     onUpdate({
       position,
+      frames: data,
+      renderer,
       length: data.length,
       compare: frame?.compareCount || 0,
       compareMax: data.at(-1)?.compareCount || 0,
@@ -51,38 +44,10 @@ export function createPlayer({
     },
   });
   audio.refresh();
-  const events = new AbortController();
-  if (onEdit) {
-    for (const [event, method] of [
-      ["pointermove", "onMouseMove"],
-      ["pointerleave", "onMouseOut"],
-      ["pointerdown", "onMouseDown"],
-      ["pointerup", "onMouseUp"],
-      ["pointercancel", "onMouseUp"],
-    ]) {
-      svg.addEventListener(
-        event,
-        (e) => {
-          if (event === "pointerdown") svg.setPointerCapture(e.pointerId);
-          visualization?.[method]?.(e);
-        },
-        { signal: events.signal },
-      );
-    }
-  }
-  const setVisualization = (name, reset = false) => {
+  /** @param {import('../visualizations/visualization-types.ts').VisualizationType} name */
+  const setVisualization = (name) => {
     if (!Object.hasOwn(visualizations, name)) return;
-    if (renderer === name && visualization?.setData && reset) visualization.setData(data);
-    else if (renderer !== name || reset || !visualization) {
-      renderer = name;
-      svg.replaceChildren();
-      visualization = visualizations[name]({
-        data,
-        svg: select(svg),
-        hasMarkers: !onEdit,
-        onClick: onEdit,
-      });
-    }
+    renderer = name;
     draw();
   };
   return {
@@ -90,7 +55,7 @@ export function createPlayer({
       if (disposed) return;
       data = value;
       transport.setLength(data.length);
-      setVisualization(renderer, true);
+      draw();
     },
     setVisualization,
     seek(value) {
@@ -112,7 +77,6 @@ export function createPlayer({
     },
     suspend() {
       transport.suspend();
-      visualization?.onMouseUp?.();
       draw();
     },
     setTempo: transport.setTempo,
@@ -129,12 +93,9 @@ export function createPlayer({
     destroy() {
       if (disposed) return;
       disposed = true;
-      events.abort();
       transport.dispose();
       audio.dispose();
-      svg.replaceChildren();
       data = [];
-      visualization = null;
     },
   };
 }

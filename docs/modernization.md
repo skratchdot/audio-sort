@@ -106,7 +106,9 @@ editor runtime. Client navigation unmounts the playground when leaving Home.
 The current UI refinement adds shadcn Base UI (Nova preset) before phase 8.
 Shared primitives live in `components/ui/`; playground components, dialogs, and
 runtime modules live in `components/playground/`, `components/dialogs/`, and `controllers/`, respectively. Tailwind component classes replace
-`site.css`, with sky/neutral theme tokens and a small D3 stylesheet. One `lg`
+`site.css`, with sky/neutral theme tokens. React now renders chart SVG children
+and the envelope diagram with Tailwind classes; D3 only supplies pure utilities.
+The intermediate D3 stylesheet and DOM renderer implementations are removed. One `lg`
 threshold separates stacked and side-by-side layouts; chart heights use `clamp()`.
 Review the larger controls, dialog behavior, and laptop/mobile layouts before merging.
 
