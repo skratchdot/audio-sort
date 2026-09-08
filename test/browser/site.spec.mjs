@@ -857,6 +857,8 @@ test("soundfonts decode native audio and play buffered notes without JSONP", asy
   const wav = Buffer.alloc(44 + frames * 4);
   wav.write("RIFF", 0);
   wav.writeUInt32LE(wav.length - 8, 4);
+  // WAV chunk identifiers, not prose.
+  // cspell:disable-next-line
   wav.write("WAVEfmt ", 8);
   wav.writeUInt32LE(16, 16);
   wav.writeUInt16LE(1, 20);

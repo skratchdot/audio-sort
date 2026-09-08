@@ -19,7 +19,7 @@ export function About() {
         </p>
         <p>
           I plan on adding a few more features, and getting a longer list of default sorting
-          algoritms to choose from. You can currently tweak the existing algorithms, (or add your
+          algorithms to choose from. You can currently tweak the existing algorithms, (or add your
           own) to hear what small changes sound like.
         </p>
         <p>
