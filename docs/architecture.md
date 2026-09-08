@@ -1,6 +1,6 @@
 # Architecture
 
-Modules in `src/js/` use lowercase, hyphen-separated filenames. `ui/` contains
+Modules in `src/` use lowercase, hyphen-separated filenames. `ui/` contains
 React components and runtime/player modules, `sorting/` the engine and request handling, and
 `sorting/algorithms/` only algorithm implementations. Generators, utilities,
 MIDI support, and visualizations each have their own directory. The app entry,
@@ -24,19 +24,19 @@ JavaScript. Audio and editor dependencies are dynamically imported by
 Home's effect, never evaluated during server prerendering. About/API remain usable
 without JavaScript. `src/client.tsx` hydrates the document.
 
-[`main.tsx`](../src/js/main.tsx) owns the browser workspace lifecycle with an application-scoped
+[`main.tsx`](../src/main.tsx) owns the browser workspace lifecycle with an application-scoped
 vanilla Jotai store. React owns settings, tabs, transport controls, counters, native
 range inputs, and dialogs. Components are split into settings, waveform, playback,
 and dialog modules under `ui/`. Tailwind Preflight/utilities and first-party
 `site.css` preserve the two-section design; no Bootstrap or jQuery is shipped.
 
-[`create-workspace.mjs`](../src/js/ui/create-workspace.mjs) coordinates workers,
+[`create-workspace.mjs`](../src/ui/create-workspace.mjs) coordinates workers,
 data generation, settings subscriptions, soundfont preloading, and player lifetime.
 React reads its playback snapshots through `useSyncExternalStore`. Settings and
 custom algorithms are read directly from Jotai; there is no mirrored settings cache.
 Audio clocks and nodes remain outside React and Jotai.
 
-[`create-workspace-player.mjs`](../src/js/ui/create-workspace-player.mjs) owns
+[`create-workspace-player.mjs`](../src/ui/create-workspace-player.mjs) owns
 the contents of its D3 SVG and delegates transport and synthesis to
 `audio/create-transport.ts` and `audio/create-timbre-audio.mjs`.
 React renders the surrounding controls and an empty SVG host, never chart children.
@@ -69,17 +69,17 @@ modules; see [the audio boundary](audio-dependencies.md).
 
 ## Engine and workers
 
-[`create-sort-engine.ts`](../src/js/sorting/create-sort-engine.ts) exports `createSortEngine()`. Each default sort request
+[`create-sort-engine.ts`](../src/sorting/create-sort-engine.ts) exports `createSortEngine()`. Each default sort request
 gets a fresh engine so recorded frames, counters, and custom API changes do not
 leak between requests. `engine.init()` resets recording state, but does not undo
 changes to engine methods when deliberately reusing an instance.
 
-[`sort-types.ts`](../src/js/sorting/sort-types.ts) defines items, frames, the
+[`sort-types.ts`](../src/sorting/sort-types.ts) defines items, frames, the
 algorithm-facing API, and request/response contracts. Operations accept indices
 or item references; callers remain responsible for valid indices. The recorder
 preserves the legacy extra terminal frame for nonempty sorts.
 
-[`sort-requests.ts`](../src/js/sorting/sort-requests.ts) handles two message types:
+[`sort-requests.ts`](../src/sorting/sort-requests.ts) handles two message types:
 
 - Built-in: `{ key, type: "builtin", id, arr }` runs an imported algorithm.
 - Custom: `{ key, type: "custom", source, arr }` compiles an editor body with
@@ -91,13 +91,13 @@ JavaScript, not a security sandbox.
 
 ## Algorithms and editor source
 
-[`algorithm-registry.mjs`](../src/js/sorting/algorithm-registry.mjs) holds immutable built-in functions and
-metadata. [`state/algorithm-overrides.ts`](../src/js/state/algorithm-overrides.ts)
+[`algorithm-registry.mjs`](../src/sorting/algorithm-registry.mjs) holds immutable built-in functions and
+metadata. [`state/algorithm-overrides.ts`](../src/state/algorithm-overrides.ts)
 stores edits and additions per application store and derives a combined catalog.
 Built-in identities stay intact until overridden; invalid source is compiled
 before any state update. Duplicate IDs are rejected rather than replacing an
 existing entry. Function metadata and editor source format are unchanged.
-[`algorithm-sources.mjs`](../src/js/sorting/algorithm-sources.mjs) imports raw source separately so the
+[`algorithm-sources.mjs`](../src/sorting/algorithm-sources.mjs) imports raw source separately so the
 editor shows readable code without including those strings in the worker bundle.
 Saving an edit creates a custom override and preserves its display metadata.
 

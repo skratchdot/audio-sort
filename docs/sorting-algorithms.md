@@ -7,7 +7,7 @@ keep appearing. This catalog covers the named sorts in Wikipedia's
 plus additional variants, networks, and external sorts. Each algorithm name links to
 its Wikipedia article or the relevant parent article when it has no separate page.
 
-Implementation status checked against the [registry](../src/js/sorting/algorithm-registry.mjs)
+Implementation status checked against the [registry](../src/sorting/algorithm-registry.mjs)
 on 2026-09-07. Only registered built-ins count as implemented; historical files and
 custom editor examples do not.
 
@@ -41,16 +41,16 @@ not an endorsement of their accuracy.
 The catalog below describes algorithm properties separately so stale labels do not
 become requirements for new implementations.
 
-| Name / source                                                       | Stable | Best    | Average          | Worst   | Memory | Method     |
-| ------------------------------------------------------------------- | ------ | ------- | ---------------- | ------- | ------ | ---------- |
-| [Bubble](../src/js/sorting/algorithms/bubble.mjs)                   | Yes    | n       | n²               | n²      | 1      | exchanging |
-| [Cocktail shaker](../src/js/sorting/algorithms/cocktail-shaker.mjs) | Yes    | n       | n²               | n²      | 1      | exchanging |
-| [Comb](../src/js/sorting/algorithms/comb.mjs)                       | No     | n log n | n² (upper bound) | n²      | 1      | exchanging |
-| [Gnome](../src/js/sorting/algorithms/gnome.mjs)                     | Yes    | n       | n²               | n²      | 1      | exchanging |
-| [Heap](../src/js/sorting/algorithms/heap.mjs)                       | No     | n       | n log n          | n log n | log n  | heap       |
-| [Insertion](../src/js/sorting/algorithms/insertion.mjs)             | Yes    | n²      | n²               | n²      | 1      | insertion  |
-| [Quick](../src/js/sorting/algorithms/quick.mjs)                     | No     | n log n | n log n          | n²      | n      | exchanging |
-| [Selection](../src/js/sorting/algorithms/selection.mjs)             | No     | n²      | n²               | n²      | 1      | selection  |
+| Name / source                                                    | Stable | Best    | Average          | Worst   | Memory | Method     |
+| ---------------------------------------------------------------- | ------ | ------- | ---------------- | ------- | ------ | ---------- |
+| [Bubble](../src/sorting/algorithms/bubble.mjs)                   | Yes    | n       | n²               | n²      | 1      | exchanging |
+| [Cocktail shaker](../src/sorting/algorithms/cocktail-shaker.mjs) | Yes    | n       | n²               | n²      | 1      | exchanging |
+| [Comb](../src/sorting/algorithms/comb.mjs)                       | No     | n log n | n² (upper bound) | n²      | 1      | exchanging |
+| [Gnome](../src/sorting/algorithms/gnome.mjs)                     | Yes    | n       | n²               | n²      | 1      | exchanging |
+| [Heap](../src/sorting/algorithms/heap.mjs)                       | No     | n       | n log n          | n log n | log n  | heap       |
+| [Insertion](../src/sorting/algorithms/insertion.mjs)             | Yes    | n²      | n²               | n²      | 1      | insertion  |
+| [Quick](../src/sorting/algorithms/quick.mjs)                     | No     | n log n | n log n          | n²      | n      | exchanging |
+| [Selection](../src/sorting/algorithms/selection.mjs)             | No     | n²      | n²               | n²      | 1      | selection  |
 
 Quick's memory bound includes its worst-case recursive stack; balanced partitions
 use logarithmic space. Heap also includes its recursive heapify stack. Its linear

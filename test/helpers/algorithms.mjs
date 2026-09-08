@@ -1,11 +1,11 @@
 import { readdirSync } from "node:fs";
 import { createContext, runInContext } from "node:vm";
-import { algorithms } from "../../src/js/sorting/algorithm-registry.mjs";
-import { createSortEngine } from "../../src/js/sorting/create-sort-engine.ts";
+import { algorithms } from "../../src/sorting/algorithm-registry.mjs";
+import { createSortEngine } from "../../src/sorting/create-sort-engine.ts";
 
 const root = new URL("../../", import.meta.url);
 
-export const algorithmFiles = readdirSync(new URL("src/js/sorting/algorithms/", root))
+export const algorithmFiles = readdirSync(new URL("src/sorting/algorithms/", root))
   .filter((file) => file.endsWith(".mjs"))
   .sort();
 

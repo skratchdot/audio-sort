@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { handleSortRequest } from "../src/js/sorting/sort-requests.ts";
+import { handleSortRequest } from "../src/sorting/sort-requests.ts";
 
 test("worker responses contain frames on success", () => {
   const response = handleSortRequest({ key: 7, type: "builtin", id: "bubble", arr: [2, 1] });

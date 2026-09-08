@@ -1,8 +1,8 @@
 import { expect, test, vi } from "vitest";
 import { createStore } from "jotai/vanilla";
-import { connectPlaybackSettings } from "../src/js/ui/connect-playback-settings.ts";
-import { updateSettingAtom } from "../src/js/state/settings.ts";
-import { toggleAutoPlayAtom, toggleLoopAtom } from "../src/js/state/playback-preferences.ts";
+import { connectPlaybackSettings } from "../src/ui/connect-playback-settings.ts";
+import { updateSettingAtom } from "../src/state/settings.ts";
+import { toggleAutoPlayAtom, toggleLoopAtom } from "../src/state/playback-preferences.ts";
 
 const createEffects = () => ({ volume: vi.fn(), tempo: vi.fn(), preferences: vi.fn() });
 

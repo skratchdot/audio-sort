@@ -47,7 +47,7 @@ See [development documentation](docs/development.md) for browser tests and deplo
 ## See Also / Credits
 
 Musical scale data is adapted from [subcollider.js](https://github.com/mohayonao/subcollider).
-All 108 scales and the original license notice are preserved in [scales.ts](src/js/midi/scales.ts).
+All 108 scales and the original license notice are preserved in [scales.ts](src/midi/scales.ts).
 
 ### About Sorting Algorithms
 

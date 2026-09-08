@@ -1,5 +1,5 @@
 import { expect, test, vi } from "vitest";
-import { createTransport } from "../src/js/audio/create-transport.ts";
+import { createTransport } from "../src/audio/create-transport.ts";
 
 function setup(length = 3) {
   let tick;

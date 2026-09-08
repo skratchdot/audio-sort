@@ -1,5 +1,5 @@
 import { expect, test, vi } from "vitest";
-import { createSoundfont, soundfontUrl } from "../src/js/audio/create-soundfont.ts";
+import { createSoundfont, soundfontUrl } from "../src/audio/create-soundfont.ts";
 
 function setup(overrides = {}) {
   const sample = { play: vi.fn(), pause: vi.fn(), dispose: vi.fn() };

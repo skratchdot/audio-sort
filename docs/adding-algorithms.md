@@ -3,13 +3,13 @@
 See the [sorting algorithm catalog](sorting-algorithms.md) for candidates, complexity,
 stability, implementation status, and compatibility notes.
 
-1. Add `src/js/sorting/algorithms/<id>.mjs`, following an existing algorithm's default
+1. Add `src/sorting/algorithms/<id>.mjs`, following an existing algorithm's default
    function and metadata properties. Use its `AS` argument to record operations
    and animation frames; see the [engine API](../src/api.html).
 2. Import and register the function under a stable ID in
-   [`algorithm-registry.mjs`](../src/js/sorting/algorithm-registry.mjs).
+   [`algorithm-registry.mjs`](../src/sorting/algorithm-registry.mjs).
 3. Add a raw-source import and matching entry in
-   [`algorithm-sources.mjs`](../src/js/sorting/algorithm-sources.mjs) for the editor.
+   [`algorithm-sources.mjs`](../src/sorting/algorithm-sources.mjs) for the editor.
 4. Run `pnpm run check`, then `pnpm run test:browser`. See
    [Development](development.md) for browser setup.
 

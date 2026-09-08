@@ -1,16 +1,16 @@
 import { expect, test, vi } from "vitest";
 import { createStore } from "jotai/vanilla";
-import { algorithms } from "../src/js/sorting/algorithm-registry.mjs";
+import { algorithms } from "../src/sorting/algorithm-registry.mjs";
 import {
   algorithmCatalogAtom,
   editAlgorithmAtom,
   addAlgorithmAtom,
-} from "../src/js/state/algorithm-overrides.ts";
+} from "../src/state/algorithm-overrides.ts";
 import {
   createSortRequest,
   getFunctionBody,
   runSortRequest,
-} from "../src/js/sorting/sort-requests.ts";
+} from "../src/sorting/sort-requests.ts";
 
 test("unmodified catalogs retain built-in identities and direct worker requests", () => {
   const catalog = createStore().get(algorithmCatalogAtom);

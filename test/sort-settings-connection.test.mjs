@@ -1,8 +1,8 @@
 import { expect, test, vi } from "vitest";
 import { createStore } from "jotai/vanilla";
-import { connectSortSettings } from "../src/js/ui/connect-sort-settings.ts";
-import { updateSettingAtom } from "../src/js/state/settings.ts";
-import { addAlgorithmAtom, editAlgorithmAtom } from "../src/js/state/algorithm-overrides.ts";
+import { connectSortSettings } from "../src/ui/connect-sort-settings.ts";
+import { updateSettingAtom } from "../src/state/settings.ts";
+import { addAlgorithmAtom, editAlgorithmAtom } from "../src/state/algorithm-overrides.ts";
 
 const createEffects = () => ({
   catalog: vi.fn(),

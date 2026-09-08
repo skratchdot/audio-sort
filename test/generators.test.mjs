@@ -1,12 +1,12 @@
 import { describe, expect, test, vi } from "vitest";
 import { readdirSync } from "node:fs";
-import { generators } from "../src/js/generators/generator-registry.ts";
-import { instruments } from "../src/js/midi/instruments.ts";
+import { generators } from "../src/generators/generator-registry.ts";
+import { instruments } from "../src/midi/instruments.ts";
 
 const names = ["sorted", "reverse", "randomUnique", "randomDupes", "almostSorted", "fewUnique"];
 
 test("registry covers every generator without creating a global namespace", () => {
-  const files = readdirSync(new URL("../src/js/generators/patterns/", import.meta.url))
+  const files = readdirSync(new URL("../src/generators/patterns/", import.meta.url))
     .filter((file) => file.endsWith(".ts"))
     .map((file) => file.slice(0, -3).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase()));
   expect(Object.keys(generators).sort()).toEqual([...names].sort());

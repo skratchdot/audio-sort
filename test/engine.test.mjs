@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { createSortEngine } from "../src/js/sorting/create-sort-engine.ts";
+import { createSortEngine } from "../src/sorting/create-sort-engine.ts";
 
 test("preserves the final playback frame even when a nonempty sort does no work", () => {
   const engine = createSortEngine();
