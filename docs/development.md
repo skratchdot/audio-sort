@@ -93,7 +93,7 @@ Keep accepted vocabulary in version control:
 - `.cspell/music.txt`: instrument terminology.
 - Config `overrides`: terms specific to a file or group, such as names in README references.
 
-Keep dictionary files alphabetized, one word per line. Fix real typos before
+Keep dictionary files lowercase and alphabetized, one word per line. Fix real typos before
 adding words; do not accept an entire error report automatically. Use a narrow
 `cspell:disable-next-line` directive with an explanation for non-language data
 such as binary signatures, rather than disabling a whole file. Avoid broad regex
