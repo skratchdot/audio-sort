@@ -17,6 +17,10 @@ import { playbackPreferencesAtom, toggleLoopAtom } from "../state/playback-prefe
 import { createSortRequest, runSortRequest } from "../sorting/sort-requests.ts";
 
 const emptyPlayer = {
+  frames: /** @type {import('../sorting/sort-types.ts').SortFrame[]} */ ([]),
+  renderer: /** @type {import('../visualizations/visualization-types.ts').VisualizationType} */ (
+    "bar"
+  ),
   position: 0,
   length: 0,
   compare: 0,
@@ -55,6 +59,7 @@ export function createPlayground(store = createStore()) {
   const frames = () =>
     baseData.map((_, index) => ({
       arr: baseData.map((value, i) => ({
+        id: i,
         value,
         play: i === index,
         mark: false,
@@ -212,24 +217,11 @@ export function createPlayground(store = createStore()) {
       try {
         for (const id of ["base", "sort"]) {
           players[id] = createPlayer({
-            svg: elements[id],
             settings,
             getMidiNumber: helper.getMidiNumber,
             soundfont,
             isLooping: () => store.get(playbackPreferencesAtom).loop[id],
             onUpdate: (value) => publish({ [id]: value }),
-            onEdit:
-              id === "base"
-                ? (index, value) => {
-                    baseData[index] = value;
-                    maxData[index] = scaleLinear()
-                      .domain([0, baseData.length - 1])
-                      .range([0, maxData.length - 1])(value);
-                    players.base.setData(frames());
-                    clearTimeout(timer);
-                    timer = setTimeout(sort, 250);
-                  }
-                : null,
           });
         }
         generate("randomUnique");
@@ -238,6 +230,16 @@ export function createPlayground(store = createStore()) {
         this.destroy();
         throw error;
       }
+    },
+    edit(index, value) {
+      if (destroyed || suspended || !players || index < 0 || index >= baseData.length) return;
+      baseData[index] = value;
+      maxData[index] = scaleLinear()
+        .domain([0, baseData.length - 1])
+        .range([0, maxData.length - 1])(value);
+      players.base.setData(frames());
+      clearTimeout(timer);
+      timer = setTimeout(sort, 250);
     },
     action,
     seek(id, value) {

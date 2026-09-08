@@ -11,7 +11,7 @@ not start playback.
 `audio/create-timbre-audio.mjs` adapts the existing engine: interval creation,
 ADSHR and oscillator/pluck nodes, MIDI note triggers, gain, preview plotting,
 and node disposal. It accepts the engine and settings getters as dependencies.
-The player factory now connects those modules to sliders, buttons, and D3.
+The player factory connects those modules to React controls and chart snapshots.
 `audio/create-soundfont.ts` now owns a controller-scoped sample cache shared by
 both players. `audio/create-timbre-soundfont.mjs` decodes fetched MP3s with the
 existing AudioContext and feeds stereo buffers into the existing Timbre mixer.
