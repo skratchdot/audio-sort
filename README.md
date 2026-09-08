@@ -4,7 +4,7 @@ A webpage to visualize and audibilize sorting algorithms using javascript.
 
 [![Audio Sort][2]][1]
 
-[1]: https://projects.skratchdot.com/audio-sort/index.html
+[1]: https://projects.skratchdot.com/audio-sort/
 [2]: https://projects.skratchdot.com/audio-sort/img/preview.jpg
 
 ## Development
@@ -23,7 +23,7 @@ See [development documentation](docs/development.md) for browser tests and deplo
 
 ## Audio Sort Links
 
-- [Live Demo](https://projects.skratchdot.com/audio-sort/index.html)
+- [Live Demo](https://projects.skratchdot.com/audio-sort/)
 
 - [Project Page / Comments](https://skratchdot.com/projects/audio-sort/)
 
