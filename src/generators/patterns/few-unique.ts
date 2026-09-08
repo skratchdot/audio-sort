@@ -1,4 +1,4 @@
-import shuffle from "../../utilities/shuffle.ts";
+import shuffle from "../../utils/shuffle.ts";
 
 const fewUniqueSize = 4;
 

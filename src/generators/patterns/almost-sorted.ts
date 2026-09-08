@@ -1,6 +1,6 @@
 import sorted from "./sorted.ts";
-import random from "../../utilities/random.ts";
-import swap from "../../utilities/swap.ts";
+import random from "../../utils/random.ts";
+import swap from "../../utils/swap.ts";
 
 const almostSortedFactor = 2;
 

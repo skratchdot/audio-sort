@@ -3,10 +3,10 @@ import { Toggle } from "@/components/ui/toggle";
 import { ValueSlider } from "@/components/value-slider";
 import { useSyncExternalStore } from "react";
 import { useAtomValue } from "jotai";
-import { playbackPreferencesAtom } from "../../../state/playback-preferences.ts";
-import type { Props, PlayerId } from "../runtime/workspace-types.ts";
+import { playbackPreferencesAtom } from "../../state/playback-preferences.ts";
+import type { Props, PlayerId } from "../../controllers/playground-types.ts";
 import { FastForward, Rewind, SkipBack, SkipForward, Square, RotateCcw } from "lucide-react";
-import { ControlIcon } from "../../../components/control-icon.tsx";
+import { ControlIcon } from "../control-icon.tsx";
 
 export function Counters({ runtime }: Props) {
   const state = useSyncExternalStore(runtime.subscribe, () => runtime.getSnapshot().sort);

@@ -14,8 +14,8 @@ export default defineConfig({
     "src/midi/scales.ts",
   ],
   dictionaryDefinitions: [
-    { name: "project", path: "./.cspell/project.txt", addWords: true },
-    { name: "music", path: "./.cspell/music.txt" },
+    { name: "project", path: ".cspell/project.txt", addWords: true },
+    { name: "music", path: ".cspell/music.txt" },
   ],
   dictionaries: ["project", "music"],
   overrides: [

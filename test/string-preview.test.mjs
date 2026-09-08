@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { getStringPreviewSamples } from "../src/features/workspace/runtime/string-preview.ts";
+import { getStringPreviewSamples } from "../src/audio/string-preview.ts";
 
 test("string illustration is deterministic, bounded, oscillating, and decaying", () => {
   const samples = getStringPreviewSamples();

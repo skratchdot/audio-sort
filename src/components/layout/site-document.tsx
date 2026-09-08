@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { HeadContent, Scripts } from "@tanstack/react-router";
-import { Header } from "../components/layout/header.tsx";
-import { Footer } from "../components/layout/footer.tsx";
-import stylesheet from "../styles/globals.css?url";
+import { Header } from "./header.tsx";
+import { Footer } from "./footer.tsx";
+import stylesheet from "../../styles/globals.css?url";
 
 export function SiteDocument({ children }: { children: ReactNode }) {
   return (

@@ -4,10 +4,10 @@ import { useLayoutEffect, useRef } from "react";
 import { Field } from "@base-ui/react/field";
 import { useAtomValue, useSetAtom } from "jotai";
 import type { createStore } from "jotai/vanilla";
-import { settingsAtom, updateSettingAtom } from "../../../state/settings.ts";
-import { envelopeAtom, updateEnvelopeAtom, type EnvelopeKey } from "../../../state/envelope.ts";
-import { waveformDefaults, type WaveformId } from "../../../state/waveforms.ts";
-import { drawEnvelopeDiagram, formatEnvelopeValue } from "../runtime/envelope-diagram.ts";
+import { settingsAtom, updateSettingAtom } from "../../state/settings.ts";
+import { envelopeAtom, updateEnvelopeAtom, type EnvelopeKey } from "../../state/envelope.ts";
+import { waveformDefaults, type WaveformId } from "../../state/waveforms.ts";
+import { drawEnvelopeDiagram, formatEnvelopeValue } from "../../audio/envelope-diagram.ts";
 
 type Store = ReturnType<typeof createStore>;
 const controls: ReadonlyArray<{

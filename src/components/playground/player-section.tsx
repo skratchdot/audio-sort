@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ControlIcon } from "@/components/control-icon";
-import type { PlayerId } from "../runtime/workspace-types";
+import type { PlayerId } from "../../controllers/playground-types";
 
-export function WorkspaceSection({
+export function PlayerSection({
   id,
   title,
   description,

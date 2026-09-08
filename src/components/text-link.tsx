@@ -1,6 +1,6 @@
 import { createLink } from "@tanstack/react-router";
 import type { ComponentProps } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 export function TextLink({ className, ...props }: ComponentProps<"a">) {
   return (

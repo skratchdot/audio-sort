@@ -1,6 +1,6 @@
 import { expect, test, vi } from "vitest";
 import { createStore } from "jotai/vanilla";
-import { connectAudioSettings } from "../src/features/workspace/runtime/connect-audio-settings.ts";
+import { connectAudioSettings } from "../src/controllers/connect-audio-settings.ts";
 import { updateSettingAtom } from "../src/state/settings.ts";
 import { updateEnvelopeAtom } from "../src/state/envelope.ts";
 

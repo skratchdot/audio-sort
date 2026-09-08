@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import { instruments } from "../../../midi/instruments.ts";
-import { WorkspaceDialog as Dialog } from "./workspace-dialog.tsx";
-import type { Props, PlayerId } from "../runtime/workspace-types.ts";
+import { instruments } from "../../midi/instruments.ts";
+import { PlayerDialog as Dialog } from "./player-dialog.tsx";
+import type { Props, PlayerId } from "../../controllers/playground-types.ts";
 export function MidiDialog({
   runtime,
   id,

@@ -1,4 +1,4 @@
-import { WorkspaceSection } from "./workspace-section";
+import { PlayerSection } from "./player-section";
 import { SortSidebar } from "./sort-sidebar";
 import { Button } from "@/components/ui/button";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -6,9 +6,9 @@ import { Settings } from "./settings-controls.tsx";
 import { Transport, Scrubber } from "./playback-controls.tsx";
 import { AlgorithmDialog } from "../dialogs/algorithm-dialog.tsx";
 import { MidiDialog } from "../dialogs/midi-dialog.tsx";
-import type { Props, PlayerId } from "../runtime/workspace-types.ts";
+import type { Props, PlayerId } from "../../controllers/playground-types.ts";
 type Modal = "sort" | "add-algorithm" | "midi-export" | null;
-export function Workspace({ runtime }: Props) {
+export function SortingPlayground({ runtime }: Props) {
   const error = useSyncExternalStore(runtime.subscribe, () => runtime.getSnapshot().error);
   const suspended = useSyncExternalStore(runtime.subscribe, () => runtime.getSnapshot().suspended);
   const base = useRef<SVGSVGElement>(null);
@@ -33,7 +33,7 @@ export function Workspace({ runtime }: Props) {
   const close = () => setModal(null);
   return (
     <>
-      <WorkspaceSection
+      <PlayerSection
         id="base"
         title="Audio Data"
         description="modify the data set you will be sorting. preview how the data sounds and set playback options."
@@ -72,8 +72,8 @@ export function Workspace({ runtime }: Props) {
             </div>
           </div>
         </div>
-      </WorkspaceSection>
-      <WorkspaceSection
+      </PlayerSection>
+      <PlayerSection
         id="sort"
         title="Sorting"
         description="choose a sorting algorithm to visualize and audibilize how the algorithm works."
@@ -93,7 +93,7 @@ export function Workspace({ runtime }: Props) {
             <Scrubber runtime={runtime} id="sort" />
           </div>
         </div>
-      </WorkspaceSection>
+      </PlayerSection>
       {!suspended && modal === "sort" && (
         <AlgorithmDialog runtime={runtime} adding={false} onClose={close} />
       )}

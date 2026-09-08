@@ -11,12 +11,12 @@
 
 ## Completed UI migration
 
-PR #47 migrated the whole workspace; PR #48 polished icons, hover states, and typography:
+PR #47 migrated the whole playground; PR #48 polished icons, hover states, and typography:
 
-- The workspace uses a reusable vanilla Jotai store.
-- `ui/workspace.tsx` assembles settings, playback controls, and native dialogs.
-- `ui/create-workspace.mjs` owns worker/data coordination and audio subscriptions.
-- `ui/create-workspace-player.mjs` bridges the existing transport/audio modules and D3.
+- The playground uses a reusable vanilla Jotai store.
+- `components/playground/sorting-playground.tsx` assembles settings, playback controls, and dialogs.
+- `controllers/create-playground.mjs` owns worker/data coordination and audio subscriptions.
+- `controllers/create-player.mjs` bridges the existing transport/audio modules and D3.
 - React owns controls; D3 owns SVG children; audio draws the waveform canvas.
 - Settings/algorithm overrides stay in Jotai. Playback snapshots use `useSyncExternalStore`.
 - Native ranges replace plugin sliders; native dialogs handle editing and MIDI export.
@@ -34,12 +34,12 @@ the old JSONP/MP3 extensions. No new license-output logic is included.
 ## Completed TanStack Start shell
 
 Eleventy and Liquid are replaced by TanStack Start file routes and React pages.
-The existing workspace, runtime, and visual design are retained.
+The existing playground, runtime, and visual design are retained.
 
 - `src/routes/` defines the three pages; Start generates `src/route-tree.gen.ts`.
-- `src/pages/site-document.tsx` renders the shared header/footer and document.
-- `src/pages/home.tsx` dynamically imports `src/features/workspace/browser-workspace.tsx` after hydration.
-  It renders the workspace within Start's React root; runtime lifecycle cleanup
+- `src/components/layout/site-document.tsx` renders the shared header/footer and document.
+- `src/routes/index.tsx` dynamically imports `src/components/playground/browser-playground.tsx` after hydration.
+  It renders the playground within Start's React root; runtime lifecycle cleanup
   handles navigation away, cached pages, and remounts. Audio/editor modules never
   execute during prerendering.
 - Public routes are `/audio-sort/`, `/audio-sort/about`, and `/audio-sort/api`. Per the user's updated preference,
@@ -55,7 +55,7 @@ The existing workspace, runtime, and visual design are retained.
   per-page output configuration. Link crawling stays disabled because it duplicates
   base-prefixed URLs in the Pages build.
 - Tests cover clean URLs/reloads, client navigation, no-JavaScript content,
-  hydration errors, lazy-load recovery, and the existing workspace regressions.
+  hydration errors, lazy-load recovery, and the existing playground regressions.
 - Adding Vite's raw-import types exposed an existing `getFunctionBody` signature
   mismatch; it now explicitly accepts the source strings it already handled.
 
@@ -66,10 +66,10 @@ or sorting APIs. It uses shadcn's Base UI Nova primitives, retains Lucide and th
 system font, and maps the light theme to Tailwind sky/neutral colors.
 
 - `src/components/ui/`: shared primitives; `components/layout/`: header/footer.
-- `src/features/workspace/`: components, separate dialogs, and runtime coordination.
+- `src/components/playground/` and `src/components/dialogs/`: controls and dialogs; `src/controllers/`: runtime coordination.
 - `src/styles/globals.css`: theme/document defaults; `visualizations.css`: D3 state styles.
 - `site.css` and the `tw:` prefix are removed. Buttons and links own their Tailwind classes.
-- Two workspace layouts use one 1024px threshold; chart heights are fluid.
+- Two playground layouts use one 1024px threshold; chart heights are fluid.
 - Tab panels stay mounted for Ace/canvas lifetime. Slider thumbs use center alignment
   to avoid hidden-panel measurement. Base UI handles dialog focus and dismissal.
 

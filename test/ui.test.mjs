@@ -1,17 +1,17 @@
 import { expect, test } from "vitest";
-import { createWorkspace } from "../src/features/workspace/runtime/create-workspace.mjs";
-import { createHelpers } from "../src/features/workspace/runtime/create-helpers.mjs";
-import { createWorkspacePlayer } from "../src/features/workspace/runtime/create-workspace-player.mjs";
+import { createPlayground } from "../src/controllers/create-playground.mjs";
+import { createHelpers } from "../src/controllers/create-helpers.mjs";
+import { createPlayer } from "../src/controllers/create-player.mjs";
 import { visualizations } from "../src/visualizations/visualization-registry.mjs";
 
 test("UI modules import without DOM initialization or first-party globals", () => {
   for (const name of ["A", "visualization"]) expect(Object.hasOwn(globalThis, name)).toBe(false);
-  const first = createWorkspace();
-  const second = createWorkspace();
+  const first = createPlayground();
+  const second = createPlayground();
   expect(first).not.toBe(second);
   expect(typeof first.mount).toBe("function");
   expect(first.settings.getSelected("unknown", "fallback")).toBe("fallback");
-  expect(typeof createWorkspacePlayer).toBe("function");
+  expect(typeof createPlayer).toBe("function");
   expect(Object.keys(visualizations).sort()).toEqual(["bar", "flat"]);
   for (const name of ["A", "visualization"]) expect(Object.hasOwn(globalThis, name)).toBe(false);
 });
@@ -33,10 +33,10 @@ test("MIDI helper reads current settings from its injected controller", () => {
   expect(helpers.getMidiNumber(4)).toBe(72);
 });
 
-test("destroying an unmounted workspace is safe and prevents reuse", () => {
-  const controller = createWorkspace();
+test("destroying an unmounted playground is safe and prevents reuse", () => {
+  const controller = createPlayground();
   controller.destroy();
   controller.destroy();
   controller.resume();
-  expect(() => controller.mount({})).toThrow("destroyed workspace");
+  expect(() => controller.mount({})).toThrow("destroyed playground");
 });
