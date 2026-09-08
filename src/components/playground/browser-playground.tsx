@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 import { createStore } from "jotai/vanilla";
-import { Workspace } from "./components/workspace.tsx";
-import { createWorkspace } from "./runtime/create-workspace.mjs";
+import { SortingPlayground } from "./sorting-playground.tsx";
+import { createPlayground } from "../../controllers/create-playground.mjs";
 
 const store = createStore();
-type Runtime = ReturnType<typeof createWorkspace>;
+type Runtime = ReturnType<typeof createPlayground>;
 
-export function BrowserWorkspace() {
+export function BrowserPlayground() {
   const [runtime, setRuntime] = useState<Runtime | null>(null);
   useEffect(() => {
     let current: Runtime | null = null;
     const mount = () => {
-      current = createWorkspace(store);
+      current = createPlayground(store);
       setRuntime(current);
     };
     const onPageHide = (event: PageTransitionEvent) => {
@@ -36,5 +36,5 @@ export function BrowserWorkspace() {
       current?.destroy();
     };
   }, []);
-  return runtime ? <Workspace runtime={runtime} /> : null;
+  return runtime ? <SortingPlayground runtime={runtime} /> : null;
 }

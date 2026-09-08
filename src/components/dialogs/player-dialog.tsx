@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-export function WorkspaceDialog({
+export function PlayerDialog({
   id,
   title,
   children,

@@ -4,11 +4,11 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
-import { settingsAtom, updateSettingAtom, defaults } from "../../../state/settings.ts";
-import { scales } from "../../../midi/scales.ts";
-import { instruments } from "../../../midi/instruments.ts";
+import { settingsAtom, updateSettingAtom, defaults } from "../../state/settings.ts";
+import { scales } from "../../midi/scales.ts";
+import { instruments } from "../../midi/instruments.ts";
 import { WaveformControls } from "./waveform-controls.tsx";
-import type { Props } from "../runtime/workspace-types.ts";
+import type { Props } from "../../controllers/playground-types.ts";
 const scaleOptions = Object.entries(scales)
   .sort(
     ([, a], [, b]) =>

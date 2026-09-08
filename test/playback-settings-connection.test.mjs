@@ -1,6 +1,6 @@
 import { expect, test, vi } from "vitest";
 import { createStore } from "jotai/vanilla";
-import { connectPlaybackSettings } from "../src/features/workspace/runtime/connect-playback-settings.ts";
+import { connectPlaybackSettings } from "../src/controllers/connect-playback-settings.ts";
 import { updateSettingAtom } from "../src/state/settings.ts";
 import { toggleAutoPlayAtom, toggleLoopAtom } from "../src/state/playback-preferences.ts";
 

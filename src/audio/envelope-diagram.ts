@@ -1,4 +1,4 @@
-import type { Envelope, EnvelopeKey } from "../../../state/envelope.ts";
+import type { Envelope, EnvelopeKey } from "../state/envelope.ts";
 
 export function formatEnvelopeValue(key: EnvelopeKey, value: number): string {
   if (key === "s") return `${Math.round(value * 100)}%`;

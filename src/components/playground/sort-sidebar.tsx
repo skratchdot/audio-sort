@@ -8,7 +8,7 @@ import { OptionButton } from "@/components/option-button";
 import { ControlIcon } from "@/components/control-icon";
 import { Info, CirclePlus, ChartNoAxesColumnIncreasing, List } from "lucide-react";
 import { Counters } from "./playback-controls";
-import type { Props } from "../runtime/workspace-types";
+import type { Props } from "../../controllers/playground-types";
 export function SortSidebar({
   runtime,
   onDialog: setModal,

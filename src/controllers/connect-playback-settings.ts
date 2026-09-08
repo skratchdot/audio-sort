@@ -1,7 +1,7 @@
 import type { createStore } from "jotai/vanilla";
-import { settingsAtom } from "../../../state/settings.ts";
-import { waveformDefaults } from "../../../state/waveforms.ts";
-import { playbackPreferencesAtom } from "../../../state/playback-preferences.ts";
+import { settingsAtom } from "../state/settings.ts";
+import { waveformDefaults } from "../state/waveforms.ts";
+import { playbackPreferencesAtom } from "../state/playback-preferences.ts";
 
 type Store = ReturnType<typeof createStore>;
 type Preferences = ReturnType<typeof playbackPreferencesAtom.read>;

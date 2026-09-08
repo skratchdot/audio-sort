@@ -2,11 +2,25 @@
 
 Modules in `src/` use lowercase, hyphen-separated filenames. `components/ui/` contains
 shadcn Base UI primitives; `components/layout/` contains the header and footer.
-`features/workspace/` separates components, dialogs, and runtime coordination.
+`components/playground/` contains the interactive screen and its controls;
+`components/dialogs/` contains the algorithm editor and MIDI export dialogs.
 `sorting/` contains the engine and request handling, and
-`sorting/algorithms/` only algorithm implementations. Generators, utilities,
-MIDI support, and visualizations each have their own directory. The client entry,
-worker entry, and vendor bridge stay at the top level. `@/` aliases `src/`.
+`sorting/algorithms/` only algorithm implementations. Generators,
+MIDI support, and visualizations each have their own directory. The worker lives in
+`sorting/worker.mjs`; the Timbre adapter lives in `audio/timbre.mjs`. `@/` aliases `src/`.
+
+`utilities/` contains small, stateless, domain-independent helpers: `cn.ts` combines
+CSS classes; `random.ts`, `shuffle.ts`, and `swap.ts` handle numbers and arrays.
+There is no separate `lib/` folder or catch-all `utils.ts` file. shadcn's
+`utils` alias points to `@/utilities/cn` so newly generated components use the same helper.
+Domain-specific code stays with its domain rather than accumulating in `utilities/`.
+
+The sorting playground is the interactive data/sort screen, including its editor
+and playback controls. React presentation lives under `components/`;
+`controllers/` connects the sorting, audio, state, and visualization modules. Shared
+settings and atoms remain in `state/`; component-local state stays in its component. A player
+is one data or sort panel; the playground coordinates both. The older “workspace”
+name did not describe a separate domain concept.
 
 TypeScript is introduced incrementally alongside `.mjs` modules. Vite handles
 bundling; `pnpm run typecheck` checks `.ts` and `.tsx` application modules separately.
@@ -18,30 +32,30 @@ one level above, separate from the implementations they register.
 
 ## UI
 
-TanStack Start routes in `src/routes/` render Home, About, and API through the
-shared document in `src/pages/`. Public URLs are `/audio-sort/`, `/audio-sort/about`, and `/audio-sort/api`;
+TanStack Start routes in `src/routes/` contain Home, About, and API page content and use
+the shared document in `src/components/layout/`. Public URLs are `/audio-sort/`, `/audio-sort/about`, and `/audio-sort/api`;
 prerendering emits `index.html`, `about/index.html`, and `api/index.html`.
 TanStack links provide client navigation and ordinary anchor fallbacks without
 JavaScript. Audio and editor dependencies are dynamically imported by
 Home's effect, never evaluated during server prerendering. About/API remain usable
 without JavaScript. `src/client.tsx` hydrates the document.
 
-[`browser-workspace.tsx`](../src/features/workspace/browser-workspace.tsx) owns the browser workspace lifecycle with an application-scoped
+[`browser-playground.tsx`](../src/components/playground/browser-playground.tsx) owns the browser playground lifecycle with an application-scoped
 vanilla Jotai store. React owns settings, tabs, transport controls, counters,
 sliders, and dialogs. Shared buttons, links, and option controls use Tailwind classes.
 `styles/globals.css` holds the shadcn theme and document defaults;
 `styles/visualizations.css` styles D3-owned SVG children. There is no `site.css`.
-The light theme uses sky accents and neutral surfaces. Workspace layout uses one
+The light theme uses sky accents and neutral surfaces. Playground layout uses one
 threshold (`lg`, 1024px): stacked below it, side-by-side above it. Chart heights
 are fluid, bounded with `clamp()`, without height-specific media queries.
 
-[`create-workspace.mjs`](../src/features/workspace/runtime/create-workspace.mjs) coordinates workers,
+[`create-playground.mjs`](../src/controllers/create-playground.mjs) coordinates workers,
 data generation, settings subscriptions, soundfont preloading, and player lifetime.
 React reads its playback snapshots through `useSyncExternalStore`. Settings and
 custom algorithms are read directly from Jotai; there is no mirrored settings cache.
 Audio clocks and nodes remain outside React and Jotai.
 
-[`create-workspace-player.mjs`](../src/features/workspace/runtime/create-workspace-player.mjs) owns
+[`create-player.mjs`](../src/controllers/create-player.mjs) owns
 the contents of its D3 SVG and delegates transport and synthesis to
 `audio/create-transport.ts` and `audio/create-timbre-audio.mjs`.
 React renders the surrounding controls and an empty SVG host, never chart children.
@@ -65,11 +79,11 @@ initialization does not depend on measuring thumb widths. MIDI export uses shadc
 Cached-page suspension disconnects runtime effects, pauses audio, cancels workers
 and pending resumes, and closes dialogs. Returning reconnects effects without
 automatically playing. React continues to represent the same Jotai store.
-Non-cached exits and Home effect cleanup unmount the workspace, dispose owned resources, and
+Non-cached exits and Home effect cleanup unmount the playground, dispose owned resources, and
 release native pointer listeners. Fresh runtime instances can reuse the store.
 The shared AudioContext stays library-owned.
 
-All third-party JavaScript uses package imports. `vendor.mjs` only re-exports the
+All third-party JavaScript uses package imports. `audio/timbre.mjs` only re-exports the
 pinned Timbre browser entry; there are no classic script tags or `public/js` files.
 D3 imports remain scoped. Sample audio is fetched and decoded by first-party
 modules; see [the audio boundary](audio-dependencies.md).

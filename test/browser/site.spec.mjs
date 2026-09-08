@@ -317,7 +317,7 @@ test("built UI loads and algorithm IDs execute in the bundled worker", async ({
   await page.goto("./");
   const sortWorker = await workerReady;
   await expect(page.locator("#wrapper > #header")).toHaveCount(1);
-  await expect(page.locator("#workspace > #base-section")).toHaveCount(1);
+  await expect(page.locator("#playground > #base-section")).toHaveCount(1);
   await expect(page.locator("body > #footer")).toHaveCount(1);
   const workerURL = sortWorker.url();
   expect(await sortWorker.evaluate(() => Object.hasOwn(globalThis, "AS"))).toBe(false);
@@ -722,7 +722,7 @@ test("teardown clears owned resources and repeated remounts do not duplicate UI 
       await page.evaluate(() => globalThis.sortWorkers.every((worker) => worker.wasTerminated)),
     ).toBe(true);
     expect(await page.evaluate(() => typeof globalThis.jQuery)).toBe("undefined");
-    await expect(page.locator("#workspace > *")).toHaveCount(0);
+    await expect(page.locator("#playground > *")).toHaveCount(0);
     await page.evaluate(() =>
       globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pageshow", { persisted: true })),
     );
@@ -993,7 +993,7 @@ test("the page scrolls only when its content exceeds the viewport", async ({ pag
   }
 });
 
-test("charts size fluidly with two workspace layouts", async ({ page }) => {
+test("charts size fluidly with two playground layouts", async ({ page }) => {
   await page.goto("./");
   for (const [width, height, chartHeight] of [
     [1440, 900, "216px"],
@@ -1109,7 +1109,7 @@ test("clean routes hydrate, navigate, and reload without a server", async ({
   page.on("console", (message) => {
     if (message.type() === "error") errors.push(message.text());
   });
-  for (const path of ["", "?view=sort#workspace"]) {
+  for (const path of ["", "?view=sort#playground"]) {
     const url = new URL(path, baseURL).href;
     expect((await page.goto(url)).status()).toBe(200);
     await expect(page.locator("#base-svg rect")).toHaveCount(12);
@@ -1124,7 +1124,7 @@ test("clean routes hydrate, navigate, and reload without a server", async ({
     await expect(page).toHaveURL(new URL("about", baseURL).href);
     await expect(page.locator("#about")).toBeVisible();
     await page.waitForLoadState("networkidle");
-    expect(await page.locator("#workspace").count()).toBe(0);
+    expect(await page.locator("#playground").count()).toBe(0);
     expect(await page.evaluate(() => globalThis.navigationWitness)).toBe(true);
     expect(
       await page.evaluate(() => globalThis.sortWorkers.every((worker) => worker.wasTerminated)),
@@ -1163,11 +1163,11 @@ test("prerendered pages and navigation remain readable without JavaScript", asyn
   }
 });
 
-test("a failed workspace download shows a recoverable error", async ({ page }) => {
-  await page.route(/\/assets\/browser-workspace-[^/]+\.js$/, (route) => route.abort());
+test("a failed playground download shows a recoverable error", async ({ page }) => {
+  await page.route(/\/assets\/browser-playground-[^/]+\.js$/, (route) => route.abort());
   await page.goto("./");
-  await expect(page.getByRole("alert")).toContainText("Unable to load the workspace");
-  await page.unroute(/\/assets\/browser-workspace-[^/]+\.js$/);
+  await expect(page.getByRole("alert")).toContainText("Unable to load the playground");
+  await page.unroute(/\/assets\/browser-playground-[^/]+\.js$/);
   await page.reload();
   await expect(page.locator("#base-svg rect")).toHaveCount(12);
   await expect(page.getByRole("alert")).toHaveCount(0);

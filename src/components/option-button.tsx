@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utilities/cn";
 import type { ComponentProps } from "react";
 
 export function OptionButton({ className, ...props }: ComponentProps<typeof Button>) {

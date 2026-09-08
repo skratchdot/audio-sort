@@ -42,7 +42,8 @@ styles live in `src/styles/visualizations.css`.
 
 Add primitives with `pnpm dlx shadcn@latest add <component>`. `components.json`
 selects Base UI, the Nova preset, neutral base colors, and Lucide icons. Keep shared
-primitives in `src/components/ui/` and workspace behavior in `src/features/workspace/`.
+primitives in `src/components/ui/`, screen controls in `src/components/playground/`,
+and dialogs in `src/components/dialogs/`. Non-React coordination lives in `src/controllers/`.
 Use `lg:` for the application's stacked/side-by-side layout; avoid adding extra width tiers.
 
 ## Checks
@@ -59,7 +60,7 @@ TypeScript can infer imported JavaScript modules (`allowJs`), but `checkJs` stay
 off until those modules are migrated. Worker payloads are still checked at runtime.
 
 Vendor and generated files are excluded from linting and formatting. Oxfmt formats
-source CSS and TSX alongside JavaScript. `src/pages/site-document.tsx` owns the
+source CSS and TSX alongside JavaScript. `src/components/layout/site-document.tsx` owns the
 shared document, header, and footer. Start generates `src/route-tree.gen.ts` from
 `src/routes/`; commit that file but do not edit it manually.
 

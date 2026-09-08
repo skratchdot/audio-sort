@@ -88,7 +88,7 @@ JSONP/MP3/soundfont scripts are removed. The [audio dependency audit](audio-depe
 records sample-host verification and the Timbre package compatibility checks.
 Timbre now uses the pinned `14.11.25` browser entry with its Node-only dependencies
 excluded. The obsolete local bundles, map, and Flash asset are removed.
-Phase 6 now replaces the complete workspace in PR #47, not a sequence of islands.
+Phase 6 now replaces the complete playground in PR #47, not a sequence of islands.
 React owns all controls and dialogs, uses the existing Jotai store, and subscribes
 to playback snapshots from a separate runtime. D3 and audio retain their owned
 SVG/canvas hosts. The legacy controller, plugin sliders, Bootstrap CSS/JavaScript,
@@ -100,12 +100,12 @@ Public routes are `/audio-sort/`, `/audio-sort/about`, and `/audio-sort/api`, wi
 Static prerendering emits directory index files into `dist/audio-sort/`;
 build-time server files remain in `.tanstack/` and are not deployed. Development,
 production, preview, and browser tests share the same base and build configuration.
-Home imports the existing workspace after hydration; About/API need no audio or
-editor runtime. Client navigation unmounts the workspace when leaving Home.
+Home imports the existing playground after hydration; About/API need no audio or
+editor runtime. Client navigation unmounts the playground when leaving Home.
 
 The current UI refinement adds shadcn Base UI (Nova preset) before phase 8.
-Shared primitives live in `components/ui/`; workspace components, dialogs, and
-runtime modules live in `features/workspace/`. Tailwind component classes replace
+Shared primitives live in `components/ui/`; playground components, dialogs, and
+runtime modules live in `components/playground/`, `components/dialogs/`, and `controllers/`, respectively. Tailwind component classes replace
 `site.css`, with sky/neutral theme tokens and a small D3 stylesheet. One `lg`
 threshold separates stacked and side-by-side layouts; chart heights use `clamp()`.
 Review the larger controls, dialog behavior, and laptop/mobile layouts before merging.

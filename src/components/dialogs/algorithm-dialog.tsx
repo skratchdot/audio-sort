@@ -1,18 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { useAtomValue } from "jotai";
-import { settingsAtom } from "../../../state/settings.ts";
+import { settingsAtom } from "../../state/settings.ts";
 import {
   algorithmCatalogAtom,
   addAlgorithmAtom,
   editAlgorithmAtom,
-} from "../../../state/algorithm-overrides.ts";
-import { algorithms } from "../../../sorting/algorithm-registry.mjs";
-import { sources } from "../../../sorting/algorithm-sources.mjs";
-import { getFunctionBody } from "../../../sorting/sort-requests.ts";
-import type { createCodeEditor } from "../runtime/create-code-editor.mjs";
-import type { Props } from "../runtime/workspace-types.ts";
-import { WorkspaceDialog as Dialog } from "./workspace-dialog.tsx";
+} from "../../state/algorithm-overrides.ts";
+import { algorithms } from "../../sorting/algorithm-registry.mjs";
+import { sources } from "../../sorting/algorithm-sources.mjs";
+import { getFunctionBody } from "../../sorting/sort-requests.ts";
+import type { createCodeEditor } from "./create-code-editor.mjs";
+import type { Props } from "../../controllers/playground-types.ts";
+import { PlayerDialog as Dialog } from "./player-dialog.tsx";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 export function AlgorithmDialog({
@@ -32,7 +32,7 @@ export function AlgorithmDialog({
   useEffect(() => {
     let cancelled = false;
     let instance: ReturnType<typeof createCodeEditor> | undefined;
-    void import("../runtime/create-code-editor.mjs")
+    void import("./create-code-editor.mjs")
       .then(({ createCodeEditor }) => {
         if (cancelled) return;
         instance = createCodeEditor(host.current!);

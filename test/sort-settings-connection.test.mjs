@@ -1,6 +1,6 @@
 import { expect, test, vi } from "vitest";
 import { createStore } from "jotai/vanilla";
-import { connectSortSettings } from "../src/features/workspace/runtime/connect-sort-settings.ts";
+import { connectSortSettings } from "../src/controllers/connect-sort-settings.ts";
 import { updateSettingAtom } from "../src/state/settings.ts";
 import { addAlgorithmAtom, editAlgorithmAtom } from "../src/state/algorithm-overrides.ts";
 
