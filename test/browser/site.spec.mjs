@@ -6,6 +6,12 @@ import { algorithmNames } from "../helpers/algorithms.mjs";
 import { generators } from "../../src/generators/generator-registry.ts";
 import { scales } from "../../src/midi/scales.ts";
 
+test("legacy index.html redirects to the application root", async ({ page }) => {
+  await page.goto("index.html");
+  await expect(page).toHaveURL("http://127.0.0.1:4173/audio-sort/");
+  await expect(page.locator("[data-scale]")).toHaveCount(108);
+});
+
 test("all local scales populate the menu without subcollider", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
