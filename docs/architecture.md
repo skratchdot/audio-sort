@@ -9,11 +9,11 @@ shadcn Base UI primitives; `components/layout/` contains the header and footer.
 MIDI support, and visualizations each have their own directory. The worker lives in
 `sorting/worker.mjs`; the Timbre adapter lives in `audio/timbre.mjs`. `@/` aliases `src/`.
 
-`utils/` contains small, stateless, domain-independent helpers: `cn.ts` combines
+`utilities/` contains small, stateless, domain-independent helpers: `cn.ts` combines
 CSS classes; `random.ts`, `shuffle.ts`, and `swap.ts` handle numbers and arrays.
-There is no separate `utilities/` folder or catch-all `utils.ts` file. shadcn's
-`utils` alias points to `@/utils/cn` so newly generated components use the same helper.
-Domain-specific code stays with its domain rather than accumulating in `utils/`.
+There is no separate `lib/` folder or catch-all `utils.ts` file. shadcn's
+`utils` alias points to `@/utilities/cn` so newly generated components use the same helper.
+Domain-specific code stays with its domain rather than accumulating in `utilities/`.
 
 The sorting playground is the interactive data/sort screen, including its editor
 and playback controls. React presentation lives under `components/`;
