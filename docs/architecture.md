@@ -1,10 +1,12 @@
 # Architecture
 
-Modules in `src/` use lowercase, hyphen-separated filenames. `ui/` contains
-React components and runtime/player modules, `sorting/` the engine and request handling, and
+Modules in `src/` use lowercase, hyphen-separated filenames. `components/ui/` contains
+shadcn Base UI primitives; `components/layout/` contains the header and footer.
+`features/workspace/` separates components, dialogs, and runtime coordination.
+`sorting/` contains the engine and request handling, and
 `sorting/algorithms/` only algorithm implementations. Generators, utilities,
-MIDI support, and visualizations each have their own directory. The app entry,
-worker entry, and vendor bridge stay at the top level.
+MIDI support, and visualizations each have their own directory. The client entry,
+worker entry, and vendor bridge stay at the top level. `@/` aliases `src/`.
 
 TypeScript is introduced incrementally alongside `.mjs` modules. Vite handles
 bundling; `pnpm run typecheck` checks `.ts` and `.tsx` application modules separately.
@@ -24,19 +26,22 @@ JavaScript. Audio and editor dependencies are dynamically imported by
 Home's effect, never evaluated during server prerendering. About/API remain usable
 without JavaScript. `src/client.tsx` hydrates the document.
 
-[`main.tsx`](../src/main.tsx) owns the browser workspace lifecycle with an application-scoped
-vanilla Jotai store. React owns settings, tabs, transport controls, counters, native
-range inputs, and dialogs. Components are split into settings, waveform, playback,
-and dialog modules under `ui/`. Tailwind Preflight/utilities and first-party
-`site.css` preserve the two-section design; no Bootstrap or jQuery is shipped.
+[`browser-workspace.tsx`](../src/features/workspace/browser-workspace.tsx) owns the browser workspace lifecycle with an application-scoped
+vanilla Jotai store. React owns settings, tabs, transport controls, counters,
+sliders, and dialogs. Shared buttons, links, and option controls use Tailwind classes.
+`styles/globals.css` holds the shadcn theme and document defaults;
+`styles/visualizations.css` styles D3-owned SVG children. There is no `site.css`.
+The light theme uses sky accents and neutral surfaces. Workspace layout uses one
+threshold (`lg`, 1024px): stacked below it, side-by-side above it. Chart heights
+are fluid, bounded with `clamp()`, without height-specific media queries.
 
-[`create-workspace.mjs`](../src/ui/create-workspace.mjs) coordinates workers,
+[`create-workspace.mjs`](../src/features/workspace/runtime/create-workspace.mjs) coordinates workers,
 data generation, settings subscriptions, soundfont preloading, and player lifetime.
 React reads its playback snapshots through `useSyncExternalStore`. Settings and
 custom algorithms are read directly from Jotai; there is no mirrored settings cache.
 Audio clocks and nodes remain outside React and Jotai.
 
-[`create-workspace-player.mjs`](../src/ui/create-workspace-player.mjs) owns
+[`create-workspace-player.mjs`](../src/features/workspace/runtime/create-workspace-player.mjs) owns
 the contents of its D3 SVG and delegates transport and synthesis to
 `audio/create-transport.ts` and `audio/create-timbre-audio.mjs`.
 React renders the surrounding controls and an empty SVG host, never chart children.
@@ -48,11 +53,13 @@ attack 50 ms, decay 300 ms, sustain 50%, hold 200 ms, and release 300 ms.
 Timbre's `adshr` holds at sustain level after decay; the envelope diagram uses that
 ordering. The string preview is illustrative, not a sampled live waveform.
 
-Native `dialog` elements provide modal focus containment and Escape handling.
+shadcn's Base UI dialogs provide modal focus containment and Escape handling.
 Closing restores focus to the trigger. Ace loads on demand from its pnpm package;
 closing a dialog invalidates pending initialization and destroys the editor/session.
 The editor remains JavaScript with two-space soft tabs. Invalid edits leave the
-catalog unchanged and show an error. MIDI export uses native selects, `jsmidgen`,
+catalog unchanged and show an error. Tab panels stay mounted to preserve the
+editor and waveform canvas. Sliders use center-aligned thumbs so hidden-panel
+initialization does not depend on measuring thumb widths. MIDI export uses shadcn native selects, `jsmidgen`,
 `file-saver`, and Blob.
 
 Cached-page suspension disconnects runtime effects, pauses audio, cancels workers

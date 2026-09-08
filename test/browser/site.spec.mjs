@@ -50,7 +50,7 @@ test("public assets are copied unchanged and CSS images load under the site base
     );
   }
   await page.goto("./");
-  for (const selector of ["#header", "#base-svg", "#sort-svg"]) {
+  for (const selector of ["#base-svg", "#sort-svg"]) {
     const background = await page
       .locator(selector)
       .first()
@@ -169,25 +169,25 @@ test("option hover and keyboard focus preserve readable selected and unselected 
     }
     const selected = page.locator(`#${id}-options button[aria-pressed="true"]`);
     await page.mouse.move(0, 0);
-    await expect(selected).toHaveCSS("background-color", "rgb(0, 136, 204)");
+    await expect(selected).toHaveCSS("background-color", "oklch(0.5 0.134 242.749)");
     await selected.hover();
     await expect(selected).toHaveCSS("color", "rgb(255, 255, 255)");
-    await expect(selected).toHaveCSS("background-color", "rgb(0, 102, 153)");
+    await expect(selected).toHaveCSS("background-color", "oklch(0.443 0.11 240.79)");
     const unselected = page.locator(`#${id}-options button[aria-pressed="false"]`).first();
     await unselected.hover();
-    await expect(unselected).toHaveCSS("color", "rgb(0, 85, 128)");
-    await expect(unselected).toHaveCSS("background-color", "rgb(253, 253, 253)");
-    await expect(selected).toHaveCSS("background-color", "rgb(0, 136, 204)");
+    await expect(unselected).toHaveCSS("color", "oklch(0.443 0.11 240.79)");
+    await expect(unselected).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await expect(selected).toHaveCSS("background-color", "oklch(0.5 0.134 242.749)");
     await page.mouse.move(0, 0);
     await unselected.focus();
     await page.keyboard.press("Tab");
     await page.keyboard.press("Shift+Tab");
     await expect(unselected).toBeFocused();
-    await expect(unselected).toHaveCSS("color", "rgb(0, 85, 128)");
-    await expect(unselected).toHaveCSS("background-color", "rgb(253, 253, 253)");
+    await expect(unselected).toHaveCSS("color", "oklch(0.443 0.11 240.79)");
+    await expect(unselected).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await selected.focus();
     await expect(selected).toHaveCSS("color", "rgb(255, 255, 255)");
-    await expect(selected).toHaveCSS("background-color", "rgb(0, 102, 153)");
+    await expect(selected).toHaveCSS("background-color", "oklch(0.443 0.11 240.79)");
   }
 });
 
@@ -200,6 +200,8 @@ test("header stays within the viewport without sharing widgets", async ({ page }
     await expect(title).toBeVisible();
     await expect(page.locator("#header-author")).toHaveCSS("font-weight", "400");
     await expect(page.locator("#header .home-link")).toHaveCSS("font-weight", "700");
+    await expect(page.locator("#header .home-link")).toHaveCSS("font-family", /^Impact,/);
+    await expect(page.locator("#header-author")).not.toHaveCSS("font-family", /^Impact,/);
     await expect(navigation.locator("a")).toHaveText(["Home", "About", "API", "Source"]);
     const titleBox = await title.boundingBox();
     const navBox = await navigation.boundingBox();
@@ -210,7 +212,7 @@ test("header stays within the viewport without sharing widgets", async ({ page }
     expect(
       titleBox.x + titleBox.width <= navBox.x || titleBox.y + titleBox.height <= navBox.y,
     ).toBe(true);
-    if (width >= 768) {
+    if (width >= 1024) {
       expect(
         Math.abs(titleBox.y + titleBox.height / 2 - (navBox.y + navBox.height / 2)),
       ).toBeLessThanOrEqual(1);
@@ -230,8 +232,8 @@ test("React controls work without Bootstrap, jQuery, or classic vendor scripts",
     await expect(icons).toHaveCount(6);
     for (const icon of await icons.all()) {
       await expect(icon).toHaveAttribute("aria-hidden", "true");
-      await expect(icon).toHaveCSS("width", "14px");
-      await expect(icon).toHaveCSS("height", "14px");
+      await expect(icon).toHaveCSS("width", "16px");
+      await expect(icon).toHaveCSS("height", "16px");
     }
     await expect(page.getByRole("button", { name: `${id} First`, exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: `${id} Last`, exact: true })).toBeVisible();
@@ -259,7 +261,7 @@ test("React controls work without Bootstrap, jQuery, or classic vendor scripts",
   }
 });
 
-test("native dialogs trap focus, report invalid edits, and close on cached-page suspension", async ({
+test("Base UI dialogs trap focus, report invalid edits, and close on cached-page suspension", async ({
   page,
 }) => {
   await page.goto("./");
@@ -407,7 +409,7 @@ test("Ace loads on demand and a closed dialog cannot finish initializing", async
   await expect(page.locator("#save-algorithm-edit")).toBeDisabled();
   await page.locator("#save-algorithm-edit").dispatchEvent("click");
   await expect(page.locator("#modal-sort")).toBeVisible();
-  await page.locator("#modal-sort .modal-footer button:first-child").click();
+  await page.locator("#modal-sort [data-slot=dialog-footer] button:first-child").click();
   await expect(page.locator("#modal-sort")).toBeHidden();
   releaseEditor();
   await expect.poll(() => page.evaluate(() => typeof globalThis.ace)).toBe("object");
@@ -445,7 +447,7 @@ test("editor supports modern JavaScript, syntax diagnostics, and two-space soft 
   await page.locator("#modal-sort-open").click();
   await expect(page.locator("#modal-sort")).toBeVisible();
   const editor = page.locator("#sort-algorithm .js-editor.ace_editor");
-  await page.locator("#modal-sort .tabs button:last-child").click();
+  await page.locator("#modal-sort [role=tab]:last-child").click();
   await editor.evaluate((element) => {
     const editor = globalThis.ace.edit(element);
     editor.setValue("let = ;");
@@ -512,7 +514,7 @@ test("all built-ins can be edited and saved from readable production source", as
     expect(values).toEqual([...values].sort((a, b) => a - b));
     await page.locator("#modal-sort-open").click();
     await expect(page.locator("#sort-info-display")).toHaveText(display);
-    await page.locator("#modal-sort .modal-footer button:first-child").click();
+    await page.locator("#modal-sort [data-slot=dialog-footer] button:first-child").click();
     await expect(page.locator("#modal-sort")).toBeHidden();
   }
   expect(errors).toEqual([]);
@@ -551,7 +553,7 @@ test("D3 joins resize bars, markers, and paths without stale elements", async ({
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("./");
-  const slider = page.locator("#data-size-container input[type=range]");
+  const slider = page.locator("#data-size-container [data-slot=slider]");
   const bounds = await slider.boundingBox();
   let previousSize = 12;
   for (const fraction of [0.7, 0.15]) {
@@ -610,7 +612,7 @@ test("module UI connects data, visualization, playback navigation, sliders, and 
     .toBeGreaterThan(1);
   await page.locator('#sort-player [data-action="stop"]').click();
   const originalVolume = await page.locator("#volume-display").textContent();
-  const slider = page.locator("#volume-container input[type=range]");
+  const slider = page.locator("#volume-container [data-slot=slider]");
   const bounds = await slider.boundingBox();
   await slider.click({ position: { x: bounds.width * 0.6, y: bounds.height / 2 } });
   await expect(page.locator("#volume-display")).not.toHaveText(originalVolume);
@@ -785,7 +787,7 @@ test("teardown cancels pending audio resume without removing unrelated native li
     };
   });
   await page.locator('#sort-player [data-action="play"]').click();
-  const slider = page.locator("#volume-container input[type=range]");
+  const slider = page.locator("#volume-container [data-slot=slider]");
   const box = await slider.boundingBox();
   await page.mouse.move(box.x + box.width * 0.5, box.y + box.height / 2);
   await page.mouse.down();
@@ -825,7 +827,7 @@ test("resizing and saving a selected algorithm update sorting without reselectin
   page,
 }) => {
   await page.goto("./");
-  const sizeSlider = page.locator("#data-size-container input[type=range]");
+  const sizeSlider = page.locator("#data-size-container [data-slot=slider]");
   const bounds = await sizeSlider.boundingBox();
   await sizeSlider.click({ position: { x: bounds.width * 0.4, y: bounds.height / 2 } });
   const size = Number(await page.locator("#data-size-display").textContent());
@@ -833,7 +835,7 @@ test("resizing and saving a selected algorithm update sorting without reselectin
     .poll(() => page.evaluate(() => globalThis.sortRequests.at(-1)?.arr.length))
     .toBe(size);
   await page.locator("#modal-sort-open").click();
-  await page.locator("#modal-sort .tabs button:last-child").click();
+  await page.locator("#modal-sort [role=tab]:last-child").click();
   await page
     .locator("#sort-algorithm .js-editor.ace_editor")
     .evaluate((element) => globalThis.ace.edit(element).setValue("AS.play(0);"));
@@ -888,7 +890,7 @@ test("soundfonts decode native audio and play buffered notes without JSONP", asy
       return bang.apply(this, args);
     };
   });
-  await page.locator('[data-audio-type="soundfont"].button').click();
+  await page.locator('button[data-audio-type="soundfont"]').click();
   await expect.poll(() => requests.length).toBeGreaterThan(0);
   // Replaying retries missed first-pass notes, matching preload-only cache misses.
   await expect(async () => {
@@ -922,7 +924,7 @@ test("audio settings render selections and survive subscription reconnection", a
   );
   await page.locator("#settings #tab-audio").click();
   await expect(page.locator("#audio-type-display")).toHaveText("waveform: sin");
-  await page.locator('[data-audio-type="soundfont"].button').click();
+  await page.locator('button[data-audio-type="soundfont"]').click();
   await expect(page.locator("#settings #tab-soundfont")).toBeVisible();
   await expect(page.locator("#settings #tab-waveform")).toBeHidden();
   await page.locator("#settings #tab-soundfont").click();
@@ -944,25 +946,63 @@ test("audio settings render selections and survive subscription reconnection", a
   await expect(scale).toHaveClass(/active/);
   await expect(instrument).toHaveClass(/active/);
   await page.locator("#settings #tab-audio").click();
-  await page.locator('[data-audio-type="waveform"].button').click();
+  await page.locator('button[data-audio-type="waveform"]').click();
   await expect(page.locator("#audio-type-display")).toHaveText("waveform: sin");
   await expect(page.locator("#settings #tab-waveform")).toBeVisible();
   expect(errors).toEqual([]);
 });
 
-test("charts use extra laptop height without enlarging short or narrow layouts", async ({
-  page,
-}) => {
+test("copyright uses the browser year rather than the deployment year", async ({ page }) => {
+  for (const year of [2035, 2036]) {
+    await page.clock.setFixedTime(new Date(`${year}-06-15T12:00:00Z`));
+    await page.goto("about");
+    await expect(page.locator(".footer-copy")).toContainText(`2013 - ${year}`);
+  }
+});
+
+test("the page scrolls only when its content exceeds the viewport", async ({ page }) => {
+  for (const route of ["./", "about"]) {
+    await page.setViewportSize({ width: 1440, height: 1400 });
+    await page.goto(route);
+    if (route === "./") await expect(page.locator("#base-svg rect")).toHaveCount(12);
+    const dimensions = () =>
+      page.evaluate(() => ({
+        content: globalThis.document.documentElement.scrollHeight,
+        viewport: globalThis.document.documentElement.clientHeight,
+      }));
+    await expect.poll(dimensions).toEqual({ content: 1400, viewport: 1400 });
+    await page.setViewportSize({ width: 1440, height: 400 });
+    await expect
+      .poll(async () => {
+        const { content, viewport } = await dimensions();
+        return content > viewport;
+      })
+      .toBe(true);
+    await page.evaluate(() =>
+      globalThis.scrollTo(0, globalThis.document.documentElement.scrollHeight),
+    );
+    await expect.poll(() => page.evaluate(() => globalThis.scrollY)).toBeGreaterThan(0);
+  }
+});
+
+test("charts size fluidly with two workspace layouts", async ({ page }) => {
   await page.goto("./");
   for (const [width, height, chartHeight] of [
-    [1440, 900, "240px"],
-    [1366, 768, "200px"],
-    [1280, 700, "200px"],
-    [768, 900, "200px"],
+    [1440, 900, "216px"],
+    [1366, 768, "192px"],
+    [1280, 700, "192px"],
+    [1023, 900, "216px"],
+    [1024, 900, "216px"],
+    [768, 900, "216px"],
+    [390, 844, "202.547px"],
   ]) {
     await page.setViewportSize({ width, height });
     await expect(page.locator("#base-chart")).toHaveCSS("height", chartHeight);
     await expect(page.locator("#sort-chart")).toHaveCSS("height", chartHeight);
+    const settings = await page.locator("#settings-content").boundingBox();
+    const chart = await page.locator("#base-chart").boundingBox();
+    if (width < 1024) expect(chart.y).toBeGreaterThan(settings.y + settings.height);
+    else expect(chart.x).toBeGreaterThan(settings.x + settings.width);
   }
 });
 
@@ -979,7 +1019,7 @@ test("envelope controls preserve the compact settings panel", async ({ page }) =
     const before = await page.locator("#sort-section").boundingBox();
     await page.locator("#settings #tab-waveform").click();
     await expect(page.locator("#envelope-controls label").first()).toHaveCSS("font-size", "12px");
-    await expect(page.locator("#waveform button").first()).toHaveCSS("font-size", "11px");
+    await expect(page.locator("#waveform button").first()).toHaveCSS("font-size", "12.8px");
     const after = await page.locator("#sort-section").boundingBox();
     expect(Math.abs(after.y - before.y)).toBeLessThanOrEqual(2);
     const panel = await page.locator("#settings-content").boundingBox();
@@ -1000,6 +1040,13 @@ test("waveform envelope edits survive switching presets", async ({ page }) => {
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("./");
   await page.locator("#settings #tab-waveform").click();
+  // These controls mount while their tab is hidden. Their thumbs must become
+  // visible and retain their measured positions when the panel is revealed.
+  const thumbs = page.locator("#envelope-controls [data-slot=slider-thumb]");
+  await expect(thumbs).toHaveCount(5);
+  for (const thumb of await thumbs.all()) await expect(thumb).toBeVisible();
+  await page.locator("#envelope-controls label").first().click();
+  await expect(page.getByRole("slider", { name: "Attack", exact: true })).toBeFocused();
   await page.locator('#waveform button[data-waveform="string"]').click();
   const display = page.locator("#waveform-adshr-attack-display");
   const preview = page.locator("#waveform-canvas");
@@ -1075,7 +1122,7 @@ test("clean routes hydrate, navigate, and reload without a server", async ({
       await page.evaluate(() => globalThis.sortWorkers.every((worker) => worker.wasTerminated)),
     ).toBe(true);
     await page.locator("#header-nav").getByRole("link", { name: "API", exact: true }).click();
-    await expect(page.locator(".table-scroll")).toBeVisible();
+    await expect(page.getByRole("region", { name: "Algorithm API reference" })).toBeVisible();
     await page.reload();
     await page.waitForLoadState("networkidle");
     expect(await page.evaluate(() => typeof globalThis.timbre)).toBe("undefined");
@@ -1098,19 +1145,21 @@ test("prerendered pages and navigation remain readable without JavaScript", asyn
     await page.locator("#header-nav").getByRole("link", { name: "About", exact: true }).click();
     await expect(page.locator("#about")).toContainText('"hear" what sorting algorithms sound like');
     await page.locator("#header-nav").getByRole("link", { name: "API", exact: true }).click();
-    await expect(page.locator(".table-scroll")).toContainText("AS.swap");
+    await expect(page.getByRole("region", { name: "Algorithm API reference" })).toContainText(
+      "AS.swap",
+    );
     await page.reload();
-    await expect(page.locator(".table-scroll")).toBeVisible();
+    await expect(page.getByRole("region", { name: "Algorithm API reference" })).toBeVisible();
   } finally {
     await context.close();
   }
 });
 
 test("a failed workspace download shows a recoverable error", async ({ page }) => {
-  await page.route(/\/assets\/main-[^/]+\.js$/, (route) => route.abort());
+  await page.route(/\/assets\/browser-workspace-[^/]+\.js$/, (route) => route.abort());
   await page.goto("./");
   await expect(page.getByRole("alert")).toContainText("Unable to load the workspace");
-  await page.unroute(/\/assets\/main-[^/]+\.js$/);
+  await page.unroute(/\/assets\/browser-workspace-[^/]+\.js$/);
   await page.reload();
   await expect(page.locator("#base-svg rect")).toHaveCount(12);
   await expect(page.getByRole("alert")).toHaveCount(0);

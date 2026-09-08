@@ -1,9 +1,9 @@
-import { Link } from "@tanstack/react-router";
+import { AppLink as Link } from "@/components/text-link";
 
 export function Api() {
   return (
-    <section className="container">
-      <h1>Algorithm API</h1>
+    <section className="mx-auto w-[calc(100%-2rem)] max-w-7xl">
+      <h1 className="my-4 text-3xl font-bold">Algorithm API</h1>
 
       <p className="lead">
         You can add/edit your own javascript algorithm by clicking the "Add Algorithm" button at the
@@ -17,7 +17,12 @@ export function Api() {
         lets you "play" certain array elements.
       </p>
 
-      <div className="table-scroll" role="region" aria-label="Algorithm API reference" tabIndex={0}>
+      <div
+        className="max-w-full overflow-x-auto"
+        role="region"
+        aria-label="Algorithm API reference"
+        tabIndex={0}
+      >
         <table>
           <thead>
             <tr>
@@ -65,7 +70,7 @@ export function Api() {
                 calls.
               </td>
               <td>
-                <div className="api-marker mark">&nbsp;</div>
+                <div className="size-10 border-2 border-neutral-700 bg-neutral-50">&nbsp;</div>
               </td>
               <td>1</td>
             </tr>
@@ -76,7 +81,7 @@ export function Api() {
                 array item (returned via an AS.get() call).
               </td>
               <td>
-                <div className="api-marker compare">&nbsp;</div>
+                <div className="size-10 border-2 border-neutral-700 bg-amber-400">&nbsp;</div>
               </td>
               <td>2</td>
             </tr>
@@ -87,7 +92,7 @@ export function Api() {
                 index, or an array item (returned via an AS.get() call).
               </td>
               <td>
-                <div className="api-marker compare">&nbsp;</div>
+                <div className="size-10 border-2 border-neutral-700 bg-amber-400">&nbsp;</div>
               </td>
               <td>2</td>
             </tr>
@@ -98,7 +103,7 @@ export function Api() {
                 array item (returned via an AS.get() call).
               </td>
               <td>
-                <div className="api-marker compare">&nbsp;</div>
+                <div className="size-10 border-2 border-neutral-700 bg-amber-400">&nbsp;</div>
               </td>
               <td>2</td>
             </tr>
@@ -109,7 +114,7 @@ export function Api() {
                 index, or an array item (returned via an AS.get() call).
               </td>
               <td>
-                <div className="api-marker compare">&nbsp;</div>
+                <div className="size-10 border-2 border-neutral-700 bg-amber-400">&nbsp;</div>
               </td>
               <td>2</td>
             </tr>
@@ -120,7 +125,7 @@ export function Api() {
                 item (returned via an AS.get() call).
               </td>
               <td>
-                <div className="api-marker compare">&nbsp;</div>
+                <div className="size-10 border-2 border-neutral-700 bg-amber-400">&nbsp;</div>
               </td>
               <td>2</td>
             </tr>
@@ -131,7 +136,7 @@ export function Api() {
                 array item (returned via an AS.get() call).
               </td>
               <td>
-                <div className="api-marker compare">&nbsp;</div>
+                <div className="size-10 border-2 border-neutral-700 bg-amber-400">&nbsp;</div>
               </td>
               <td>2</td>
             </tr>
@@ -139,7 +144,7 @@ export function Api() {
               <th>AS.swap(itemOne, itemTwo)</th>
               <td>Will swap the positions of the two items.</td>
               <td>
-                <div className="api-marker swap">&nbsp;</div>
+                <div className="size-10 border-2 border-neutral-700 bg-yellow-300">&nbsp;</div>
               </td>
               <td>3</td>
             </tr>
@@ -151,7 +156,7 @@ export function Api() {
                 swapped show up as yellow circles.
               </td>
               <td>
-                <div className="api-marker justSwapped">&nbsp;</div>
+                <div className="size-10 border-2 border-neutral-700 bg-green-500">&nbsp;</div>
               </td>
               <td>4</td>
             </tr>
@@ -162,7 +167,7 @@ export function Api() {
                 AS.highlight() call, or until AS.clearHighlight() is called.
               </td>
               <td>
-                <div className="api-marker highlight">&nbsp;</div>
+                <div className="size-10 border-2 border-neutral-700 bg-purple-600">&nbsp;</div>
               </td>
               <td>5</td>
             </tr>

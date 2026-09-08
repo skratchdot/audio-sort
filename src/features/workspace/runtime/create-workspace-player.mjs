@@ -1,9 +1,9 @@
-import { createTimbreAudio } from "../audio/create-timbre-audio.mjs";
-import { createTransport } from "../audio/create-transport.ts";
-import { timbre } from "../vendor.mjs";
+import { createTimbreAudio } from "../../../audio/create-timbre-audio.mjs";
+import { createTransport } from "../../../audio/create-transport.ts";
+import { timbre } from "../../../vendor.mjs";
 import { select } from "d3-selection";
-import { visualizations } from "../visualizations/visualization-registry.mjs";
-import { createMidiBytes } from "../midi/create-midi-bytes.mjs";
+import { visualizations } from "../../../visualizations/visualization-registry.mjs";
+import { createMidiBytes } from "../../../midi/create-midi-bytes.mjs";
 import { drawStringPreview } from "./string-preview.ts";
 
 // Owns only the D3 SVG contents and audio resources. React owns all controls.

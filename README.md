@@ -38,7 +38,8 @@ See [development documentation](docs/development.md) for browser tests and deplo
 - [Jotai](https://jotai.org/) — Stores selected audio and sorting settings independently of the UI.
 - [React](https://react.dev/) — Renders settings, playback controls, and editing/export dialogs.
 - [TanStack Start](https://tanstack.com/start) — Prerenders the React pages for static hosting.
-- [Tailwind CSS](https://tailwindcss.com/) — Styles the workspace alongside first-party CSS.
+- [Tailwind CSS](https://tailwindcss.com/) — Styles the workspace and its reusable components.
+- [shadcn/ui](https://ui.shadcn.com/) — Provides buttons, dialogs, tabs, and sliders built on Base UI.
 - [Lucide](https://lucide.dev/) — Provides consistent SVG icons for playback and other controls.
 - [Ace](https://ace.c9.io/) — Powers the algorithm editor with syntax highlighting and JavaScript diagnostics.
 - [jsmidgen](https://github.com/dingram/jsmidgen) — Encodes sorting playback as MIDI files.
