@@ -3,8 +3,11 @@ import { createStore } from "jotai/vanilla";
 import { waveformDefaults, selectedWaveformAtom } from "../src/state/waveforms.ts";
 import { envelopeDefaults, envelopeAtom, updateEnvelopeAtom } from "../src/state/envelope.ts";
 import { updateSettingAtom } from "../src/state/settings.ts";
-import { createWorkspace } from "../src/ui/create-workspace.mjs";
-import { getEnvelopePoints, formatEnvelopeValue } from "../src/ui/envelope-diagram.ts";
+import { createWorkspace } from "../src/features/workspace/runtime/create-workspace.mjs";
+import {
+  getEnvelopePoints,
+  formatEnvelopeValue,
+} from "../src/features/workspace/runtime/envelope-diagram.ts";
 
 test("all eight generators use the shared defaults, including string", () => {
   const store = createStore();

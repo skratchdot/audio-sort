@@ -1,6 +1,6 @@
 import type { createStore } from "jotai/vanilla";
-import { settingsAtom, type Settings } from "../state/settings.ts";
-import { selectedWaveformAtom, type Waveform } from "../state/waveforms.ts";
+import { settingsAtom, type Settings } from "../../../state/settings.ts";
+import { selectedWaveformAtom, type Waveform } from "../../../state/waveforms.ts";
 
 type Effects = {
   render: (settings: Settings, waveform: Waveform) => void;

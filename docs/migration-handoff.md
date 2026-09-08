@@ -31,14 +31,14 @@ All third-party JavaScript is imported from pnpm packages. Timbre remains pinned
 `14.11.25`, with Node-only dependencies excluded. Native sample loading replaces
 the old JSONP/MP3 extensions. No new license-output logic is included.
 
-## Current branch: tanstack-start-shell
+## Completed TanStack Start shell
 
 Eleventy and Liquid are replaced by TanStack Start file routes and React pages.
 The existing workspace, runtime, and visual design are retained.
 
 - `src/routes/` defines the three pages; Start generates `src/route-tree.gen.ts`.
 - `src/pages/site-document.tsx` renders the shared header/footer and document.
-- `src/pages/home.tsx` dynamically imports `src/main.tsx` after hydration.
+- `src/pages/home.tsx` dynamically imports `src/features/workspace/browser-workspace.tsx` after hydration.
   It renders the workspace within Start's React root; runtime lifecycle cleanup
   handles navigation away, cached pages, and remounts. Audio/editor modules never
   execute during prerendering.
@@ -61,10 +61,20 @@ The existing workspace, runtime, and visual design are retained.
 
 ## Next
 
-Review this migration before starting phase 8 (recorded writes/auxiliary buffers
-and Merge sort). Keep redesign and license reporting deferred. See
-`modernization.md` for the overall sequence; no algorithm metadata-format change
-or audio-engine rewrite is needed for this shell migration.
+The current `shadcn-base-ui` branch refines the UI without changing audio, state,
+or sorting APIs. It uses shadcn's Base UI Nova primitives, retains Lucide and the
+system font, and maps the light theme to Tailwind sky/neutral colors.
+
+- `src/components/ui/`: shared primitives; `components/layout/`: header/footer.
+- `src/features/workspace/`: components, separate dialogs, and runtime coordination.
+- `src/styles/globals.css`: theme/document defaults; `visualizations.css`: D3 state styles.
+- `site.css` and the `tw:` prefix are removed. Buttons and links own their Tailwind classes.
+- Two workspace layouts use one 1024px threshold; chart heights are fluid.
+- Tab panels stay mounted for Ace/canvas lifetime. Slider thumbs use center alignment
+  to avoid hidden-panel measurement. Base UI handles dialog focus and dismissal.
+
+Review this changeset visually and audition playback. Then continue phase 8
+(recorded writes/auxiliary buffers and Merge sort). Redesign and license reporting remain deferred.
 
 ## Verification
 

@@ -1,6 +1,6 @@
 import type { createStore } from "jotai/vanilla";
-import { settingsAtom } from "../state/settings.ts";
-import { algorithmCatalogAtom } from "../state/algorithm-overrides.ts";
+import { settingsAtom } from "../../../state/settings.ts";
+import { algorithmCatalogAtom } from "../../../state/algorithm-overrides.ts";
 
 type Catalog = ReturnType<typeof algorithmCatalogAtom.read>;
 type Effects = {

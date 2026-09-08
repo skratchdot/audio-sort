@@ -1,7 +1,7 @@
 import { expect, test, vi } from "vitest";
 import { createStore } from "jotai/vanilla";
 import { defaults, settingsAtom, updateSettingAtom } from "../src/state/settings.ts";
-import { createWorkspace } from "../src/ui/create-workspace.mjs";
+import { createWorkspace } from "../src/features/workspace/runtime/create-workspace.mjs";
 
 test("settings retain all nine existing defaults", () => {
   const store = createStore();

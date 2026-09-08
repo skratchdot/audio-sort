@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { expect, test } from "vitest";
 import { scales } from "../src/midi/scales.ts";
-import { createHelpers } from "../src/ui/create-helpers.mjs";
+import { createHelpers } from "../src/features/workspace/runtime/create-helpers.mjs";
 
 test("preserves all scale data extracted from the bundled subcollider 0.1.0", () => {
   // Baseline computed from ScaleInfo.names()/at() in the original bundle.

@@ -2,19 +2,19 @@ import { createStore } from "jotai/vanilla";
 import { min, max } from "d3-array";
 import { scaleLinear } from "d3-scale";
 import { saveAs } from "file-saver";
-import { timbre } from "../vendor.mjs";
-import { createTimbreSoundfont } from "../audio/create-timbre-soundfont.mjs";
+import { timbre } from "../../../vendor.mjs";
+import { createTimbreSoundfont } from "../../../audio/create-timbre-soundfont.mjs";
 import { createHelpers } from "./create-helpers.mjs";
 import { createWorkspacePlayer } from "./create-workspace-player.mjs";
 import { connectAudioSettings } from "./connect-audio-settings.ts";
 import { connectPlaybackSettings } from "./connect-playback-settings.ts";
 import { connectSortSettings } from "./connect-sort-settings.ts";
-import { generators } from "../generators/generator-registry.ts";
-import { defaults, settingsAtom, updateSettingAtom } from "../state/settings.ts";
-import { selectedWaveformAtom } from "../state/waveforms.ts";
-import { algorithmCatalogAtom } from "../state/algorithm-overrides.ts";
-import { playbackPreferencesAtom, toggleLoopAtom } from "../state/playback-preferences.ts";
-import { createSortRequest, runSortRequest } from "../sorting/sort-requests.ts";
+import { generators } from "../../../generators/generator-registry.ts";
+import { defaults, settingsAtom, updateSettingAtom } from "../../../state/settings.ts";
+import { selectedWaveformAtom } from "../../../state/waveforms.ts";
+import { algorithmCatalogAtom } from "../../../state/algorithm-overrides.ts";
+import { playbackPreferencesAtom, toggleLoopAtom } from "../../../state/playback-preferences.ts";
+import { createSortRequest, runSortRequest } from "../../../sorting/sort-requests.ts";
 
 const emptyPlayer = {
   position: 0,
@@ -129,7 +129,7 @@ export function createWorkspace(store = createStore()) {
       }
       return;
     }
-    worker = new Worker(new URL("../worker.mjs", import.meta.url), { type: "module" });
+    worker = new Worker(new URL("../../../worker.mjs", import.meta.url), { type: "module" });
     const key = workerKey;
     worker.addEventListener("message", (event) => accept(event.data));
     worker.addEventListener("error", (event) => accept({ key, error: event.message }));

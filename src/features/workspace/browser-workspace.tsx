@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createStore } from "jotai/vanilla";
-import { Workspace } from "./ui/workspace.tsx";
-import { createWorkspace } from "./ui/create-workspace.mjs";
+import { Workspace } from "./components/workspace.tsx";
+import { createWorkspace } from "./runtime/create-workspace.mjs";
 
 const store = createStore();
 type Runtime = ReturnType<typeof createWorkspace>;

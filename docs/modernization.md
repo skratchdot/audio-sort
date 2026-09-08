@@ -103,8 +103,15 @@ production, preview, and browser tests share the same base and build configurati
 Home imports the existing workspace after hydration; About/API need no audio or
 editor runtime. Client navigation unmounts the workspace when leaving Home.
 
-Next is phase 8: recorded writes/auxiliary buffers and Merge sort. The technical
-UI migration is complete; a larger visual redesign is still a separate decision.
+The current UI refinement adds shadcn Base UI (Nova preset) before phase 8.
+Shared primitives live in `components/ui/`; workspace components, dialogs, and
+runtime modules live in `features/workspace/`. Tailwind component classes replace
+`site.css`, with sky/neutral theme tokens and a small D3 stylesheet. One `lg`
+threshold separates stacked and side-by-side layouts; chart heights use `clamp()`.
+Review the larger controls, dialog behavior, and laptop/mobile layouts before merging.
+
+After this UI review, phase 8 remains recorded writes/auxiliary buffers and Merge sort.
+A larger visual redesign is still a separate decision.
 See [the migration handoff](migration-handoff.md) for fresh-context continuation.
 Keep transport state and shared vendor resources out of Jotai; retain listening checks.
 The algorithm function/metadata format and editor remain unchanged; do not add parser/build

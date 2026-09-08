@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
-import { createWorkspace } from "../src/ui/create-workspace.mjs";
-import { createHelpers } from "../src/ui/create-helpers.mjs";
-import { createWorkspacePlayer } from "../src/ui/create-workspace-player.mjs";
+import { createWorkspace } from "../src/features/workspace/runtime/create-workspace.mjs";
+import { createHelpers } from "../src/features/workspace/runtime/create-helpers.mjs";
+import { createWorkspacePlayer } from "../src/features/workspace/runtime/create-workspace-player.mjs";
 import { visualizations } from "../src/visualizations/visualization-registry.mjs";
 
 test("UI modules import without DOM initialization or first-party globals", () => {

@@ -36,8 +36,14 @@ Static files live in root-level `public/`: images in `public/img/` and the
 to `dist/audio-sort/` without a `public/` URL prefix. Use `/img/...` in source CSS; Vite
 adjusts these URLs for the deployment path. Application modules and CSS stay in `src/`.
 
-CSS is bundled and minified by Vite. Tailwind supplies Preflight and utilities;
-first-party styles preserve the existing design. No Bootstrap overrides are needed.
+CSS is bundled and minified by Vite. `src/styles/globals.css` contains Tailwind and
+shadcn theme tokens; component classes own layout and control styling. D3-specific
+styles live in `src/styles/visualizations.css`.
+
+Add primitives with `pnpm dlx shadcn@latest add <component>`. `components.json`
+selects Base UI, the Nova preset, neutral base colors, and Lucide icons. Keep shared
+primitives in `src/components/ui/` and workspace behavior in `src/features/workspace/`.
+Use `lg:` for the application's stacked/side-by-side layout; avoid adding extra width tiers.
 
 ## Checks
 
