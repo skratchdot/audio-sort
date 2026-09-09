@@ -1,11 +1,21 @@
 # Audio Sort
 
-A webpage to visualize and audibilize sorting algorithms using javascript.
+Watch and listen to sorting algorithms in your browser, or edit them to experiment with their behavior.
 
 [![Audio Sort][2]][1]
 
 [1]: https://projects.skratchdot.com/audio-sort/
 [2]: https://projects.skratchdot.com/audio-sort/img/preview.jpg
+
+## Project links
+
+- [Live Demo](https://projects.skratchdot.com/audio-sort/): Try Audio Sort in your browser.
+- [About](docs/about.md): The project’s origins and 2026 modernization.
+- [Algorithm API](docs/api.md): Write custom algorithms using the recording API.
+- [Sorting algorithm catalog](docs/sorting-algorithms.md): Compare algorithms, implementation status, and candidates for additions.
+- [Original project page](https://skratchdot.com/projects/audio-sort/): The historical project overview and collection of related resources.
+- [Source Code](https://github.com/skratchdot/audio-sort/): Browse the code, issues, and development history on GitHub.
+- [TODO List](docs/todo.md): See open feature ideas and maintenance work.
 
 ## Development
 
@@ -21,130 +31,85 @@ Open `/audio-sort/` on the development server. Build with `pnpm run build`
 
 See [development documentation](docs/development.md) for browser tests and deployment.
 
-## Audio Sort Links
-
-- [Live Demo](https://projects.skratchdot.com/audio-sort/)
-
-- [Project Page / Comments](https://skratchdot.com/projects/audio-sort/)
-
-- [Source Code](https://github.com/skratchdot/audio-sort/)
-
-- [TODO List](docs/todo.md)
-
 ## Built With
 
-- [timbre.js](https://mohayonao.github.io/timbre.js/) — Synthesizes tones and plays soundfont instruments for sorting playback.
-- [D3](https://d3js.org/) — Provides scale, color, path geometry, and array utilities; React renders the SVG charts.
-- [Jotai](https://jotai.org/) — Stores selected audio and sorting settings independently of the UI.
-- [React](https://react.dev/) — Renders settings, playback controls, and editing/export dialogs.
-- [TanStack Start](https://tanstack.com/start) — Prerenders the React pages for static hosting.
-- [Tailwind CSS](https://tailwindcss.com/) — Styles the workspace and its reusable components.
-- [shadcn/ui](https://ui.shadcn.com/) — Provides buttons, dialogs, tabs, and sliders built on Base UI.
-- [Lucide](https://lucide.dev/) — Provides consistent SVG icons for playback and other controls.
-- [Ace](https://ace.c9.io/) — Powers the algorithm editor with syntax highlighting and JavaScript diagnostics.
-- [jsmidgen](https://github.com/dingram/jsmidgen) — Encodes sorting playback as MIDI files.
-- [FileSaver.js](https://github.com/eligrey/FileSaver.js) — Downloads generated MIDI files in the browser.
+- [timbre.js](https://mohayonao.github.io/timbre.js/): Synthesizes tones and plays soundfont instruments for sorting playback.
+- [D3](https://d3js.org/): Provides scale, color, path geometry, and array utilities; React renders the SVG charts.
+- [Jotai](https://jotai.org/): Stores selected audio and sorting settings independently of the UI.
+- [React](https://react.dev/): Renders settings, playback controls, and editing/export dialogs.
+- [TanStack Start](https://tanstack.com/start): Prerenders the React pages for static hosting.
+- [Tailwind CSS](https://tailwindcss.com/): Styles the workspace and its reusable components.
+- [shadcn/ui](https://ui.shadcn.com/): Provides buttons, dialogs, tabs, and sliders built on Base UI.
+- [Lucide](https://lucide.dev/): Provides consistent SVG icons for playback and other controls.
+- [Ace](https://ace.c9.io/): Powers the algorithm editor with syntax highlighting and JavaScript diagnostics.
+- [jsmidgen](https://github.com/dingram/jsmidgen): Encodes sorting playback as MIDI files.
+- [FileSaver.js](https://github.com/eligrey/FileSaver.js): Downloads generated MIDI files in the browser.
 
-## See Also / Credits
+### Additional Credits
 
-Musical scale data is adapted from [subcollider.js](https://github.com/mohayonao/subcollider).
-All 108 scales and the original license notice are preserved in [scales.ts](src/midi/scales.ts).
+- Musical scale data is adapted from [subcollider.js](https://github.com/mohayonao/subcollider).
+  All 108 scales and the original license notice are preserved in [scales.ts](src/midi/scales.ts).
 
-### About Sorting Algorithms
+## Related resources
 
-- [Wikipedia: Sorting Algorithms](http://en.wikipedia.org/wiki/Sorting_algorithms)
+### Articles and references
 
-- [DuckDuckGo: Sorting Algorithms](https://duckduckgo.com/c/Sorting_algorithms)
+- [Wikipedia: Sorting Algorithms](https://en.wikipedia.org/wiki/Sorting_algorithm): An overview of sorting methods, complexity, and stability.
+- [c2.com: Sorting Algorithms](https://wiki.c2.com/?SortingAlgorithms): Community wiki discussions of sorting techniques.
+- [Visualising Sorting Algorithms by Aldo Cortesi](https://corte.si/posts/code/visualisingsorting/): An explanation of static sorting diagrams and how to read them.
+- [Visualizing Algorithms by Mike Bostock](https://bost.ocks.org/mike/algorithms/): An illustrated essay on explaining algorithms through visualization.
+- [Sorting Algorithms Visualised by Callum Macrae](https://macr.ae/article/sorting-algorithms): A blog post exploring sorting through visualization.
+- [DuckDuckGo: Sorting Algorithms](https://duckduckgo.com/?q=sorting+algorithms): Search for more sorting resources.
 
-- [c2.com: Sorting Algorithms](http://c2.com/cgi/wiki?SortingAlgorithms)
+### Interactive visualizations
 
-### Visual
+- [Sorting Algorithms Animations](https://www.toptal.com/developers/sorting-algorithms): Compare sorting methods across different input arrangements.
+- [Visual Sorts on Canvas by Joshua Kehn](https://www.joshuakehn.com/blog/static/sort.html): Compare JavaScript sorting algorithms with canvas animations and adjustable input data.
+- [Data Structure Visualizations](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html): Interactive teaching demos covering sorting, trees, graphs, and other data structures.
+- [VisuAlgo](https://visualgo.net/en): Animated explanations of data structures and algorithms.
+- [Algorithm Visualizer](https://github.com/algorithm-visualizer/algorithm-visualizer): An interactive platform for visualizing algorithms from code.
+- [Algorithm Playground](https://github.com/awalGarg/alpg): Visualize custom algorithms and step backward and forward through their execution.
+- [Python Algorithm Visualizations](https://pyalgoviz.appspot.com/): A tool for visualizing algorithms written in Python.
+- [Sorting Visualizer - Karim Elghamry](https://github.com/KarimElghamry/sorting-visualizer): A sorting visualizer built with React.
+- [SortDemon](https://github.com/copperhuh/SortDemon): Visualizations of over 30 sorting algorithms with adjustable speed and input size.
 
-- [sorting-algorithms.com](http://www.sorting-algorithms.com/)
+### Sorting with sound
 
-- [sortvis.org](http://sortvis.org/index.html)
+- [Assortment - webcloud.se](https://webcloud.se/Assortment/): A browser experiment combining sorting and sound.
+- [Sound Of Sorting: Downloadable App](https://panthema.net/2013/sound-of-sorting/): A desktop application that visualizes sorting and turns comparisons into sound.
 
-- [corte.si](http://corte.si/posts/code/visualisingsorting/index.html)
+### Videos and animation galleries
 
-- [visualsort.appspot.com](http://visualsort.appspot.com/)
+- [YouTube: Visualization of Quick Sort](https://www.youtube.com/watch?v=aXXWXz5rF64): A video demonstration of quicksort.
+- [YouTube: 15 Sorting Algorithms in 6 Minutes](https://www.youtube.com/watch?v=kPRA0W1kECg): A video comparing the sights and sounds of 15 sorting algorithms.
+- [YouTube: What different sorting algorithms sound like](https://www.youtube.com/watch?v=t8g-iYGHpEA): A video comparison of sorting algorithms through sound.
+- [YouTube: Heapsort audibilization](https://www.youtube.com/watch?v=iXAjiDQbPSw): A sound-based demonstration of heapsort.
+- [YouTube: The Sound of Quicksort](https://www.youtube.com/watch?v=m1PS8IR6Td0): A sound-based demonstration of quicksort.
+- [YouTube: SORTDEMO.BAS](https://www.youtube.com/watch?v=leNaS9eJWqo): A video of the BASIC sorting demonstration.
+- [Sorting Visualizations on imgur by FishyMcFishFace](https://imgur.com/gallery/RM3wl): A gallery of sorting animations.
 
-- [joshuakehn.com](http://joshuakehn.com/blog/static/sort.html)
+#### Sorting Out Sorting
 
-- [Youtube: Visualization Of QuickSort](http://www.youtube.com/watch?v=aXXWXz5rF64)
+- [Sorting Out Sorting - Part 1](https://www.youtube.com/watch?v=YvTW7341kpA): The opening segment of the sorting film.
+- [Sorting Out Sorting - Part 2](https://www.youtube.com/watch?v=plAi7kcqMNU): The second segment of the sorting film.
+- [Sorting Out Sorting - Part 3](https://www.youtube.com/watch?v=gtdfW3TbeYY): The third segment of the sorting film.
+- [Sorting Out Sorting - Part 4](https://www.youtube.com/watch?v=wdcoRfS8edM): The final segment in this four-part upload.
 
-- [Visualizing Algorithms by Mike Bostock](https://bost.ocks.org/mike/algorithms/)
+### Source code collections
 
-- [Algorithm Visualizer](https://github.com/parkjs814/AlgorithmVisualizer)
+- [Sound Of Sorting](https://github.com/bingmann/sound-of-sorting): Source code for the desktop visualization and audio application.
+- [sortvis](https://github.com/cortesi/sortvis): Python/Cairo code for generating static sorting diagrams.
+- [VisualSort](https://github.com/thedufer/VisualSort): Source for a browser visualizer that records and displays custom sorting algorithms.
+- [Illustrated Algorithms](https://github.com/ovidiuch/illustrated-algorithms): Archived source and examples of visualizations with reversible execution.
+- [Wikibooks: Sorting implementations](https://en.wikibooks.org/wiki/Algorithm_Implementation/Sorting): Sorting implementations organized by algorithm and programming language.
+- [Rosetta Code: Sorting algorithms](https://rosettacode.org/wiki/Category:Sorting_Algorithms): Sorting tasks and implementations in multiple languages.
+- [escherba/algorithms-in-javascript](https://github.com/escherba/algorithms-in-javascript/): A collection of algorithm implementations in JavaScript.
+- [humanwhocodes/computer-science-in-javascript](https://github.com/humanwhocodes/computer-science-in-javascript): JavaScript implementations of classic algorithms and data structures.
 
-- [Algorithm Playground](https://github.com/awalGarg/alpg)
+### Beyond sorting
 
-- [Data Structure Visualizations](http://www.cs.usfca.edu/~galles/visualization/Algorithms.html)
-
-- [VisuAlgo](http://visualgo.net/)
-
-- [Illustrated-Algorithms](https://illustrated-algorithms.now.sh/)
-
-- [Sorting Algorithms Visualised - Blog Post on http://macr.ae/](http://macr.ae/article/sorting-algorithms.html)
-
-- [Sorting Visualizations on imgur by FishyMcFishFace](https://imgur.com/gallery/RM3wl)
-
-- [Sorting Algorithms Animations](https://www.toptal.com/developers/sorting-algorithms/)
-
-- [Machine Learning visualizer](https://jeff3dx.github.io/mlearning)
-
-- [Python Algorithm Visualizations](https://pyalgoviz.appspot.com/)
-
-- [Morpheus - Visual Algorithm Simulator](https://rkarthick.github.io/morpheus-client/)
-
-- [Sorting Visualizer - Karim Elghamry](https://github.com/KarimElghamry/sorting-visualizer)
-
-- [SortDemon](https://github.com/copperhuh/SortDemon)
-
-- [Algorithm Visualizer](https://github.com/algorithm-visualizer/algorithm-visualizer)
-
-### Other Audio Web Apps
-
-- [Assortment - webcloud.se](http://webcloud.se/Assortment/)
-
-- [Sounds Of Sorting - caseyrule.com](http://www.caseyrule.com/projects/sounds-of-sorting/)
-
-### Audio
-
-- [Sound Of Sorting: Downloadable App](http://panthema.net/2013/sound-of-sorting/)
-
-- [Youtube: 15 Sorting Algorithms in 6 Minutes](https://www.youtube.com/watch?v=kPRA0W1kECg)
-
-- [Youtube: 15 Sorting Algorithms charted for Guitar Hero/Clone Hero](https://www.youtube.com/watch?v=YyerMJlmtts)
-
-- [Youtube: What different sorting algorithms sound like](http://www.youtube.com/watch?v=t8g-iYGHpEA)
-
-- [Youtube: Heapsort audibilization](http://www.youtube.com/watch?v=iXAjiDQbPSw)
-
-- [Youtube: The Sound of Quicksort](http://www.youtube.com/watch?v=m1PS8IR6Td0)
-
-- [Youtube: SORTDEMO.BAS](https://www.youtube.com/watch?v=leNaS9eJWqo)
-
-### Sorting Out Sorting
-
-- [Sorting Out Sorting - Part 1](http://www.youtube.com/watch?v=YvTW7341kpA)
-
-- [Sorting Out Sorting - Part 2](http://www.youtube.com/watch?v=plAi7kcqMNU)
-
-- [Sorting Out Sorting - Part 3](http://www.youtube.com/watch?v=gtdfW3TbeYY)
-
-- [Sorting Out Sorting - Part 4](http://www.youtube.com/watch?v=wdcoRfS8edM)
-
-### Implementations
-
-- [Sound Of Sorting](https://github.com/bingmann/sound-of-sorting)
-
-- [wikibooks.org](http://en.wikibooks.org/wiki/Algorithm_Implementation/Sorting)
-
-- [rosettacode.org](http://rosettacode.org/wiki/Category:Sorting_Algorithms)
-
-- [Github User: escherba](https://github.com/escherba/algorithms-in-javascript/)
-
-- [Github User: nzakas](https://github.com/nzakas/computer-science-in-javascript/)
+- [Machine Learning visualizer](https://jeff3dx.github.io/mlearning/): Interactive classification and clustering demos, including nearest neighbors and k-means.
+- [Morpheus - Visual Algorithm Simulator](https://rkarthick.github.io/morpheus-client/): Simulates synchronous distributed algorithms, including leader election in a ring.
 
 ## License
 
