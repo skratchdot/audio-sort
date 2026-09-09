@@ -39,7 +39,7 @@ export function Footer() {
             skratchdot{" "}
             <img
               className="inline size-4"
-              alt="skratchdot"
+              alt=""
               src={`${import.meta.env.BASE_URL}img/favicon.ico`}
             />
           </TextLink>

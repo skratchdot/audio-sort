@@ -20,7 +20,7 @@ export function DocsPage({
   components?: Components;
 }) {
   return (
-    <article
+    <main
       id={id}
       className="mx-auto my-8 w-[calc(100%-2rem)] max-w-7xl text-base leading-relaxed [&_h1]:mb-6 [&_h1]:text-4xl [&_h1]:font-bold [&_h2]:mt-8 [&_li]:my-2 [&_ol]:mb-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-6"
     >
@@ -51,6 +51,6 @@ export function DocsPage({
       >
         {content}
       </Markdown>
-    </article>
+    </main>
   );
 }
