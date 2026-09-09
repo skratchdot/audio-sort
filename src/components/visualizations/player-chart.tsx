@@ -1,6 +1,9 @@
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { usePlayground } from "../playground/playground-context";
+import { useAtomValue } from "jotai";
+import { playerAtoms, suspendedAtom } from "../../state/players";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent } from "react";
-import type { Props, PlayerId } from "../../controllers/playground-types";
+import type { PlayerId } from "../../state/players";
 import { createTrajectories } from "../../visualizations/create-trajectories.ts";
 import { cn } from "../../utilities/cn";
 
@@ -12,20 +15,20 @@ const markers = [
   ["mark", "fill-neutral-50"],
 ] as const;
 
-export function PlayerChart({ runtime, id }: Props & { id: PlayerId }) {
-  const { frames, position, renderer } = useSyncExternalStore(
-    runtime.subscribe,
-    () => runtime.getSnapshot()[id],
-  );
-  const suspended = useSyncExternalStore(runtime.subscribe, () => runtime.getSnapshot().suspended);
+export function PlayerChart({ id }: { id: PlayerId }) {
+  const actions = usePlayground();
+  const { frames, position, renderer } = useAtomValue(playerAtoms[id]);
+  const suspended = useAtomValue(suspendedAtom);
   const [hover, setHover] = useState(-1);
   const drag = useRef<{ pointer: number; index: number; value: number } | null>(null);
   useEffect(() => {
-    if (suspended) {
+    const cancel = () => {
       drag.current = null;
       setHover(-1);
-    }
-  }, [suspended]);
+    };
+    globalThis.addEventListener("pagehide", cancel);
+    return () => globalThis.removeEventListener("pagehide", cancel);
+  }, []);
   const editable = id === "base" && !suspended;
   const flat = renderer === "flat";
   const items = frames[position]?.arr ?? [];
@@ -63,7 +66,7 @@ export function PlayerChart({ runtime, id }: Props & { id: PlayerId }) {
         const value = point(event);
         drag.current = { pointer: event.pointerId, ...value };
         setHover(value.index);
-        runtime.edit(value.index, value.value);
+        actions.edit(value.index, value.value);
       }}
       onPointerMove={(event) => {
         if (!editable || !size || flat) return;
@@ -75,7 +78,7 @@ export function PlayerChart({ runtime, id }: Props & { id: PlayerId }) {
           (drag.current.index !== value.index || drag.current.value !== value.value)
         ) {
           drag.current = { pointer: event.pointerId, ...value };
-          runtime.edit(value.index, value.value);
+          actions.edit(value.index, value.value);
         }
       }}
       onPointerLeave={() => setHover(-1)}

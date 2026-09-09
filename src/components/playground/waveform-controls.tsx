@@ -1,15 +1,14 @@
+import { usePlayground } from "./playground-context";
 import { EnvelopeChart } from "../visualizations/envelope-chart";
 import { Button } from "@/components/ui/button";
 import { ValueSlider } from "@/components/value-slider";
 import { Field } from "@base-ui/react/field";
 import { useAtomValue, useSetAtom } from "jotai";
-import type { createStore } from "jotai/vanilla";
 import { settingsAtom, updateSettingAtom } from "../../state/settings.ts";
 import { envelopeAtom, updateEnvelopeAtom, type EnvelopeKey } from "../../state/envelope.ts";
 import { waveformDefaults, type WaveformId } from "../../state/waveforms.ts";
 import { formatEnvelopeValue } from "../../audio/envelope.ts";
 
-type Store = ReturnType<typeof createStore>;
 const controls: ReadonlyArray<{
   key: EnvelopeKey;
   name: string;
@@ -58,11 +57,12 @@ const controls: ReadonlyArray<{
   },
 ];
 
-export function WaveformControls({ store }: { store: Store }) {
-  const { waveform } = useAtomValue(settingsAtom, { store });
-  const envelope = useAtomValue(envelopeAtom, { store });
-  const updateSetting = useSetAtom(updateSettingAtom, { store });
-  const updateEnvelope = useSetAtom(updateEnvelopeAtom, { store });
+export function WaveformControls() {
+  const { setCanvas } = usePlayground();
+  const { waveform } = useAtomValue(settingsAtom);
+  const envelope = useAtomValue(envelopeAtom);
+  const updateSetting = useSetAtom(updateSettingAtom);
+  const updateEnvelope = useSetAtom(updateEnvelopeAtom);
 
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -70,6 +70,7 @@ export function WaveformControls({ store }: { store: Store }) {
         <EnvelopeChart envelope={envelope} />
         {/* The audio adapter alone draws this canvas; React never owns its pixels. */}
         <canvas
+          ref={setCanvas}
           id="waveform-canvas"
           className="mb-2 h-12 w-full rounded-lg border bg-neutral-100"
           role="img"

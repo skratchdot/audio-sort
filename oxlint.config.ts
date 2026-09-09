@@ -1,7 +1,7 @@
 import { defineConfig } from "oxlint";
 
 export default defineConfig({
-  plugins: ["eslint", "unicorn", "oxc", "vitest", "typescript", "jsx-a11y"],
+  plugins: ["eslint", "unicorn", "oxc", "vitest", "typescript", "jsx-a11y", "react"],
   categories: { correctness: "error" },
   env: { node: true },
   ignorePatterns: [
@@ -16,6 +16,8 @@ export default defineConfig({
     "test-results/**",
   ],
   rules: {
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "error",
     // SVG/canvas images and live status regions intentionally use ARIA roles.
     "jsx-a11y/prefer-tag-over-role": "off",
     "typescript/consistent-type-definitions": ["error", "type"],
@@ -25,6 +27,12 @@ export default defineConfig({
     "one-var": ["error", "never"],
   },
   overrides: [
+    {
+      // These effects initialize browser-only resources or read the client clock
+      // after hydration; neither operation can run during prerendering.
+      files: ["src/hooks/use-players.ts", "src/components/layout/footer.tsx"],
+      rules: { "react/set-state-in-effect": "off" },
+    },
     {
       files: ["src/components/docs-page.tsx"],
       // Keyboard users must be able to scroll wide documentation tables.

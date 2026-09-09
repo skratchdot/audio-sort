@@ -13,7 +13,7 @@ Paths below are relative to `src/`; `@/` aliases that directory.
 | `components/playground/`, `components/dialogs/` | Interactive controls, editor, and MIDI export                            |
 | `components/ui/`                                | Shared shadcn Base UI primitives                                         |
 | `components/visualizations/`                    | React SVG charts and envelope diagram                                    |
-| `controllers/`                                  | Playground/player coordination and settings connections                  |
+| `hooks/`                                        | React effects for players, audio settings, sorting, and cleanup          |
 | `state/`                                        | Jotai settings, envelopes, playback preferences, and algorithm overrides |
 | `sorting/`                                      | Recorder, worker protocol, registries, and algorithm implementations     |
 | `generators/`, `midi/`                          | Input patterns, musical data, and MIDI encoding                          |
@@ -31,11 +31,21 @@ About/API import Markdown from `docs/` through `components/docs-page.tsx` and
 remain readable without JavaScript. Browser audio and editor modules do not run
 during prerendering.
 
-`controllers/create-playground.mjs` coordinates data generation, workers, settings
-connections, sample preloading, and two players. Each player publishes frames,
-position, and visualization selection. React reads runtime snapshots through
-`useSyncExternalStore` and settings through the application-scoped Jotai store.
-Audio clocks, nodes, and sample caches stay outside React and Jotai.
+The document's Jotai `Provider` owns state across client-side route changes.
+Components use `useAtomValue`, `useAtom`, and `useSetAtom` directly. Settings,
+algorithm overrides, visualization choice, and player snapshots live in atoms;
+there is no module-level store or parallel subscription system.
+
+`components/playground/playground-context.tsx` provides playback, editing, and
+export actions. `hooks/use-players.ts` creates and disposes the audio resources,
+then synchronizes waveform, volume, tempo, instrument, and visualization through
+React effects. `hooks/use-sort.ts` manages input data, sample preloading, and
+worker requests; effect cleanup cancels pending edits and ignores stale replies.
+
+Audio clocks, nodes, and sample caches are imperative services owned by the
+player effect. Their callbacks read current values from the provider's store
+through `audio/audio-settings.ts`, without creating their own subscriptions.
+Player callbacks write snapshots into atoms for React to render.
 
 React owns SVG children; D3 supplies array, scale, color, and path utilities.
 Trajectory geometry is memoized by frame data. The waveform preview canvas is
@@ -46,8 +56,9 @@ Base UI handles dialog focus and dismissal. Ace loads on demand, with pending
 initialization cancelled on close. Tab panels stay mounted for editor/canvas
 lifetime. Invalid source leaves the algorithm catalog unchanged.
 
-Cached-page suspension disconnects effects, pauses audio, cancels workers and
-pending resumes, and closes dialogs. Returning reconnects without automatically playing.
+Cached-page suspension pauses audio immediately, cancels workers and pending
+resumes, and closes dialogs. React effects synchronize current settings when the
+page returns, without automatically playing.
 Leaving Home disposes the playground and its owned resources. The shared
 AudioContext remains library-owned.
 

@@ -1,15 +1,13 @@
+import { usePlayground } from "../playground/playground-context";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { instruments } from "../../midi/instruments.ts";
 import { PlayerDialog as Dialog } from "./player-dialog.tsx";
-import type { Props, PlayerId } from "../../controllers/playground-types.ts";
-export function MidiDialog({
-  runtime,
-  id,
-  onClose,
-}: Props & { id: PlayerId; onClose: () => void }) {
+import type { PlayerId } from "../../state/players";
+export function MidiDialog({ id, onClose }: { id: PlayerId; onClose: () => void }) {
+  const actions = usePlayground();
   const [name, setName] = useState("");
   const [placeholder] = useState(() => `AudioSort_${Date.now()}`);
   const [channel, setChannel] = useState(0);
@@ -24,7 +22,7 @@ export function MidiDialog({
           type="button"
           id="midi-export-btn"
           variant="default"
-          onClick={() => runtime.exportMidi(id, name.trim() || placeholder, channel, instrument)}
+          onClick={() => actions.exportMidi(id, name.trim() || placeholder, channel, instrument)}
         >
           Export As Midi
         </Button>

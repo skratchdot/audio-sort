@@ -1,4 +1,4 @@
-import { atom } from "jotai/vanilla";
+import { atom } from "jotai";
 import { algorithms } from "../sorting/algorithm-registry.mjs";
 import type { SortAlgorithm } from "../sorting/sort-types.ts";
 

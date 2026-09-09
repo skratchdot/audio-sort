@@ -3,7 +3,7 @@ import { createStore } from "jotai/vanilla";
 import { waveformDefaults, selectedWaveformAtom } from "../src/state/waveforms.ts";
 import { envelopeDefaults, envelopeAtom, updateEnvelopeAtom } from "../src/state/envelope.ts";
 import { updateSettingAtom } from "../src/state/settings.ts";
-import { createPlayground } from "../src/controllers/create-playground.mjs";
+import { createAudioSettings } from "../src/audio/audio-settings.ts";
 import { getEnvelopePoints, formatEnvelopeValue } from "../src/audio/envelope.ts";
 
 test("all eight generators use the shared defaults, including string", () => {
@@ -64,9 +64,9 @@ test.each([
   expect(() => createStore().set(updateEnvelopeAtom, { key, value })).toThrow(RangeError);
 });
 
-test("controller getters combine the current generator with the shared envelope", () => {
+test("audio getters combine the current generator with the shared envelope", () => {
   const store = createStore();
-  const controller = createPlayground(store).settings;
+  const controller = createAudioSettings(store);
   store.set(updateEnvelopeAtom, { key: "a", value: 100 });
   store.set(updateSettingAtom, { key: "waveform", value: "sin" });
   expect(controller.getSelectedWaveformInfo()).toMatchObject({ gen: "OscGen", a: 100 });

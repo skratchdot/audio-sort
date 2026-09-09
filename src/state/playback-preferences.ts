@@ -1,6 +1,6 @@
-import { atom } from "jotai/vanilla";
+import { atom } from "jotai";
 
-export type PlayerId = "base" | "sort";
+import type { PlayerId } from "./players";
 type PlaybackPreferences = Readonly<{
   autoPlay: boolean;
   loop: Readonly<Record<PlayerId, boolean>>;

@@ -295,11 +295,15 @@ test("Base UI dialogs trap focus, report invalid edits, and close on cached-page
   await expect(dialog).toBeHidden();
   await expect(trigger).toBeFocused();
   await trigger.click();
+  const requestCount = await page.evaluate(() => globalThis.sortRequests.length);
   await page.evaluate(() => {
     globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pagehide", { persisted: true }));
     globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pageshow", { persisted: true }));
   });
   await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect
+    .poll(() => page.evaluate(() => globalThis.sortRequests.length))
+    .toBe(requestCount + 1);
   await trigger.click();
   await expect(page.locator("#new-sort-name")).toHaveValue("");
 });
@@ -1203,3 +1207,36 @@ for (const filename of ["about", "api"]) {
     expect(missing).toEqual([]);
   });
 }
+
+test("provider state preserves custom algorithms and preferences across navigation", async ({
+  page,
+}) => {
+  await page.goto("./");
+  await page.locator("#sort-autoplay").click();
+  await page.locator('#sort-player [data-action="loop"]').click();
+  await page.locator("#add-algorithm-btn").click();
+  await page.locator("#new-sort-name").fill("Navigation test");
+  const editor = page.locator("[data-panel=new-sort-algorithm] .js-editor.ace_editor");
+  await expect(editor).toBeVisible();
+  await editor.click();
+  await page.keyboard.type("AS.play(0);");
+  await page.locator("#save-algorithm-new").click();
+  const algorithm = page.locator("#sort-options button").filter({ hasText: "Navigation test" });
+  await algorithm.click();
+  const id = await algorithm.getAttribute("data-sort");
+  await page.locator('[data-visualization="flat"]').click();
+  await page.locator("#header-nav").getByRole("link", { name: "About", exact: true }).click();
+  await expect(page.locator("#playground")).toHaveCount(0);
+  expect(
+    await page.evaluate(() => globalThis.sortWorkers.every((worker) => worker.wasTerminated)),
+  ).toBe(true);
+  await page.locator("#header-nav").getByRole("link", { name: "Home", exact: true }).click();
+  await expect(page.locator("#sort-options li.active button")).toHaveAttribute("data-sort", id);
+  await expect(page.locator("#sort-autoplay")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator('#sort-player [data-action="loop"]')).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
+  await expect(page.locator('[data-visualization="flat"]')).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#sort-svg path.line")).toHaveCount(12);
+});

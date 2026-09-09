@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
+import { usePlayground } from "./playground-context";
+import { visualizationAtom } from "../../state/players";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { settingsAtom } from "@/state/settings";
 import { algorithmCatalogAtom } from "@/state/algorithm-overrides";
 import { playbackPreferencesAtom, toggleAutoPlayAtom } from "@/state/playback-preferences";
@@ -8,17 +9,17 @@ import { OptionButton } from "@/components/option-button";
 import { ControlIcon } from "@/components/control-icon";
 import { Info, CirclePlus, ChartNoAxesColumnIncreasing, List } from "lucide-react";
 import { Counters } from "./playback-controls";
-import type { Props } from "../../controllers/playground-types";
 export function SortSidebar({
-  runtime,
   onDialog: setModal,
-}: Props & { onDialog: (modal: "sort" | "add-algorithm") => void }) {
-  const store = runtime.store;
-  const selected = useAtomValue(settingsAtom, { store });
-  const catalog = useAtomValue(algorithmCatalogAtom, { store });
-  const preferences = useAtomValue(playbackPreferencesAtom, { store });
-  const toggleAutoPlay = useSetAtom(toggleAutoPlayAtom, { store });
-  const [visualization, setVisualization] = useState("bar");
+}: {
+  onDialog: (modal: "sort" | "add-algorithm") => void;
+}) {
+  const actions = usePlayground();
+  const selected = useAtomValue(settingsAtom);
+  const catalog = useAtomValue(algorithmCatalogAtom);
+  const preferences = useAtomValue(playbackPreferencesAtom);
+  const toggleAutoPlay = useSetAtom(toggleAutoPlayAtom);
+  const [visualization, setVisualization] = useAtom(visualizationAtom);
   return (
     <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_5rem] gap-4">
       <div className="min-w-0">
@@ -43,7 +44,7 @@ export function SortSidebar({
                 type="button"
                 data-sort={id}
                 aria-pressed={id === selected.sort}
-                onClick={() => runtime.select(id)}
+                onClick={() => actions.select(id)}
               >
                 {algorithm.display}
               </OptionButton>
@@ -85,14 +86,13 @@ export function SortSidebar({
               aria-pressed={id === visualization}
               onClick={() => {
                 setVisualization(id!);
-                runtime.visualization(id);
               }}
             >
               <ControlIcon icon={id === "bar" ? ChartNoAxesColumnIncreasing : List} />
             </Button>
           ))}
         </div>
-        <Counters runtime={runtime} />
+        <Counters />
       </div>
     </div>
   );

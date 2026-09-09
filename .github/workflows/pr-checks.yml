@@ -30,11 +30,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint, format, test, and build
-        run: pnpm run check
-
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
+
+      - name: Lint, format, test, and build
+        run: pnpm run check
 
       - name: Test the built site and worker
         run: pnpm run test:browser
