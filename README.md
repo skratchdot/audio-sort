@@ -55,6 +55,8 @@ See [development documentation](docs/development.md) for browser tests and deplo
 ### Articles and references
 
 - [Wikipedia: Sorting Algorithms](https://en.wikipedia.org/wiki/Sorting_algorithm): An overview of sorting methods, complexity, and stability.
+- [Princeton: Algorithms, 4th edition](https://algs4.cs.princeton.edu/20sorting/): A sorting textbook companion with explanations, analysis, and Java implementations.
+- [CMU: Sorting lower bounds (PDF)](https://www.cs.cmu.edu/~avrim/451f11/lectures/lect0913.pdf): Lecture notes explaining the limits of comparison-based sorting.
 - [c2.com: Sorting Algorithms](https://wiki.c2.com/?SortingAlgorithms): Community wiki discussions of sorting techniques.
 - [Visualising Sorting Algorithms by Aldo Cortesi](https://corte.si/posts/code/visualisingsorting/): An explanation of static sorting diagrams and how to read them.
 - [Visualizing Algorithms by Mike Bostock](https://bost.ocks.org/mike/algorithms/): An illustrated essay on explaining algorithms through visualization.
@@ -63,6 +65,7 @@ See [development documentation](docs/development.md) for browser tests and deplo
 
 ### Interactive visualizations
 
+- [Sort Algorithms](https://sortalgorithms.com/): Interactive visualizations of classic sorting algorithms and novelty sorts.
 - [Sorting Algorithms Animations](https://www.toptal.com/developers/sorting-algorithms): Compare sorting methods across different input arrangements.
 - [Visual Sorts on Canvas by Joshua Kehn](https://www.joshuakehn.com/blog/static/sort.html): Compare JavaScript sorting algorithms with canvas animations and adjustable input data.
 - [Data Structure Visualizations](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html): Interactive teaching demos covering sorting, trees, graphs, and other data structures.
@@ -75,11 +78,13 @@ See [development documentation](docs/development.md) for browser tests and deplo
 
 ### Sorting with sound
 
+- [Sounds of Sorting by Casey Rule](https://www.caseyrule.com/projects/sorting/): Sorts musical pitches with configurable pitch sets and separate sounds for reads and writes.
 - [Assortment - webcloud.se](https://webcloud.se/Assortment/): A browser experiment combining sorting and sound.
 - [Sound Of Sorting: Downloadable App](https://panthema.net/2013/sound-of-sorting/): A desktop application that visualizes sorting and turns comparisons into sound.
 
-### Videos and animation galleries
+### Videos and visual galleries
 
+- [sortvis.org](https://sortvis.org/): Static diagrams showing how items move through different sorting algorithms.
 - [YouTube: Visualization of Quick Sort](https://www.youtube.com/watch?v=aXXWXz5rF64): A video demonstration of quicksort.
 - [YouTube: 15 Sorting Algorithms in 6 Minutes](https://www.youtube.com/watch?v=kPRA0W1kECg): A video comparing the sights and sounds of 15 sorting algorithms.
 - [YouTube: What different sorting algorithms sound like](https://www.youtube.com/watch?v=t8g-iYGHpEA): A video comparison of sorting algorithms through sound.
