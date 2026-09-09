@@ -43,7 +43,7 @@ export default defineConfig({
       env: { node: false, browser: true },
     },
     {
-      files: ["src/worker.mjs"],
+      files: ["src/sorting/worker.ts"],
       env: { browser: false, worker: true },
     },
   ],

@@ -7,10 +7,10 @@ import {
   addAlgorithmAtom,
   editAlgorithmAtom,
 } from "../../state/algorithm-overrides.ts";
-import { algorithms } from "../../sorting/algorithm-registry.mjs";
-import { sources } from "../../sorting/algorithm-sources.mjs";
+import { algorithms } from "../../sorting/algorithm-registry.ts";
+import { sources } from "../../sorting/algorithm-sources.ts";
 import { getFunctionBody } from "../../sorting/sort-requests.ts";
-import type { createCodeEditor } from "./create-code-editor.mjs";
+import type { createCodeEditor } from "./create-code-editor.ts";
 import { PlayerDialog as Dialog } from "./player-dialog.tsx";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,7 @@ export function AlgorithmDialog({ adding, onClose }: { adding: boolean; onClose:
   useEffect(() => {
     let cancelled = false;
     let instance: ReturnType<typeof createCodeEditor> | undefined;
-    void import("./create-code-editor.mjs")
+    void import("./create-code-editor.ts")
       .then(({ createCodeEditor }) => {
         if (cancelled) return;
         instance = createCodeEditor(host.current!);

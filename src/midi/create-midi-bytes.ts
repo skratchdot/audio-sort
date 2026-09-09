@@ -1,7 +1,14 @@
+import type { SortFrame } from "../sorting/sort-types";
 import Midi from "jsmidgen";
 
 // Keep the original export timing and velocity independent of library defaults.
-export function createMidiBytes(data, getMidiNumber, tempo, channel, instrument) {
+export function createMidiBytes(
+  data: readonly SortFrame[],
+  getMidiNumber: (value: number) => number,
+  tempo: number,
+  channel: number,
+  instrument: number,
+) {
   const duration = 64;
   let totalDuration = 0;
 
@@ -13,13 +20,11 @@ export function createMidiBytes(data, getMidiNumber, tempo, channel, instrument)
   midiFile.addTrack(midiTrack);
 
   // build midi track
-  for (let i = 0; i < data.length; i++) {
-    const info = data[i];
-    const play = [];
+  for (const info of data) {
+    const play: number[] = [];
     totalDuration += duration;
     // get the notes we need to play
-    for (let j = 0; j < info.arr.length; j++) {
-      const currentItem = info.arr[j];
+    for (const currentItem of info.arr) {
       if (currentItem.play) {
         const midiNumber = getMidiNumber(currentItem.value);
         if (midiNumber >= 0 && midiNumber < 128) {
@@ -30,14 +35,14 @@ export function createMidiBytes(data, getMidiNumber, tempo, channel, instrument)
     // note on
     for (let j = 0; j < play.length; j++) {
       if (j === 0) {
-        midiTrack.noteOn(channel, play[j], duration, 100);
+        midiTrack.noteOn(channel, play[j]!, duration, 100);
       } else {
-        midiTrack.noteOn(channel, play[j], 0, 100);
+        midiTrack.noteOn(channel, play[j]!, 0, 100);
       }
     }
     // note off
     for (let j = 0; j < play.length; j++) {
-      midiTrack.noteOff(channel, play[j], 0, 100);
+      midiTrack.noteOff(channel, play[j]!, 0, 100);
     }
   }
 

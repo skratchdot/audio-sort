@@ -1,15 +1,27 @@
-import { createTimbreAudio } from "./create-timbre-audio.mjs";
+import type { AudioSettings } from "./audio-settings";
+import type { createSoundfont } from "./create-soundfont";
+import type { PlayerState } from "../state/players";
+import type { SortFrame } from "../sorting/sort-types";
+import type { VisualizationType } from "../visualizations/visualization-types";
+
+type Options = {
+  settings: AudioSettings;
+  getMidiNumber: (value: number) => number;
+  soundfont: ReturnType<typeof createSoundfont>;
+  isLooping: () => boolean;
+  onUpdate: (state: PlayerState) => void;
+};
+import { createTimbreAudio } from "./create-timbre-audio.ts";
 import { createTransport } from "./create-transport.ts";
-import { timbre } from "./timbre.mjs";
+import { timbre } from "./timbre.ts";
 import { visualizations } from "../visualizations/visualization-types.ts";
-import { createMidiBytes } from "../midi/create-midi-bytes.mjs";
+import { createMidiBytes } from "../midi/create-midi-bytes.ts";
 import { drawStringPreview } from "./string-preview.ts";
 
 // Owns transport and audio resources; React renders the published chart data.
-export function createPlayer({ settings, getMidiNumber, soundfont, isLooping, onUpdate }) {
-  let data = [];
-  /** @type {import('../visualizations/visualization-types.ts').VisualizationType} */
-  let renderer = "bar";
+export function createPlayer({ settings, getMidiNumber, soundfont, isLooping, onUpdate }: Options) {
+  let data: SortFrame[] = [];
+  let renderer: VisualizationType = "bar";
   let disposed = false;
   const audio = createTimbreAudio(
     timbre,
@@ -39,30 +51,29 @@ export function createPlayer({ settings, getMidiNumber, soundfont, isLooping, on
     onStart: audio.start,
     onSuspend: audio.suspend,
     onFrame(index) {
-      audio.playFrame(data[index]);
+      audio.playFrame(data[index]!);
       draw();
     },
   });
   audio.refresh();
-  /** @param {import('../visualizations/visualization-types.ts').VisualizationType} name */
-  const setVisualization = (name) => {
+  const setVisualization = (name: VisualizationType) => {
     if (!Object.hasOwn(visualizations, name)) return;
     renderer = name;
     draw();
   };
   return {
-    setData(value) {
+    setData(value: SortFrame[]) {
       if (disposed) return;
       data = value;
       transport.setLength(data.length);
       draw();
     },
     setVisualization,
-    seek(value) {
+    seek(value: number) {
       transport.seek(value);
       draw();
     },
-    async action(action) {
+    async action(action: string) {
       await transport.whenReady(audio.resume(), () => {
         if (action === "stop") transport.stop();
         else if (action === "play" || action === "reverse") transport.play(action === "reverse");
@@ -82,13 +93,13 @@ export function createPlayer({ settings, getMidiNumber, soundfont, isLooping, on
     setTempo: transport.setTempo,
     setVolume: audio.setVolume,
     refresh: audio.refresh,
-    plot(canvas) {
+    plot(canvas: HTMLCanvasElement | null) {
       if (!canvas) return;
-      canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+      canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
       if (settings.getSelected("waveform") === "string") drawStringPreview(canvas);
       else audio.plot({ target: canvas, background: "rgba(255,255,255,0)" });
     },
-    getMidiBytes: (tempo, channel, instrument) =>
+    getMidiBytes: (tempo: number, channel: number, instrument: number) =>
       createMidiBytes(data, getMidiNumber, tempo, channel, instrument),
     destroy() {
       if (disposed) return;

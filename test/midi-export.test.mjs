@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { createMidiBytes } from "../src/midi/create-midi-bytes.mjs";
+import { createMidiBytes } from "../src/midi/create-midi-bytes.ts";
 
 const frames = [
   {

@@ -10,11 +10,11 @@ import { updateEnvelopeAtom } from "../src/state/envelope.ts";
 import { editAlgorithmAtom, algorithmCatalogAtom } from "../src/state/algorithm-overrides.ts";
 import { toggleAutoPlayAtom } from "../src/state/playback-preferences.ts";
 import { playerAtoms, sortErrorAtom, suspendedAtom } from "../src/state/players.ts";
-import { createPlayer } from "../src/audio/create-player.mjs";
-import { createTimbreSoundfont } from "../src/audio/create-timbre-soundfont.mjs";
+import { createPlayer } from "../src/audio/create-player.ts";
+import { createTimbreSoundfont } from "../src/audio/create-timbre-soundfont.ts";
 
-vi.mock("../src/audio/timbre.mjs", () => ({ timbre: {} }));
-vi.mock("../src/audio/create-player.mjs", () => ({
+vi.mock("../src/audio/timbre.ts", () => ({ timbre: {} }));
+vi.mock("../src/audio/create-player.ts", () => ({
   createPlayer: vi.fn(() => ({
     destroy: vi.fn(),
     suspend: vi.fn(),
@@ -29,7 +29,7 @@ vi.mock("../src/audio/create-player.mjs", () => ({
     action: vi.fn(),
   })),
 }));
-vi.mock("../src/audio/create-timbre-soundfont.mjs", () => ({
+vi.mock("../src/audio/create-timbre-soundfont.ts", () => ({
   createTimbreSoundfont: vi.fn(() => ({
     setInstrument: vi.fn(),
     preload: vi.fn(),

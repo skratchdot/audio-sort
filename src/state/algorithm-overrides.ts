@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { algorithms } from "../sorting/algorithm-registry.mjs";
+import { algorithms } from "../sorting/algorithm-registry.ts";
 import type { SortAlgorithm } from "../sorting/sort-types.ts";
 
 // Types for the existing function properties, not a new algorithm format.

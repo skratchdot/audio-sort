@@ -99,7 +99,7 @@ export function useSort(session: AudioSession | null) {
         accept(handleSortRequest(request));
         return;
       }
-      worker = new Worker(new URL("../sorting/worker.mjs", import.meta.url), { type: "module" });
+      worker = new Worker(new URL("../sorting/worker.ts", import.meta.url), { type: "module" });
       worker.addEventListener("message", (event: MessageEvent<SortResponse>) => accept(event.data));
       worker.addEventListener("error", (event) => accept({ key, error: event.message }));
       worker.postMessage(request);
