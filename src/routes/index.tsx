@@ -37,4 +37,17 @@ function Home() {
   );
 }
 
-export const Route = createFileRoute("/")({ component: Home });
+export const Route = createFileRoute("/")({
+  component: Home,
+  head: () => ({
+    links: [
+      {
+        rel: "preload",
+        as: "image",
+        type: "image/webp",
+        href: `${import.meta.env.BASE_URL}img/gradient_squares.webp`,
+        fetchPriority: "high",
+      },
+    ],
+  }),
+});
