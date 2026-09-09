@@ -51,7 +51,7 @@ export function PlayerChart({ runtime, id }: Props & { id: PlayerId }) {
       id={`${id}-svg`}
       aria-label={id === "base" ? "Input data visualization" : "Sorting visualization"}
       className={cn(
-        "h-full w-full rounded-lg border border-neutral-300 bg-neutral-100 bg-[url('/img/gradient_squares.png')] bg-center bg-repeat",
+        "h-full w-full rounded-lg border border-neutral-300 bg-neutral-100 bg-[url('/img/gradient_squares.webp')] bg-center bg-repeat",
         id === "base" && "cursor-pointer touch-none",
       )}
       viewBox={flat ? `0 0 ${Math.max(1, frames.length - 1)} ${Math.max(1, size)}` : undefined}

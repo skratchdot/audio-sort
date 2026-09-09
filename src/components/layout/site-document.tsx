@@ -14,9 +14,10 @@ export function SiteDocument({ children }: { children: ReactNode }) {
         <meta name="description" content="audio, sorting algorithms, visualizations" />
         <meta name="author" content="skratchdot.com" />
         <link
-          rel="shortcut icon"
+          rel="icon"
           type="image/png"
-          href={`${import.meta.env.BASE_URL}img/favicon.ico`}
+          sizes="32x32"
+          href={`${import.meta.env.BASE_URL}img/favicon.png`}
         />
         <link rel="stylesheet" href={stylesheet} />
         <HeadContent />
