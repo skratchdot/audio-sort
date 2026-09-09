@@ -8,7 +8,7 @@ plus additional variants, networks, and external sorts. Each algorithm name link
 its Wikipedia article or the relevant parent article when it has no separate page.
 
 Implementation status checked against the [registry](../src/sorting/algorithm-registry.mjs)
-on 2026-09-07. Only registered built-ins count as implemented; historical files and
+on 2026-09-08. Only registered built-ins count as implemented; historical files and
 custom editor examples do not.
 
 ## Reading the tables
@@ -184,4 +184,4 @@ general sorting implementations; the app requires an ordered permutation of the 
 
 When adding an algorithm, choose its exact variant, confirm the bounds from its paper
 or reference implementation, test duplicate-key stability and identity preservation,
-and update both this catalog and the app metadata. Follow [Adding algorithms](adding-algorithms.md).
+and update both this catalog and the app metadata. Follow [Adding algorithms](development.md#adding-algorithms).
