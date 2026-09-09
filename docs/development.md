@@ -42,9 +42,14 @@ repository's Pages source to **GitHub Actions**. No Node server is deployed.
 | `pnpm run format` / `pnpm run format:check` | Format files / check formatting                                       |
 | `pnpm run spellcheck`                       | CSpell checks                                                         |
 | `pnpm run typecheck`                        | Strict checking of application TypeScript; `.mjs` is not type-checked |
-| `pnpm test` / `pnpm run test:watch`         | Unit tests / watch mode                                               |
+| `pnpm test` / `pnpm run test:watch`         | Node and Chromium hook tests / watch mode                             |
 
-Run browser tests against a completed build:
+Vitest runs pure unit tests in Node and React hook tests in Chromium through its
+Playwright provider. Install Chromium once with `pnpm exec playwright install chromium`
+before running `pnpm test` or `pnpm run check`. To run only Node tests, use
+`pnpm test --project=node`.
+
+The separate Playwright suite tests the completed production build:
 
 ```sh
 pnpm exec playwright install chromium

@@ -1,10 +1,9 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
-import { useSetAtom, useStore } from "jotai";
+import { useStore } from "jotai";
 import { saveAs } from "file-saver";
 import { usePlayers } from "../../hooks/use-players";
 import { useSort } from "../../hooks/use-sort";
 import { settingsAtom } from "../../state/settings";
-import { toggleLoopAtom } from "../../state/playback-preferences";
 import { suspendedAtom, type PlayerId } from "../../state/players";
 
 function useActions() {
@@ -12,16 +11,11 @@ function useActions() {
   const session = usePlayers(canvas);
   const sorting = useSort(session);
   const store = useStore();
-  const toggleLoop = useSetAtom(toggleLoopAtom);
   return {
     ...sorting,
     setCanvas,
     async action(id: PlayerId, name: string) {
       if (!session || store.get(suspendedAtom)) return;
-      if (name === "loop") {
-        toggleLoop(id);
-        return;
-      }
       if (["play", "reverse", "stop"].includes(name))
         session.players[id === "base" ? "sort" : "base"].suspend();
       await session.players[id].action(name);

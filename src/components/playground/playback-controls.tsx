@@ -3,8 +3,8 @@ import { playerAtoms } from "../../state/players";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import { ValueSlider } from "@/components/value-slider";
-import { useAtomValue } from "jotai";
-import { playbackPreferencesAtom } from "../../state/playback-preferences.ts";
+import { useAtomValue, useSetAtom } from "jotai";
+import { playbackPreferencesAtom, toggleLoopAtom } from "../../state/playback-preferences.ts";
 import type { PlayerId } from "../../state/players";
 import { FastForward, Rewind, SkipBack, SkipForward, Square, RotateCcw } from "lucide-react";
 import { ControlIcon } from "../control-icon.tsx";
@@ -32,6 +32,7 @@ export function Counters() {
 export function Transport({ id }: { id: PlayerId }) {
   const actions = usePlayground();
   const state = useAtomValue(playerAtoms[id]);
+  const toggleLoop = useSetAtom(toggleLoopAtom);
   const preferences = useAtomValue(playbackPreferencesAtom);
   return (
     <div id={`${id}-player`} className="flex min-h-8 flex-wrap items-center justify-between gap-2">
@@ -82,7 +83,7 @@ export function Transport({ id }: { id: PlayerId }) {
           className="aria-pressed:bg-muted aria-pressed:shadow-inner"
           data-action="loop"
           pressed={preferences.loop[id]}
-          onPressedChange={() => void actions.action(id, "loop")}
+          onPressedChange={() => toggleLoop(id)}
         >
           <ControlIcon icon={RotateCcw} /> <span>Loop?</span>
         </Toggle>

@@ -1,4 +1,3 @@
-// @vitest-environment jsdom
 // cspell:words unstub
 import { afterEach, expect, test, vi } from "vitest";
 import { createElement } from "react";
