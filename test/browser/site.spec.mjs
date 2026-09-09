@@ -510,6 +510,11 @@ test("all built-ins can be edited and saved from readable production source", as
       .locator("[data-panel=sort-algorithm] .js-editor.ace_editor")
       .evaluate((element) => globalThis.ace.edit(element).getValue());
     expect(source).toContain("AS.");
+    expect(source).toBe(source.trim());
+    if (id === "bubble") {
+      expect(source).toContain("\nlet swapped;");
+      expect(source).toContain("\n  swapped = false;");
+    }
     await page.locator("#save-algorithm-edit").click();
     await expect(page.locator("#modal-sort")).toBeHidden();
     await page.locator(`#sort-options [data-sort="${id}"]`).click();

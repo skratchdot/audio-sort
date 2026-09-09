@@ -34,15 +34,13 @@ export function AlgorithmDialog({ adding, onClose }: { adding: boolean; onClose:
         if (cancelled) return;
         instance = createCodeEditor(host.current!);
         editor.current = instance;
-        instance.setValue(
-          adding
-            ? ""
-            : getFunctionBody(
-                algorithm === algorithms[sort as keyof typeof algorithms]
-                  ? sources[sort as keyof typeof sources]
-                  : algorithm,
-              ),
-        );
+        const builtin = algorithm === algorithms[sort as keyof typeof algorithms];
+        const body = adding
+          ? ""
+          : getFunctionBody(builtin ? sources[sort as keyof typeof sources] : algorithm);
+        // Built-ins use two-space function indentation. Preserve custom source verbatim,
+        // since changing whitespace inside a template literal can change its value.
+        instance.setValue(builtin ? body.replace(/^ {2}/gm, "").trim() : body);
         instance.clearSelection();
         setStatus("ready");
       })
