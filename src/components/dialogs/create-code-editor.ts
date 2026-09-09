@@ -7,7 +7,7 @@ import javascriptWorkerUrl from "ace-builds/src-min-noconflict/worker-javascript
 // Let Vite emit the worker and resolve it at both / and /audio-sort/.
 ace.config.setModuleUrl("ace/mode/javascript_worker", javascriptWorkerUrl);
 
-export function createCodeEditor(element) {
+export function createCodeEditor(element: HTMLElement) {
   const editor = ace.edit(element);
   editor.setOptions({
     theme: "ace/theme/monokai",
@@ -17,7 +17,13 @@ export function createCodeEditor(element) {
   const session = editor.getSession();
   session.on("changeMode", () => {
     // The editor contains a function body with AS supplied by the runner.
-    session.$worker?.call("changeOptions", [{ esversion: 11, globals: { AS: false } }]);
+    // Ace creates this worker after setting the mode, but omits it from EditSession's types.
+    const worker = (
+      session as typeof session & {
+        $worker?: { call(command: string, args: unknown[]): void };
+      }
+    ).$worker;
+    worker?.call("changeOptions", [{ esversion: 11, globals: { AS: false } }]);
   });
   session.setMode("ace/mode/javascript");
   return editor;

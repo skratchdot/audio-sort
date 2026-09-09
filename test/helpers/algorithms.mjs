@@ -1,6 +1,6 @@
 import { readdirSync } from "node:fs";
 import { createContext, runInContext } from "node:vm";
-import { algorithms } from "../../src/sorting/algorithm-registry.mjs";
+import { algorithms } from "../../src/sorting/algorithm-registry.ts";
 import { createSortEngine } from "../../src/sorting/create-sort-engine.ts";
 
 const root = new URL("../../", import.meta.url);

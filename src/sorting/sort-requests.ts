@@ -1,4 +1,4 @@
-import { algorithms } from "./algorithm-registry.mjs";
+import { algorithms } from "./algorithm-registry.ts";
 import { createSortEngine } from "./create-sort-engine.ts";
 import type {
   SortAlgorithm,

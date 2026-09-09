@@ -31,7 +31,7 @@ function useActions() {
         instrument,
       );
       saveAs(
-        new Blob([Uint8Array.from(bytes as string, (char) => char.charCodeAt(0))], {
+        new Blob([Uint8Array.from(bytes, (char) => char.charCodeAt(0))], {
           type: "audio/midi",
         }),
         `${filename}.mid`,

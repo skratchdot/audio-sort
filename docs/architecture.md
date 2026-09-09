@@ -21,8 +21,10 @@ Paths below are relative to `src/`; `@/` aliases that directory.
 | `visualizations/`                               | Pure trajectory geometry and visualization types                         |
 | `utilities/`                                    | Stateless helpers for arrays, randomness, and CSS classes                |
 
-TypeScript and JavaScript coexist. Built-in algorithms and editable function bodies
-remain JavaScript. Third-party JavaScript comes from package imports.
+Application modules use TypeScript. The eight built-in algorithm implementations
+remain JavaScript because their raw source populates the JavaScript editor.
+Third-party JavaScript comes from package imports; `types/` describes the browser
+APIs missing from the libraries' declarations.
 
 ## UI and lifecycle
 
@@ -76,10 +78,10 @@ contain `{ key, frames }` or `{ key, error }`. Without Worker support, the same
 handler runs on the main thread. Custom JavaScript has no security sandbox, and the
 worker does not impose an execution or frame budget.
 
-`sorting/algorithm-registry.mjs` holds frozen built-ins. Jotai stores custom
+`sorting/algorithm-registry.ts` holds frozen built-ins. Jotai stores custom
 additions and overrides separately and derives the combined catalog. Source is
 compiled before updating state; duplicate IDs are rejected.
-`sorting/algorithm-sources.mjs` imports readable source separately for the editor,
+`sorting/algorithm-sources.ts` imports readable source separately for the editor,
 so source strings are not included in the worker bundle.
 
 ## Audio
@@ -87,18 +89,18 @@ so source strings are not included in the worker bundle.
 `audio/create-transport.ts` owns timing, position, direction, looping, and pending
 resume invalidation. Its clock and effects are injected. Stop allows note tails
 to finish; suspension/disposal silences owned nodes.
-`audio/create-timbre-audio.mjs` connects transport events to synthesis and previews.
+`audio/create-timbre-audio.ts` connects transport events to synthesis and previews.
 Waveforms share the envelope in `state/envelope.ts`; the string preview is
 illustrative rather than a sampled live waveform.
 
 `audio/create-soundfont.ts` shares a sample cache between both players, deduplicates
 requests, allows retries, and aborts fetches after ten seconds. Cache misses load
-without playing a late note. `audio/create-timbre-soundfont.mjs` decodes MP3s with
+without playing a late note. `audio/create-timbre-soundfont.ts` decodes MP3s with
 the existing AudioContext and feeds buffers to Timbre. Disposal aborts requests
 and ignores late results. The GeneralUser GS sample bank and instrument/note
 mapping were retained during modernization.
 
-`audio/timbre.mjs` imports `timbre/timbre.dev.js`, not its Node entry.
+`audio/timbre.ts` imports `timbre/timbre.dev.js`, not its Node entry.
 `pnpm-workspace.yaml` excludes unused `speaker` and `readable-stream` dependencies;
 Vite maps the bundle's CommonJS `global` to `globalThis`. Timbre publishes a global
 as a side effect, but application code uses its import. `package.json` permits

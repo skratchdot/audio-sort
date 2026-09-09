@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { createHelpers } from "../src/midi/create-helpers.mjs";
-import { createPlayer } from "../src/audio/create-player.mjs";
+import { createHelpers } from "../src/midi/create-helpers.ts";
+import { createPlayer } from "../src/audio/create-player.ts";
 import { visualizations } from "../src/visualizations/visualization-types.ts";
 
 test("UI modules import without DOM initialization or first-party globals", () => {

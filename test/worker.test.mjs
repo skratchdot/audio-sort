@@ -1,7 +1,7 @@
 import { createSortEngine } from "../src/sorting/create-sort-engine.ts";
 import { describe, expect, test, vi } from "vitest";
-import { algorithms } from "../src/sorting/algorithm-registry.mjs";
-import { sources } from "../src/sorting/algorithm-sources.mjs";
+import { algorithms } from "../src/sorting/algorithm-registry.ts";
+import { sources } from "../src/sorting/algorithm-sources.ts";
 import {
   createSortRequest,
   getFunctionBody,

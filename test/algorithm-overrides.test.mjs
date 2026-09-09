@@ -1,6 +1,6 @@
 import { expect, test, vi } from "vitest";
 import { createStore } from "jotai/vanilla";
-import { algorithms } from "../src/sorting/algorithm-registry.mjs";
+import { algorithms } from "../src/sorting/algorithm-registry.ts";
 import {
   algorithmCatalogAtom,
   editAlgorithmAtom,

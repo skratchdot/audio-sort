@@ -1,14 +1,15 @@
+import type { Timbre } from "timbre/timbre.dev.js";
 import { createSoundfont } from "./create-soundfont.ts";
 
 // Native decoding replaces JSONP and the bundled JS MP3 decoder. Continue routing
 // samples through Timbre so they share the existing mixer with waveform playback.
-export function createTimbreSoundfont(timbre) {
+export function createTimbreSoundfont(timbre: Timbre) {
   return createSoundfont({
     decode: (bytes) => timbre.fn._audioContext.decodeAudioData(bytes),
     createSample(decoded) {
       const left = decoded.getChannelData(0);
       const right = decoded.numberOfChannels > 1 ? decoded.getChannelData(1) : left;
-      const mix = Float32Array.from(left, (value, index) => (value + right[index]) / 2);
+      const mix = Float32Array.from(left, (value, index) => (value + right[index]!) / 2);
       const sample = timbre("buffer", {
         buffer: { samplerate: decoded.sampleRate, buffer: [mix, left, right] },
       }).on("ended", function () {

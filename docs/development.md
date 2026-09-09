@@ -94,8 +94,8 @@ The [sorting catalog](sorting-algorithms.md) records candidates and implementati
 
 1. Add `src/sorting/algorithms/<id>.mjs` with a default function and metadata,
    following an existing implementation. Use its `AS` argument; see the [API](api.md).
-2. Register its stable ID in `src/sorting/algorithm-registry.mjs`.
-3. Add a raw-source import and entry in `src/sorting/algorithm-sources.mjs`.
+2. Register its stable ID in `src/sorting/algorithm-registry.ts`.
+3. Add a raw-source import and entry in `src/sorting/algorithm-sources.ts`.
 4. Update the catalog, then run `pnpm run check` and `pnpm run test:browser`.
 
 Keep the function body self-contained: imported helpers are unavailable when the

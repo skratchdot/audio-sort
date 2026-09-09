@@ -7,7 +7,7 @@ keep appearing. This catalog covers the named sorts in Wikipedia's
 plus additional variants, networks, and external sorts. Each algorithm name links to
 its Wikipedia article or the relevant parent article when it has no separate page.
 
-Implementation status checked against the [registry](../src/sorting/algorithm-registry.mjs)
+Implementation status checked against the [registry](../src/sorting/algorithm-registry.ts)
 on 2026-09-08. Only registered built-ins count as implemented; historical files and
 custom editor examples do not.
 

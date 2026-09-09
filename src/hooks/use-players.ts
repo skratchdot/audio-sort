@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAtomValue, useStore } from "jotai";
-import { createPlayer } from "../audio/create-player.mjs";
-import { createTimbreSoundfont } from "../audio/create-timbre-soundfont.mjs";
-import { timbre } from "../audio/timbre.mjs";
+import { createPlayer } from "../audio/create-player.ts";
+import { createTimbreSoundfont } from "../audio/create-timbre-soundfont.ts";
+import { timbre } from "../audio/timbre.ts";
 import { createAudioSettings } from "../audio/audio-settings";
-import { createHelpers } from "../midi/create-helpers.mjs";
+import { createHelpers } from "../midi/create-helpers.ts";
 import { settingsAtom } from "../state/settings";
 import { selectedWaveformAtom } from "../state/waveforms";
 import { playbackPreferencesAtom } from "../state/playback-preferences";
