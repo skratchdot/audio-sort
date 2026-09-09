@@ -46,7 +46,7 @@ export function Settings({ runtime }: Props) {
         ))}
       </TabsList>
       <div id="settings-content" className="min-h-72 rounded-lg border bg-card p-4">
-        <TabsContent value="audio" id="audio" keepMounted>
+        <TabsContent value="audio" data-panel="audio" keepMounted>
           {(
             [
               ["volume", "Volume", selected.volume.toFixed(2)],
@@ -102,10 +102,10 @@ export function Settings({ runtime }: Props) {
             {selected.audioType} settings
           </Button>
         </TabsContent>
-        <TabsContent value="waveform" id="waveform" keepMounted>
+        <TabsContent value="waveform" data-panel="waveform" keepMounted>
           <WaveformControls store={store} />
         </TabsContent>
-        <TabsContent value="scale" id="scale" keepMounted>
+        <TabsContent value="scale" data-panel="scale" keepMounted>
           <FilteredOptions
             id="scale"
             label="Scale"
@@ -114,7 +114,7 @@ export function Settings({ runtime }: Props) {
             onSelect={(value) => update({ key: "scale", value })}
           />
         </TabsContent>
-        <TabsContent value="soundfont" id="soundfont" keepMounted>
+        <TabsContent value="soundfont" data-panel="soundfont" keepMounted>
           <FilteredOptions
             id="soundfont"
             label="Soundfont"

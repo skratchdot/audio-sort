@@ -107,3 +107,20 @@ Add primitives with `pnpm dlx shadcn@latest add <component>`. `components.json`
 selects Base UI, Nova, and Lucide. Theme defaults live in `src/styles/globals.css`;
 components own their Tailwind classes. See [architecture](architecture.md) for
 module ownership and the current layout.
+
+## Accessibility
+
+Oxlint enables `jsx-a11y` correctness rules. The semantic-tag preference is disabled
+because SVG/canvas images and live regions legitimately use ARIA. Documentation
+table regions retain keyboard focus for scrolling. Shared links and labels forward
+content and associations explicitly so lint can inspect them.
+
+The browser suite runs axe on Home, About, API, settings tabs, and editor/export
+dialogs. Run just these checks with `pnpm run test:browser --grep 'accessibility:'`
+after building. Tests check the rendered DOM, including generated ARIA references
+that static lint cannot validate. Base UI owns tab-panel IDs; use `data-panel` for
+stable test selectors rather than overriding those IDs.
+
+For release review, also run Lighthouse on the production build and manually check
+keyboard navigation, focus restoration, and screen-reader labels. A clean automated
+audit does not establish complete accessibility.

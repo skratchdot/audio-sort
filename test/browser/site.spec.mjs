@@ -256,7 +256,7 @@ test("React controls work without Bootstrap, jQuery, or classic vendor scripts",
   await page.locator("#tab-audio").focus();
   await page.keyboard.press("ArrowRight");
   await expect(page.locator("#tab-waveform")).toBeFocused();
-  await expect(page.locator("#waveform")).toBeVisible();
+  await expect(page.locator("[data-panel=waveform]")).toBeVisible();
   await page.keyboard.press("ArrowRight");
   await expect(page.locator("#tab-scale")).toBeFocused();
   await page.locator("#scale-filter").fill("[");
@@ -282,7 +282,7 @@ test("Base UI dialogs trap focus, report invalid edits, and close on cached-page
   await page.locator("#new-sort-name").fill("Invalid algorithm");
   await expect(page.locator("#save-algorithm-new")).toBeEnabled();
   await page
-    .locator("#new-sort-algorithm .js-editor.ace_editor")
+    .locator("[data-panel=new-sort-algorithm] .js-editor.ace_editor")
     .evaluate((element) => globalThis.ace.edit(element).setValue("let = ;"));
   await page.locator("#save-algorithm-new").click();
   await expect(dialog.getByRole("alert")).toBeVisible();
@@ -423,11 +423,13 @@ test("Ace loads on demand and a closed dialog cannot finish initializing", async
   await expect(page.locator("#modal-sort")).toBeHidden();
   releaseEditor();
   await expect.poll(() => page.evaluate(() => typeof globalThis.ace)).toBe("object");
-  await expect(page.locator("#sort-algorithm .js-editor.ace_editor")).toHaveCount(0);
+  await expect(page.locator("[data-panel=sort-algorithm] .js-editor.ace_editor")).toHaveCount(0);
   await page.locator("#add-algorithm-btn").click();
   await page.locator("#new-sort-name").fill("Lazy editor");
   await expect(page.locator("#save-algorithm-new")).toBeEnabled();
-  await expect(page.locator("#new-sort-algorithm .js-editor.ace_editor")).toHaveCount(1);
+  await expect(page.locator("[data-panel=new-sort-algorithm] .js-editor.ace_editor")).toHaveCount(
+    1,
+  );
   expect(editorRequests).toHaveLength(1);
 });
 
@@ -456,7 +458,7 @@ test("editor supports modern JavaScript, syntax diagnostics, and two-space soft 
   await page.goto("./");
   await page.locator("#modal-sort-open").click();
   await expect(page.locator("#modal-sort")).toBeVisible();
-  const editor = page.locator("#sort-algorithm .js-editor.ace_editor");
+  const editor = page.locator("[data-panel=sort-algorithm] .js-editor.ace_editor");
   await page.locator("#modal-sort [role=tab]:last-child").click();
   await editor.evaluate((element) => {
     const editor = globalThis.ace.edit(element);
@@ -501,7 +503,7 @@ test("all built-ins can be edited and saved from readable production source", as
     await expect(page.locator("#modal-sort")).toBeVisible();
     const display = await page.locator("#sort-info-display").textContent();
     const source = await page
-      .locator("#sort-algorithm .js-editor.ace_editor")
+      .locator("[data-panel=sort-algorithm] .js-editor.ace_editor")
       .evaluate((element) => globalThis.ace.edit(element).getValue());
     expect(source).toContain("AS.");
     await page.locator("#save-algorithm-edit").click();
@@ -544,7 +546,7 @@ for (const fallback of [false, true]) {
     await page.locator("#add-algorithm-btn").click();
     await page.locator("#new-sort-name").fill("Custom smoke");
     await page
-      .locator("#new-sort-algorithm .js-editor.ace_editor")
+      .locator("[data-panel=new-sort-algorithm] .js-editor.ace_editor")
       .evaluate((element) => globalThis.ace.edit(element).setValue("AS.play(0);"));
     await page.locator("#save-algorithm-new").click();
     await expect(page.locator("#modal-add-algorithm")).toBeHidden();
@@ -710,7 +712,9 @@ test("teardown clears owned resources and repeated remounts do not duplicate UI 
   const initialSliderCount = await page.locator("input[type=range]").count();
   for (let cycle = 0; cycle < 2; cycle++) {
     await page.locator("#add-algorithm-btn").click();
-    await expect(page.locator("#new-sort-algorithm .js-editor.ace_editor")).toHaveCount(1);
+    await expect(page.locator("[data-panel=new-sort-algorithm] .js-editor.ace_editor")).toHaveCount(
+      1,
+    );
     await page.evaluate(() => {
       globalThis.dispatchEvent(
         new globalThis.PageTransitionEvent("pagehide", { persisted: false }),
@@ -772,7 +776,9 @@ test("destroy during an editor download cannot initialize a stale editor", async
     globalThis.dispatchEvent(new globalThis.PageTransitionEvent("pageshow", { persisted: true })),
   );
   await page.locator("#add-algorithm-btn").click();
-  await expect(page.locator("#new-sort-algorithm .js-editor.ace_editor")).toHaveCount(1);
+  await expect(page.locator("[data-panel=new-sort-algorithm] .js-editor.ace_editor")).toHaveCount(
+    1,
+  );
 });
 
 test("teardown cancels pending audio resume without removing unrelated native listeners", async ({
@@ -847,7 +853,7 @@ test("resizing and saving a selected algorithm update sorting without reselectin
   await page.locator("#modal-sort-open").click();
   await page.locator("#modal-sort [role=tab]:last-child").click();
   await page
-    .locator("#sort-algorithm .js-editor.ace_editor")
+    .locator("[data-panel=sort-algorithm] .js-editor.ace_editor")
     .evaluate((element) => globalThis.ace.edit(element).setValue("AS.play(0);"));
   await page.locator("#save-algorithm-edit").click();
   await expect.poll(() => page.evaluate(() => globalThis.sortRequests.at(-1)?.type)).toBe("custom");
@@ -929,8 +935,8 @@ test("audio settings render selections and survive subscription reconnection", a
   await page.goto("./");
   await page.locator("#settings #tab-waveform").click();
   await expect(page.locator("#waveform-adshr-attack-display")).toHaveText("50 ms");
-  await page.locator('#waveform button[data-waveform="sin"]').click();
-  await expect(page.locator('#waveform button[data-waveform="sin"]')).toHaveAttribute(
+  await page.locator('[data-panel=waveform] button[data-waveform="sin"]').click();
+  await expect(page.locator('[data-panel=waveform] button[data-waveform="sin"]')).toHaveAttribute(
     "aria-pressed",
     "true",
   );
@@ -1031,7 +1037,10 @@ test("envelope controls preserve the compact settings panel", async ({ page }) =
     const before = await page.locator("#sort-section").boundingBox();
     await page.locator("#settings #tab-waveform").click();
     await expect(page.locator("#envelope-controls label").first()).toHaveCSS("font-size", "12px");
-    await expect(page.locator("#waveform button").first()).toHaveCSS("font-size", "12.8px");
+    await expect(page.locator("[data-panel=waveform] button").first()).toHaveCSS(
+      "font-size",
+      "12.8px",
+    );
     const after = await page.locator("#sort-section").boundingBox();
     expect(Math.abs(after.y - before.y)).toBeLessThanOrEqual(2);
     const panel = await page.locator("#settings-content").boundingBox();
@@ -1059,7 +1068,7 @@ test("waveform envelope edits survive switching presets", async ({ page }) => {
   for (const thumb of await thumbs.all()) await expect(thumb).toBeVisible();
   await page.locator("#envelope-controls label").first().click();
   await expect(page.getByRole("slider", { name: "Attack", exact: true })).toBeFocused();
-  await page.locator('#waveform button[data-waveform="string"]').click();
+  await page.locator('[data-panel=waveform] button[data-waveform="string"]').click();
   const display = page.locator("#waveform-adshr-attack-display");
   const preview = page.locator("#waveform-canvas");
   await expect(preview).toHaveAttribute("aria-label", /String: illustrative/);
@@ -1084,7 +1093,7 @@ test("waveform envelope edits survive switching presets", async ({ page }) => {
   await slider.press("ArrowRight");
   await expect(display).not.toHaveText("50 ms");
   const attack = await display.textContent();
-  await page.locator('#waveform button[data-waveform="sin"]').click();
+  await page.locator('[data-panel=waveform] button[data-waveform="sin"]').click();
   await expect(display).toHaveText(attack);
   await expect(preview).toHaveAttribute("aria-label", "sin oscillator waveform");
   expect(await preview.evaluate((canvas) => canvas.toDataURL())).not.toBe(stringPreview);
@@ -1097,7 +1106,7 @@ test("waveform envelope edits survive switching presets", async ({ page }) => {
     "aria-label",
     /sustain 51% for 200 ms/,
   );
-  await page.locator('#waveform button[data-waveform="string"]').click();
+  await page.locator('[data-panel=waveform] button[data-waveform="string"]').click();
   await expect(display).toHaveText(attack);
   expect(await preview.evaluate((canvas) => canvas.toDataURL())).toBe(stringPreview);
   expect(errors).toEqual([]);

@@ -119,7 +119,12 @@ export function AlgorithmDialog({
           </TabsList>
         )}
         {!adding && (
-          <TabsContent value="information" id="sort-information" keepMounted className="min-h-72">
+          <TabsContent
+            value="information"
+            data-panel="sort-information"
+            keepMounted
+            className="min-h-72"
+          >
             <table>
               <tbody>
                 {(
@@ -150,7 +155,7 @@ export function AlgorithmDialog({
         )}
         <TabsContent
           value="algorithm"
-          id={adding ? "new-sort-algorithm" : "sort-algorithm"}
+          data-panel={adding ? "new-sort-algorithm" : "sort-algorithm"}
           keepMounted
         >
           <div className="js-editor h-72 w-full" ref={host} />

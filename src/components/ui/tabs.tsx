@@ -59,7 +59,8 @@ function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
   );
 }
 
-function TabsContent({ className, ...props }: TabsPrimitive.Panel.Props) {
+// Base UI owns panel IDs so tab aria-controls references stay in sync.
+function TabsContent({ className, ...props }: Omit<TabsPrimitive.Panel.Props, "id">) {
   return (
     <TabsPrimitive.Panel
       data-slot="tabs-content"
