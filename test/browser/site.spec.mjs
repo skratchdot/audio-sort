@@ -208,7 +208,11 @@ test("header stays within the viewport without sharing widgets", async ({ page }
     await expect(page.locator("#header .home-link")).toHaveCSS("font-weight", "700");
     await expect(page.locator("#header .home-link")).toHaveCSS("font-family", /^Impact,/);
     await expect(page.locator("#header-author")).not.toHaveCSS("font-family", /^Impact,/);
-    await expect(navigation.locator("a")).toHaveText(["Home", "About", "API", "Source"]);
+    await expect(navigation.locator("a")).toHaveText(["Home", "About", "API", ""]);
+    await expect(navigation.getByRole("link", { name: "Source on GitHub" })).toHaveAttribute(
+      "href",
+      "https://github.com/skratchdot/audio-sort/",
+    );
     const titleBox = await title.boundingBox();
     const navBox = await navigation.boundingBox();
     for (const box of [titleBox, navBox]) {
@@ -1152,7 +1156,9 @@ test("prerendered pages and navigation remain readable without JavaScript", asyn
     await expect(page.locator("noscript p")).toContainText("Enable JavaScript");
     await page.locator("#header-nav").getByRole("link", { name: "About", exact: true }).click();
     await expect(page.locator("#about")).toContainText('"hear" what sorting algorithms sound like');
-    await page.locator("#header-nav").getByRole("link", { name: "API", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Why it started in 2013" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "What changed in 2026" })).toBeVisible();
+    await page.locator("#about").getByRole("link", { name: "Algorithm API", exact: true }).click();
     await expect(page.getByRole("region", { name: "Algorithm API reference" })).toContainText(
       "AS.swap",
     );
