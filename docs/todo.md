@@ -1,27 +1,28 @@
-# Audio Sort
+# TODO
 
-## Todo List
+Open ideas and maintenance work, not an ordered roadmap. Completed migration
+history lives in Git; [About](about.md) summarizes the project story.
 
-- Add waveform visualization in header while audio is playing
+## Algorithms and recording
 
-- Add more sorting algorithms; see the [catalog](sorting-algorithms.md).
+- Add more algorithms; see the [catalog](sorting-algorithms.md).
+- Design recorded writes and auxiliary buffers for Merge, Counting, and Radix,
+  preserving item identity and showing intermediate work.
+- Review frame-recording behavior, including the extra terminal frame and how
+  marker calls are grouped into playback steps.
 
-- Improve visualizations / transitions. Allow filtering of what to show / play.
+## Maintenance
 
-- Add "use defaults" button for audio controls
+- Complete the audio migration listening review using the
+  [audio checklist](architecture.md#audio). Automated tests are not a listening review.
+- Review third-party attribution across dependencies, adapted code/data, and audio assets.
+- Extend TypeScript coverage to remaining JavaScript runtime modules where useful.
 
-- Add popovers on sort selection with info about the sort's performance
+## Interface ideas
 
-- Allow defaults to be set via url parameters
-
-- Add "share settings" button which would populate the url based on your current settings
-
-- Fix the play intervalCallback() function. Shouldn't be looping so much in there. The
-  program was running faster before I re-factored a bunch of stuff and added this stupid loop.
-
-- Review engine frame-recording quirks.
-
-## Maintenance ideas
-
-See the ordered [modernization plan](modernization.md) for TypeScript, state,
-UI, site-build, and remaining vendor-script migrations.
+- Add a waveform visualization in the header during playback.
+- Improve transitions and allow filtering which operations are shown or played.
+- Add a reset-to-defaults action for audio controls.
+- Make algorithm performance information easier to discover. It is already
+  available in the selected algorithm's Information tab; inline hints are optional.
+- Support URL-based settings and a share-settings action.

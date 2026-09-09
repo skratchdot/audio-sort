@@ -1,70 +1,50 @@
 # Development
 
-Use Node.js 24 or newer and the pnpm version pinned in `package.json`, installed with
-your preferred version manager (such as mise) or the [pnpm installer](https://pnpm.io/installation).
-Run commands from the repository root; `pnpm install --frozen-lockfile` installs the
-locked dependencies. Use `pnpm add` / `pnpm add -D` for dependency changes and commit
-the resulting `pnpm-lock.yaml`. Do not generate an npm lockfile.
+Use Node.js 24+ and the pnpm version in `package.json`.
 
-## Build and preview
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+```
 
-`pnpm dev` serves the site with live updates (`pnpm start` is an alias).
-`pnpm build` creates `dist/audio-sort/`; `pnpm preview` serves that production build.
-Development uses `http://localhost:5173/audio-sort/`; preview uses
-`http://localhost:8080/audio-sort/` by default.
+Open `http://localhost:5173/audio-sort/`. Use `pnpm add` / `pnpm add -D` for
+dependency changes and commit `pnpm-lock.yaml`.
 
-TanStack Start prerenders the React pages and Vite bundles JavaScript and CSS.
-Site files live in `src/`; tests and tool configuration stay at the root.
-Only the contents of `dist/audio-sort/` are deployed. Build-time server files live in ignored `.tanstack/`;
-GitHub Pages needs no Node server.
+## Build and deployment
 
-The shared base is `/audio-sort/` in development, preview, tests, and production.
-Routes are `/audio-sort/`, `/audio-sort/about`, and `/audio-sort/api`; the latter two are deployed as directory
-index files. A static host may append a trailing slash on direct visits.
+`pnpm build` prerenders the site into `dist/audio-sort/`. `pnpm preview` serves
+`dist/` with sirv at `http://localhost:8080/audio-sort/`, without server rendering
+or an SPA fallback. Build-time server files stay in ignored `.tanstack/`.
 
-Preview uses `sirv-cli` to serve `dist/` as static files only, with no server
-rendering or SPA fallback. There are no deployment-specific build commands or
-base-path environment variables.
+Development, preview, tests, and deployment share the `/audio-sort/` base.
+The public pages are Home, About, and API. About/API emit directory index files;
+static hosts may append a trailing slash. The legacy `/audio-sort/index.html`
+route redirects to Home in the router.
 
-Prerendering automatically discovers static routes; new static pages need no extra
-build configuration. Link crawling is disabled because Start currently duplicates
-base-prefixed URLs in the Pages build. Dynamic routes would need concrete URLs
-supplied explicitly.
+TanStack Start discovers static routes automatically. Link crawling is disabled
+because it duplicates base-prefixed URLs in this build. Dynamic routes need
+explicit URLs for prerendering. Start generates `src/route-tree.gen.ts`; commit it but
+do not edit it manually.
 
-Static files live in root-level `public/`: images in `public/img/` and the
-`.nojekyll` marker. There are no vendored JavaScript files. Files are copied unchanged
-to `dist/audio-sort/` without a `public/` URL prefix. Use `/img/...` in source CSS; Vite
-adjusts these URLs for the deployment path. Application modules and CSS stay in `src/`.
+Assets in `public/` are copied unchanged into the output, including `.nojekyll`.
+For source CSS images, use `/img/...`; Vite adjusts those URLs for the site base.
 
-CSS is bundled and minified by Vite. `src/styles/globals.css` contains Tailwind and
-shadcn theme tokens; component classes own layout, controls, and SVG chart styling.
-React chart components live in `src/components/visualizations/`.
-
-Add primitives with `pnpm dlx shadcn@latest add <component>`. `components.json`
-selects Base UI, the Nova preset, neutral base colors, and Lucide icons. Keep shared
-primitives in `src/components/ui/`, screen controls in `src/components/playground/`,
-and dialogs in `src/components/dialogs/`. Non-React coordination lives in `src/controllers/`.
-Use `lg:` for the application's stacked/side-by-side layout; avoid adding extra width tiers.
+GitHub Actions runs checks and browser tests for PRs and deployment. The Pages
+workflow uploads the tested `dist/audio-sort/` without rebuilding. Set the
+repository's Pages source to **GitHub Actions**. No Node server is deployed.
 
 ## Checks
 
-`pnpm run check` runs lint, formatting and spelling checks, TypeScript checking, unit tests, and a production build.
+| Command                                     | Purpose                                                               |
+| ------------------------------------------- | --------------------------------------------------------------------- |
+| `pnpm run check`                            | Lint, formatting, spelling, types, unit tests, and production build   |
+| `pnpm run lint`                             | Oxlint checks                                                         |
+| `pnpm run format` / `pnpm run format:check` | Format files / check formatting                                       |
+| `pnpm run spellcheck`                       | CSpell checks                                                         |
+| `pnpm run typecheck`                        | Strict checking of application TypeScript; `.mjs` is not type-checked |
+| `pnpm test` / `pnpm run test:watch`         | Unit tests / watch mode                                               |
 
-- `pnpm run lint`: check first-party JavaScript and TypeScript with Oxlint.
-- `pnpm run spellcheck`: check spelling in source, docs, and configuration with CSpell.
-- `pnpm run typecheck`: check TypeScript modules and React pages with strict settings; no files are emitted.
-- `pnpm run format`: format with Oxfmt; `pnpm run format:check` checks without editing.
-- `pnpm test`: run unit tests; `pnpm run test:watch` reruns them while editing.
-
-TypeScript can infer imported JavaScript modules (`allowJs`), but `checkJs` stays
-off until those modules are migrated. Worker payloads are still checked at runtime.
-
-Vendor and generated files are excluded from linting and formatting. Oxfmt formats
-source CSS and TSX alongside JavaScript. `src/components/layout/site-document.tsx` owns the
-shared document, header, and footer. Start generates `src/route-tree.gen.ts` from
-`src/routes/`; commit that file but do not edit it manually.
-
-Run browser tests against a completed production build:
+Run browser tests against a completed build:
 
 ```sh
 pnpm exec playwright install chromium
@@ -72,74 +52,58 @@ pnpm run build
 pnpm run test:browser
 ```
 
-Do not rebuild `dist/` while browser tests are running. To use an existing Chrome
-installation, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its executable path.
+Do not rebuild while browser tests run. To use installed Chrome, set
+`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its executable path. Tests cover static
+URLs, navigation without JavaScript, editing, workers, playback, and UI lifecycle.
+External audio services are stubbed; audible output and the real sample host need
+manual checks. See [audio maintenance](architecture.md#audio) and [TODO](todo.md).
 
-Browser tests serve the completed production build at `/audio-sort/`.
-They cover page URLs, workers, editor behavior,
-and UI controls. External services are stubbed; audible output and remote soundfonts
-need manual testing. Known bugs are tracked in [TODO](todo.md).
-
-## Spelling
-
-`cspell.config.ts` is the shared spelling configuration. CSpell loads TypeScript
-natively with our supported Node version; no extra loader is needed. Checks use
-US English, respect `.gitignore`, and exclude lock files, generated routes, and
-public assets. The original scale catalogue (`src/midi/scales.ts`) is also excluded
-instead of maintaining a dictionary of its names. Spelling also runs in CI through `pnpm run check`.
-
-Keep accepted vocabulary in version control:
-
-- `.cspell/project.txt`: project names, dependencies, and sorting terminology.
-- `.cspell/music.txt`: instrument terminology.
-- Config `overrides`: terms specific to a file or group, such as names in README references.
-
-Keep dictionary files lowercase and alphabetized, one word per line. Fix real typos before
-adding words; do not accept an entire error report automatically. Use a narrow
-`cspell:disable-next-line` directive with an explanation for non-language data
-such as binary signatures, rather than disabling a whole file. Avoid broad regex
-exclusions that hide prose or comments.
-
-The optional VS Code Code Spell Checker extension can use the same configuration
-(use a current version). Add shared terms to the repository dictionaries, not a
-personal editor word list, so local checks and CI agree.
-
-See CSpell's [configuration reference](https://cspell.org/docs/Configuration) and
-[custom dictionary example](https://cspell.org/docs/getting-started).
-
-## Deployment
-
-GitHub Actions runs checks and browser tests for PRs and before deployment.
-CI uses the latest Node.js LTS release. Check/build jobs have a 10-minute timeout;
-the deployment job has a 5-minute timeout.
-CI builds once, tests that build, and uploads `dist/audio-sort/` without rebuilding.
-The repository's Pages
-publishing source must be **GitHub Actions**.
-
-## Reference
-
-- [Modernization plan](modernization.md)
-
-- [Architecture](architecture.md)
-- [Adding algorithms](adding-algorithms.md)
+CSpell configuration lives in `cspell.config.ts`. Add accepted vocabulary to
+`.cspell/project.txt` or `.cspell/music.txt`, lowercase and alphabetized. Use narrow
+config overrides for file-specific terms. Fix typos instead of broadly excluding
+prose. The original scale catalog is excluded; its attribution stays in source.
 
 ## Markdown site pages
 
-Edit `docs/about.md` and `docs/api.md` to update the public About and API pages.
-The shared `src/components/docs-page.tsx` renderer supports Markdown headings,
-lists, links, fenced code, and GitHub-style tables. Raw HTML is not rendered.
-Content is included in the static HTML, so it remains readable without JavaScript.
+Edit [about.md](about.md) and [api.md](api.md) for the public pages.
+`src/components/docs-page.tsx` supports headings, lists, links, fenced code, and
+GitHub-style tables. Raw HTML is not rendered. Content is prerendered and readable
+without JavaScript. API-specific rendering adds marker swatches.
 
 To publish another document:
 
-1. Add a Markdown file in `docs/`, with a single `#` page title.
-2. Copy a small route such as `src/routes/about.tsx`, change its route path, and
-   import your document with Vite's `?raw` suffix. Static routes are prerendered automatically.
-3. Add its filename and route to `documentRoutes` in `src/components/docs-page.tsx`
-   so relative Markdown links such as `api.md` resolve to the published page.
-4. Add a link in `src/components/layout/header.tsx` if it belongs in navigation.
+1. Add a Markdown file in `docs/` with one `#` page title.
+2. Copy `src/routes/about.tsx`, change the route path and element ID, and import
+   the document with Vite's `?raw` suffix. Set a descriptive table label if needed.
+3. Add its filename and route to `documentRoutes` in `src/components/docs-page.tsx`.
+4. Add a header link if it belongs in navigation. Update the browser test's page
+   and navigation expectations when adding a route or link.
 
-Use application paths such as `/` for Home and `api.md` for another published
-Markdown document. The renderer uses router links to preserve the `/audio-sort/`
-base and client navigation. Use full repository URLs for development documents
-that are not published. Adding a file to `docs/` alone does not publish it.
+Use `/` for Home and `api.md` for another published document. Router links preserve
+`/audio-sort/` and client navigation. Link unpublished development docs through
+full repository URLs. Adding a file to `docs/` alone does not publish it.
+
+## Adding algorithms
+
+The [sorting catalog](sorting-algorithms.md) records candidates and implementation status.
+
+1. Add `src/sorting/algorithms/<id>.mjs` with a default function and metadata,
+   following an existing implementation. Use its `AS` argument; see the [API](api.md).
+2. Register its stable ID in `src/sorting/algorithm-registry.mjs`.
+3. Add a raw-source import and entry in `src/sorting/algorithm-sources.mjs`.
+4. Update the catalog, then run `pnpm run check` and `pnpm run test:browser`.
+
+Keep the function body self-contained: imported helpers are unavailable when the
+body is copied into the editor. Declare helpers inside the function. Choose the
+exact variant before assigning complexity and stability metadata.
+
+Tests discover algorithm files and check registry/source coverage, sorting,
+item preservation, counters, and metadata. Browser tests run each built-in in a
+worker and after saving it through the editor.
+
+## UI components
+
+Add primitives with `pnpm dlx shadcn@latest add <component>`. `components.json`
+selects Base UI, Nova, and Lucide. Theme defaults live in `src/styles/globals.css`;
+components own their Tailwind classes. See [architecture](architecture.md) for
+module ownership and the current layout.
