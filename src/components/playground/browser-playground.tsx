@@ -1,40 +1,35 @@
 import { useEffect, useState } from "react";
-import { createStore } from "jotai/vanilla";
-import { SortingPlayground } from "./sorting-playground.tsx";
-import { createPlayground } from "../../controllers/create-playground.mjs";
-
-const store = createStore();
-type Runtime = ReturnType<typeof createPlayground>;
+import { useSetAtom } from "jotai";
+import { suspendedAtom, pageLifecycleAtom } from "../../state/players";
+import { SortingPlayground } from "./sorting-playground";
+import { PlaygroundProvider } from "./playground-context";
 
 export function BrowserPlayground() {
-  const [runtime, setRuntime] = useState<Runtime | null>(null);
+  const [mounted, setMounted] = useState(true);
+  const setLifecycle = useSetAtom(pageLifecycleAtom);
+  const setSuspended = useSetAtom(suspendedAtom);
   useEffect(() => {
-    let current: Runtime | null = null;
-    const mount = () => {
-      current = createPlayground(store);
-      setRuntime(current);
+    setSuspended(false);
+    const hide = (event: PageTransitionEvent) => {
+      setSuspended(true);
+      setLifecycle((value) => value + 1);
+      if (!event.persisted) setMounted(false);
     };
-    const onPageHide = (event: PageTransitionEvent) => {
-      if (event.persisted) current?.suspend();
-      else {
-        current?.destroy();
-        current = null;
-        setRuntime(null);
-      }
-    };
-    const onPageShow = (event: PageTransitionEvent) => {
+    const show = (event: PageTransitionEvent) => {
       if (!event.persisted) return;
-      if (current) current.resume();
-      else mount();
+      setSuspended(false);
+      setMounted(true);
     };
-    mount();
-    globalThis.addEventListener("pagehide", onPageHide);
-    globalThis.addEventListener("pageshow", onPageShow);
+    globalThis.addEventListener("pagehide", hide);
+    globalThis.addEventListener("pageshow", show);
     return () => {
-      globalThis.removeEventListener("pagehide", onPageHide);
-      globalThis.removeEventListener("pageshow", onPageShow);
-      current?.destroy();
+      globalThis.removeEventListener("pagehide", hide);
+      globalThis.removeEventListener("pageshow", show);
     };
-  }, []);
-  return runtime ? <SortingPlayground runtime={runtime} /> : null;
+  }, [setSuspended, setLifecycle]);
+  return mounted ? (
+    <PlaygroundProvider>
+      <SortingPlayground />
+    </PlaygroundProvider>
+  ) : null;
 }

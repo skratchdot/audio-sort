@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { settingsAtom } from "../../state/settings.ts";
 import {
   algorithmCatalogAtom,
@@ -11,17 +11,14 @@ import { algorithms } from "../../sorting/algorithm-registry.mjs";
 import { sources } from "../../sorting/algorithm-sources.mjs";
 import { getFunctionBody } from "../../sorting/sort-requests.ts";
 import type { createCodeEditor } from "./create-code-editor.mjs";
-import type { Props } from "../../controllers/playground-types.ts";
 import { PlayerDialog as Dialog } from "./player-dialog.tsx";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-export function AlgorithmDialog({
-  runtime,
-  adding,
-  onClose,
-}: Props & { adding: boolean; onClose: () => void }) {
-  const { sort } = useAtomValue(settingsAtom, { store: runtime.store });
-  const catalog = useAtomValue(algorithmCatalogAtom, { store: runtime.store });
+export function AlgorithmDialog({ adding, onClose }: { adding: boolean; onClose: () => void }) {
+  const addAlgorithm = useSetAtom(addAlgorithmAtom);
+  const editAlgorithm = useSetAtom(editAlgorithmAtom);
+  const { sort } = useAtomValue(settingsAtom);
+  const catalog = useAtomValue(algorithmCatalogAtom);
   const algorithm = catalog[sort]!;
   const [name, setName] = useState("");
   const [tab, setTab] = useState(adding ? "algorithm" : "information");
@@ -70,12 +67,12 @@ export function AlgorithmDialog({
     try {
       if (adding) {
         if (!name.trim()) return;
-        runtime.store.set(addAlgorithmAtom, {
+        addAlgorithm({
           id: `custom_${crypto.randomUUID()}`,
           name: name.trim(),
           source: editor.current.getValue(),
         });
-      } else runtime.store.set(editAlgorithmAtom, { id: sort, source: editor.current.getValue() });
+      } else editAlgorithm({ id: sort, source: editor.current.getValue() });
       onClose();
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : String(error));

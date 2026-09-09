@@ -1,4 +1,4 @@
-import { scales } from "../midi/scales.ts";
+import { scales } from "./scales.ts";
 
 export function createHelpers(settings, dependencies = { scales }) {
   return {

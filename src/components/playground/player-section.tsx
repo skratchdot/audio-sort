@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ControlIcon } from "@/components/control-icon";
-import type { PlayerId } from "../../controllers/playground-types";
+import type { PlayerId } from "../../state/players";
 
 export function PlayerSection({
   id,

@@ -1,4 +1,4 @@
-import { atom } from "jotai/vanilla";
+import { atom } from "jotai";
 import { settingsAtom } from "./settings.ts";
 import { envelopeAtom, type Envelope } from "./envelope.ts";
 

@@ -1,7 +1,7 @@
 import { expect, test, vi } from "vitest";
 import { createStore } from "jotai/vanilla";
 import { defaults, settingsAtom, updateSettingAtom } from "../src/state/settings.ts";
-import { createPlayground } from "../src/controllers/create-playground.mjs";
+import { createAudioSettings } from "../src/audio/audio-settings.ts";
 
 test("settings retain all nine existing defaults", () => {
   const store = createStore();
@@ -39,10 +39,10 @@ test("stores are isolated, snapshots immutable, and updates notify only on chang
   expect(listener).toHaveBeenCalledTimes(1);
 });
 
-test("runtime audio settings getters read the current store, including falsy values and fallbacks", () => {
+test("audio settings getters read the current store, including falsy values and fallbacks", () => {
   const store = createStore();
-  const controller = createPlayground(store).settings;
-  const independent = createPlayground().settings;
+  const controller = createAudioSettings(store);
+  const independent = createAudioSettings(createStore());
   for (const [key, value] of Object.entries({
     volume: 0,
     tempo: 120,

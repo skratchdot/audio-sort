@@ -1,9 +1,9 @@
-import { createTimbreAudio } from "../audio/create-timbre-audio.mjs";
-import { createTransport } from "../audio/create-transport.ts";
-import { timbre } from "../audio/timbre.mjs";
+import { createTimbreAudio } from "./create-timbre-audio.mjs";
+import { createTransport } from "./create-transport.ts";
+import { timbre } from "./timbre.mjs";
 import { visualizations } from "../visualizations/visualization-types.ts";
 import { createMidiBytes } from "../midi/create-midi-bytes.mjs";
-import { drawStringPreview } from "../audio/string-preview.ts";
+import { drawStringPreview } from "./string-preview.ts";
 
 // Owns transport and audio resources; React renders the published chart data.
 export function createPlayer({ settings, getMidiNumber, soundfont, isLooping, onUpdate }) {

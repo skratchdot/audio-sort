@@ -1,3 +1,4 @@
+import { Provider } from "jotai";
 import type { ReactNode } from "react";
 import { HeadContent, Scripts } from "@tanstack/react-router";
 import { Header } from "./header.tsx";
@@ -25,7 +26,7 @@ export function SiteDocument({ children }: { children: ReactNode }) {
       <body className="flex min-h-dvh flex-col">
         <div id="wrapper" className="flow-root flex-1">
           <Header />
-          {children}
+          <Provider>{children}</Provider>
         </div>
         <Footer />
         <Scripts />

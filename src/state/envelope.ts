@@ -1,4 +1,4 @@
-import { atom } from "jotai/vanilla";
+import { atom } from "jotai";
 
 export type EnvelopeKey = "a" | "d" | "s" | "h" | "r";
 export type Envelope = Readonly<Record<EnvelopeKey, number>>;

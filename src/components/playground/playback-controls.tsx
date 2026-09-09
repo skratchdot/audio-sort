@@ -1,15 +1,16 @@
+import { usePlayground } from "./playground-context";
+import { playerAtoms } from "../../state/players";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import { ValueSlider } from "@/components/value-slider";
-import { useSyncExternalStore } from "react";
 import { useAtomValue } from "jotai";
 import { playbackPreferencesAtom } from "../../state/playback-preferences.ts";
-import type { Props, PlayerId } from "../../controllers/playground-types.ts";
+import type { PlayerId } from "../../state/players";
 import { FastForward, Rewind, SkipBack, SkipForward, Square, RotateCcw } from "lucide-react";
 import { ControlIcon } from "../control-icon.tsx";
 
-export function Counters({ runtime }: Props) {
-  const state = useSyncExternalStore(runtime.subscribe, () => runtime.getSnapshot().sort);
+export function Counters() {
+  const state = useAtomValue(playerAtoms.sort);
   return (
     <>
       {[
@@ -28,9 +29,10 @@ export function Counters({ runtime }: Props) {
     </>
   );
 }
-export function Transport({ runtime, id }: Props & { id: PlayerId }) {
-  const state = useSyncExternalStore(runtime.subscribe, () => runtime.getSnapshot()[id]);
-  const preferences = useAtomValue(playbackPreferencesAtom, { store: runtime.store });
+export function Transport({ id }: { id: PlayerId }) {
+  const actions = usePlayground();
+  const state = useAtomValue(playerAtoms[id]);
+  const preferences = useAtomValue(playbackPreferencesAtom);
   return (
     <div id={`${id}-player`} className="flex min-h-8 flex-wrap items-center justify-between gap-2">
       {id === "sort" && (
@@ -54,7 +56,7 @@ export function Transport({ runtime, id }: Props & { id: PlayerId }) {
             data-action={action}
             aria-label={`${id} ${label}`}
             title={label}
-            onClick={() => void runtime.action(id, action)}
+            onClick={() => void actions.action(id, action!)}
           >
             {action !== "play" && (
               <ControlIcon
@@ -80,7 +82,7 @@ export function Transport({ runtime, id }: Props & { id: PlayerId }) {
           className="aria-pressed:bg-muted aria-pressed:shadow-inner"
           data-action="loop"
           pressed={preferences.loop[id]}
-          onPressedChange={() => void runtime.action(id, "loop")}
+          onPressedChange={() => void actions.action(id, "loop")}
         >
           <ControlIcon icon={RotateCcw} /> <span>Loop?</span>
         </Toggle>
@@ -93,8 +95,9 @@ export function Transport({ runtime, id }: Props & { id: PlayerId }) {
   );
 }
 
-export function Scrubber({ runtime, id }: Props & { id: PlayerId }) {
-  const state = useSyncExternalStore(runtime.subscribe, () => runtime.getSnapshot()[id]);
+export function Scrubber({ id }: { id: PlayerId }) {
+  const actions = usePlayground();
+  const state = useAtomValue(playerAtoms[id]);
   return (
     <div className="mx-2 my-2">
       <ValueSlider
@@ -103,7 +106,7 @@ export function Scrubber({ runtime, id }: Props & { id: PlayerId }) {
         max={Math.max(0, state.length - 1)}
         step={1}
         value={state.position}
-        onChange={(value) => runtime.seek(id, value)}
+        onChange={(value) => actions.seek(id, value)}
       />
     </div>
   );

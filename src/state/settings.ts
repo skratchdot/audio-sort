@@ -1,4 +1,4 @@
-import { atom } from "jotai/vanilla";
+import { atom } from "jotai";
 import type { WaveformId } from "./waveforms.ts";
 
 export type Settings = Readonly<{

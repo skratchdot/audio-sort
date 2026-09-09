@@ -8,7 +8,6 @@ import { settingsAtom, updateSettingAtom, defaults } from "../../state/settings.
 import { scales } from "../../midi/scales.ts";
 import { instruments } from "../../midi/instruments.ts";
 import { WaveformControls } from "./waveform-controls.tsx";
-import type { Props } from "../../controllers/playground-types.ts";
 const scaleOptions = Object.entries(scales)
   .sort(
     ([, a], [, b]) =>
@@ -27,10 +26,9 @@ const instrumentOptions = instruments.map((item) => ({
   group: item.group,
 }));
 
-export function Settings({ runtime }: Props) {
-  const store = runtime.store;
-  const selected = useAtomValue(settingsAtom, { store });
-  const update = useSetAtom(updateSettingAtom, { store });
+export function Settings() {
+  const selected = useAtomValue(settingsAtom);
+  const update = useSetAtom(updateSettingAtom);
   const [tab, setTab] = useState("audio");
   const activeTab = ["waveform", "soundfont"].includes(tab) ? selected.audioType : tab;
   const note = selected.centerNote;
@@ -103,7 +101,7 @@ export function Settings({ runtime }: Props) {
           </Button>
         </TabsContent>
         <TabsContent value="waveform" data-panel="waveform" keepMounted>
-          <WaveformControls store={store} />
+          <WaveformControls />
         </TabsContent>
         <TabsContent value="scale" data-panel="scale" keepMounted>
           <FilteredOptions

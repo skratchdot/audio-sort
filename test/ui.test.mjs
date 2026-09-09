@@ -1,22 +1,16 @@
 import { expect, test } from "vitest";
-import { createPlayground } from "../src/controllers/create-playground.mjs";
-import { createHelpers } from "../src/controllers/create-helpers.mjs";
-import { createPlayer } from "../src/controllers/create-player.mjs";
+import { createHelpers } from "../src/midi/create-helpers.mjs";
+import { createPlayer } from "../src/audio/create-player.mjs";
 import { visualizations } from "../src/visualizations/visualization-types.ts";
 
 test("UI modules import without DOM initialization or first-party globals", () => {
   for (const name of ["A", "visualization"]) expect(Object.hasOwn(globalThis, name)).toBe(false);
-  const first = createPlayground();
-  const second = createPlayground();
-  expect(first).not.toBe(second);
-  expect(typeof first.mount).toBe("function");
-  expect(first.settings.getSelected("unknown", "fallback")).toBe("fallback");
   expect(typeof createPlayer).toBe("function");
   expect(Object.keys(visualizations).sort()).toEqual(["bar", "flat"]);
   for (const name of ["A", "visualization"]) expect(Object.hasOwn(globalThis, name)).toBe(false);
 });
 
-test("MIDI helper reads current settings from its injected controller", () => {
+test("MIDI helper reads current settings from its injected settings", () => {
   const selected = { scale: "test", dataSize: 8, centerNote: 60 };
   const helpers = createHelpers(
     { getSelected: (key) => selected[key] },
@@ -31,12 +25,4 @@ test("MIDI helper reads current settings from its injected controller", () => {
   expect(helpers.getMidiNumber(7)).toBe(65);
   selected.centerNote = 72;
   expect(helpers.getMidiNumber(4)).toBe(72);
-});
-
-test("destroying an unmounted playground is safe and prevents reuse", () => {
-  const controller = createPlayground();
-  controller.destroy();
-  controller.destroy();
-  controller.resume();
-  expect(() => controller.mount({})).toThrow("destroyed playground");
 });
