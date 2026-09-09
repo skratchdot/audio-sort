@@ -122,3 +122,24 @@ publishing source must be **GitHub Actions**.
 
 - [Architecture](architecture.md)
 - [Adding algorithms](adding-algorithms.md)
+
+## Markdown site pages
+
+Edit `docs/about.md` and `docs/api.md` to update the public About and API pages.
+The shared `src/components/docs-page.tsx` renderer supports Markdown headings,
+lists, links, fenced code, and GitHub-style tables. Raw HTML is not rendered.
+Content is included in the static HTML, so it remains readable without JavaScript.
+
+To publish another document:
+
+1. Add a Markdown file in `docs/`, with a single `#` page title.
+2. Copy a small route such as `src/routes/about.tsx`, change its route path, and
+   import your document with Vite's `?raw` suffix. Static routes are prerendered automatically.
+3. Add its filename and route to `documentRoutes` in `src/components/docs-page.tsx`
+   so relative Markdown links such as `api.md` resolve to the published page.
+4. Add a link in `src/components/layout/header.tsx` if it belongs in navigation.
+
+Use application paths such as `/` for Home and `api.md` for another published
+Markdown document. The renderer uses router links to preserve the `/audio-sort/`
+base and client navigation. Use full repository URLs for development documents
+that are not published. Adding a file to `docs/` alone does not publish it.
